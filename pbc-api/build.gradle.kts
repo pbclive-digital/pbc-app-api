@@ -23,7 +23,7 @@ dependencies {
     implementation(libs.spring.boot.starter)
 	implementation(libs.spring.boot.starter.web)
 	implementation(libs.spring.boot.starter.validation)
-	implementation(libs.spring.boot.starter.security)
+	//implementation(libs.spring.boot.starter.security)
 	implementation(libs.spring.boot.starter.thymeleaf)
 
     implementation(libs.kotlin.stdlib.jdk8)
@@ -34,12 +34,35 @@ dependencies {
 	testImplementation(libs.kotlin.test.junit5)
 }
 
+/**
+ * Fix the issue in running the app from java -jar
+ * https://codeutility.org/spring-boot-kotlin-gradle-error-main-method-not-found-in-class-stack-overflow/
+ */
+tasks.jar {
+    manifest {
+        attributes("Main-Class" to "com.kavi.pbc.live.api.PbcApiApplication")
+        attributes("Start-Class" to "com.kavi.pbc.live.api.PbcApiApplication")
+    }
+}
+
+tasks.register("stage") {
+    dependsOn("bootJar")
+}
+
+springBoot {
+    mainClass.set("com.kavi.pbc.live.api.PbcApiApplicationKt")
+}
+
+tasks.bootRun {
+    systemProperties["spring.profiles.active"] = "qa"
+}
+
 kotlin {
-	compilerOptions {
-		freeCompilerArgs.addAll("-Xjsr305=strict", "-Xannotation-default-target=param-property")
-	}
+    compilerOptions {
+        freeCompilerArgs.addAll("-Xjsr305=strict", "-Xannotation-default-target=param-property")
+    }
 }
 
 tasks.withType<Test> {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
