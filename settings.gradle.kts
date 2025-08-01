@@ -7,6 +7,8 @@ dependencyResolutionManagement {
 }
 
 listOf(
+    "module-firebase",
+    "module-data",
     "pbc-api"
 ).onEach {
     include(it)

@@ -6,7 +6,9 @@ junit5 = "2.1.21"
 jvmVersion = "24"
 kotlinSerialization = "1.4.0"
 kotlinLogging = "3.0.5"
-jsonVersion = "20220320"
+jsonVersion = "20231013"
+
+firebaseAdmin = "9.3.0"
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
@@ -28,6 +30,8 @@ kotlin-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-j
 kotlin-logging-jvm = { module = "io.github.microutils:kotlin-logging-jvm", version.ref = "kotlinLogging" }
 
 json = { module = "org.json:json", version.ref = "jsonVersion" }
+
+firebase-admin = { module = "com.google.firebase:firebase-admin", version.ref = "firebaseAdmin"}
 
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "springBoot" }
 kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "junit5" }

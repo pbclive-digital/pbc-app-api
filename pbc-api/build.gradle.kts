@@ -33,6 +33,9 @@ dependencies {
     implementation(libs.json)
     implementation(libs.kotlin.logging.jvm)
 
+    implementation(project(":module-firebase"))
+    implementation(project(":module-data"))
+
 	testImplementation(libs.spring.boot.starter.test)
 	testImplementation(libs.kotlin.test.junit5)
 }
@@ -66,6 +69,6 @@ kotlin {
     }
 }
 
-tasks.withType<Test> {
+tasks.test {
     useJUnitPlatform()
 }
