@@ -30,6 +30,9 @@ dependencies {
 	implementation(libs.kotlin.reflect)
 	implementation(libs.kotlin.serialization)
 
+    implementation(libs.json)
+    implementation(libs.kotlin.logging.jvm)
+
 	testImplementation(libs.spring.boot.starter.test)
 	testImplementation(libs.kotlin.test.junit5)
 }

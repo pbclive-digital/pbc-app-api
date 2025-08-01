@@ -5,6 +5,8 @@ kotlin = "2.2.0"
 junit5 = "2.1.21"
 jvmVersion = "24"
 kotlinSerialization = "1.4.0"
+kotlinLogging = "3.0.5"
+jsonVersion = "20220320"
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
@@ -23,6 +25,9 @@ spring-boot-starter-thymeleaf = { module = "org.springframework.boot:spring-boot
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
 kotlin-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinSerialization" }
+kotlin-logging-jvm = { module = "io.github.microutils:kotlin-logging-jvm", version.ref = "kotlinLogging" }
+
+json = { module = "org.json:json", version.ref = "jsonVersion" }
 
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "springBoot" }
 kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "junit5" }
