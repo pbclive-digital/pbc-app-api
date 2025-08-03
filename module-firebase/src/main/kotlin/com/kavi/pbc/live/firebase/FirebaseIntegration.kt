@@ -30,7 +30,6 @@ class FirebaseIntegration: DatastoreIntegration {
     }
 
     override fun init(env: IntegrationEnv) {
-        println("ENV: $env")
         FirebaseDataRepository::class.java.getResourceAsStream(getEnvFilePath(env)).use {
                 inputStream ->
             inputStream?.let {

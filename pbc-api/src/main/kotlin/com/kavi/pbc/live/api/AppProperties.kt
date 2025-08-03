@@ -10,4 +10,10 @@ class AppProperties {
 
     @Value("\${app.env}")
     lateinit var appEnv: String
+
+    @Value("\${ios.support.version}")
+    lateinit var iOSSupportVersion: String
+
+    @Value("\${android.support.version}")
+    lateinit var androidSupportVersion: String
 }

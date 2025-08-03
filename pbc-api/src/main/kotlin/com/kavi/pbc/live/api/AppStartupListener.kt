@@ -14,7 +14,6 @@ class AppStartupListener: ApplicationListener<ContextRefreshedEvent> {
     lateinit var appProperties: AppProperties
 
     override fun onApplicationEvent(event: ContextRefreshedEvent) {
-        println("App startup invoked")
         // Initialize firebase fire-store with environment
         initializeFirebase()
     }
