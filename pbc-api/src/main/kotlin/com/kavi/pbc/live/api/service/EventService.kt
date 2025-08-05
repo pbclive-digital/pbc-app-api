@@ -50,4 +50,31 @@ class EventService {
                 ))
         }
     }
+
+    fun getPastEvents(): ResponseEntity<BaseResponse<List<Event>>>? {
+        val properties = mapOf(
+            "eventStatus" to EventStatus.PASSED
+        )
+        val orderBy = mapOf(
+            "property" to "eventDate",
+            "direction" to "DESC"
+        )
+
+        val finalUpcomingEventList = dataRepository.getEntityListFromProperties(
+            entityCollection = DBConstant.EVENT_COLLECTION,
+            propertiesMap = properties,
+            orderByMap = orderBy,
+            className = Event::class.java
+        )
+
+        return if (finalUpcomingEventList.isNotEmpty()) {
+            ResponseEntity.ok(BaseResponse(Status.SUCCESS, finalUpcomingEventList, null))
+        } else {
+            ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error(HttpStatus.NOT_FOUND.toString()))
+                ))
+        }
+    }
 }
