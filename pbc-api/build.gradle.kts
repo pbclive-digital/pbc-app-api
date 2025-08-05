@@ -60,7 +60,7 @@ springBoot {
 }
 
 tasks.bootRun {
-    systemProperties["spring.profiles.active"] = "qa"
+    systemProperties["spring.profiles.active"] = "staging"
 }
 
 kotlin {

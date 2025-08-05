@@ -48,6 +48,6 @@ Example : 2025.1.0
      ````
 
 ### Debug using IntelliJ
- * Before attached debugger in IntelliJ, open the `AppProperties.kt` file and hardcode the values to `appEnv="qa"`.
+ * Before attached debugger in IntelliJ, open the `AppProperties.kt` file and hardcode the values to `appEnv="staging"`.
    While debugging, it failed to read the properties. 
 

@@ -1,6 +1,6 @@
 package com.kavi.pbc.live.data.integration
 
 enum class IntegrationEnv(val env: String) {
-    QA("qa"),
+    STAGING("staging"),
     PROD("prod")
 }
