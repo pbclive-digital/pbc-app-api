@@ -1,0 +1,44 @@
+package com.kavi.pbc.live.api.controller
+
+import com.kavi.droid.survey.api.dto.BaseResponse
+import com.kavi.pbc.live.api.service.EventService
+import com.kavi.pbc.live.api.util.AppLogger
+import com.kavi.pbc.live.data.model.event.Event
+import jakarta.validation.Valid
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+
+@RestController
+@RequestMapping("/event")
+class EventController(private val eventService: EventService) {
+
+    @Autowired
+    lateinit var logger: AppLogger
+
+    @PostMapping("/create")
+    fun createUser(@Valid @RequestBody event: Event): ResponseEntity<BaseResponse<String>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: POST: [/event/create]", EventController::class.java)
+
+        val response = eventService.createEvent(event)
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
+    @GetMapping("/get/upcoming")
+    fun getAllUpcomingEvents(): ResponseEntity<BaseResponse<List<Event>>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET: [/event/get/upcoming]", EventController::class.java)
+
+        val response = eventService.getUpcomingEvents()
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+}
