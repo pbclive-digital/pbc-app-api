@@ -47,7 +47,7 @@ class FirebaseIntegration: DatastoreIntegration {
      */
     override fun getEnvFilePath(env: IntegrationEnv): String {
         return when(env) {
-            IntegrationEnv.QA -> "/firebase/pbc-live-service-account-key-qa-v2.json"
+            IntegrationEnv.QA -> "/firebase/pbc-live-service-account-key-qa.json"
             IntegrationEnv.PROD -> "/firebase/pbc-live-service-account-key-qa.json" //TODO - Create a new key for production while application start to deploy
         }
     }
