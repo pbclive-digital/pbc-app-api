@@ -33,7 +33,7 @@ dependencies {
     implementation(libs.json)
     implementation(libs.kotlin.logging.jvm)
 
-    implementation(project(":module-firebase"))
+    implementation(project(":module-remote-datastore"))
     implementation(project(":module-data"))
 
 	testImplementation(libs.spring.boot.starter.test)

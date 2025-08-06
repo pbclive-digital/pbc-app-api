@@ -7,7 +7,7 @@ dependencyResolutionManagement {
 }
 
 listOf(
-    "module-firebase",
+    "module-remote-datastore",
     "module-data",
     "pbc-api"
 ).onEach {

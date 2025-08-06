@@ -3,11 +3,11 @@ package com.kavi.pbc.live.api.service
 import com.kavi.droid.survey.api.dto.BaseResponse
 import com.kavi.droid.survey.api.dto.Error
 import com.kavi.droid.survey.api.dto.Status
+import com.kavi.pbc.live.com.kavi.pbc.live.datastore.DataRepository
 import com.kavi.pbc.live.com.kavi.pbc.live.firebase.repository.FirebaseDataRepository
 import com.kavi.pbc.live.data.model.event.Event
 import com.kavi.pbc.live.data.model.event.EventStatus
-import com.kavi.pbc.live.data.repository.DataRepository
-import com.kavi.pbc.live.data.repository.db.DBConstant
+import com.kavi.pbc.live.com.kavi.pbc.live.datastore.firebase.repository.DBConstant
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service

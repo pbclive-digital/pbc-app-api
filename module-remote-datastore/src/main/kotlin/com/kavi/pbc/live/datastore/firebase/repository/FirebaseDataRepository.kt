@@ -8,8 +8,8 @@ import com.google.cloud.firestore.Query
 import com.google.cloud.firestore.QuerySnapshot
 import com.google.cloud.firestore.WriteResult
 import com.google.firebase.cloud.FirestoreClient
+import com.kavi.pbc.live.com.kavi.pbc.live.datastore.DataRepository
 import com.kavi.pbc.live.data.model.BaseModel
-import com.kavi.pbc.live.data.repository.DataRepository
 
 class FirebaseDataRepository: DataRepository {
 

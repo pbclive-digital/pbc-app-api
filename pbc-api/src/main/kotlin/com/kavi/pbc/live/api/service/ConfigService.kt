@@ -4,11 +4,11 @@ import com.kavi.droid.survey.api.dto.BaseResponse
 import com.kavi.droid.survey.api.dto.Error
 import com.kavi.droid.survey.api.dto.Status
 import com.kavi.pbc.live.api.AppProperties
-import com.kavi.pbc.live.com.kavi.pbc.live.firebase.repository.FirebaseDataRepository
+import com.kavi.pbc.live.com.kavi.pbc.live.datastore.DataRepository
 import com.kavi.pbc.live.data.model.config.AppVersionStatus
 import com.kavi.pbc.live.data.model.config.Config
-import com.kavi.pbc.live.data.repository.DataRepository
-import com.kavi.pbc.live.data.repository.db.DBConstant
+import com.kavi.pbc.live.com.kavi.pbc.live.datastore.firebase.repository.DBConstant
+import com.kavi.pbc.live.com.kavi.pbc.live.firebase.repository.FirebaseDataRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

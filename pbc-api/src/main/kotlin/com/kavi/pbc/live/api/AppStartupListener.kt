@@ -1,6 +1,6 @@
 package com.kavi.pbc.live.api
 
-import com.kavi.pbc.live.com.kavi.pbc.live.firebase.FirebaseIntegration
+import com.kavi.pbc.live.com.kavi.pbc.live.datastore.firebase.FirebaseIntegration
 import com.kavi.pbc.live.data.integration.IntegrationEnv
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationListener

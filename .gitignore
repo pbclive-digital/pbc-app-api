@@ -40,4 +40,4 @@ out/
 .kotlin
 
 ### Firebase secrents ###
-module-firebase/src/main/resources/firebase/*
+module-remote-datastore/src/main/resources/firebase/*

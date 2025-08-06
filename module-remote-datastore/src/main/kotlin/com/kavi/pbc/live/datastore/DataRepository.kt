@@ -1,4 +1,4 @@
-package com.kavi.pbc.live.data.repository
+package com.kavi.pbc.live.com.kavi.pbc.live.datastore
 
 import com.kavi.pbc.live.data.model.BaseModel
 

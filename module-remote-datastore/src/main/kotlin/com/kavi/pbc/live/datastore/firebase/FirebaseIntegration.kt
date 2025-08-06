@@ -1,4 +1,4 @@
-package com.kavi.pbc.live.com.kavi.pbc.live.firebase
+package com.kavi.pbc.live.com.kavi.pbc.live.datastore.firebase
 
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
