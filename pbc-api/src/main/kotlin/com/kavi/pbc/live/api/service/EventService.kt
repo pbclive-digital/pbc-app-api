@@ -11,6 +11,7 @@ import com.kavi.pbc.live.data.repository.db.DBConstant
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import java.util.Date
 
 @Service
 class EventService {
@@ -60,21 +61,53 @@ class EventService {
             "direction" to "DESC"
         )
 
-        val finalUpcomingEventList = dataRepository.getEntityListFromProperties(
+        val finalPassedEventList = dataRepository.getEntityListFromProperties(
             entityCollection = DBConstant.EVENT_COLLECTION,
             propertiesMap = properties,
             orderByMap = orderBy,
             className = Event::class.java
         )
 
-        return if (finalUpcomingEventList.isNotEmpty()) {
-            ResponseEntity.ok(BaseResponse(Status.SUCCESS, finalUpcomingEventList, null))
+        return if (finalPassedEventList.isNotEmpty()) {
+            ResponseEntity.ok(BaseResponse(Status.SUCCESS, finalPassedEventList, null))
         } else {
             ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(BaseResponse(Status.ERROR, null, listOf(
                     Error(HttpStatus.NOT_FOUND.toString()))
                 ))
+        }
+    }
+
+    fun updateEventStatusAccordingToDate(): String? {
+        val properties = mapOf(
+            "eventStatus" to EventStatus.PUBLISHED
+        )
+        println("Current Time: ${System.currentTimeMillis()}")
+        val lessThanMap = mapOf(
+            "eventDate" to System.currentTimeMillis()
+        )
+
+        val dueEventList = dataRepository.getEntityListFromProperties(
+            entityCollection = DBConstant.EVENT_COLLECTION,
+            propertiesMap = properties,
+            lessThanMap = lessThanMap,
+            className = Event::class.java
+        )
+
+        dueEventList.forEach { dueEvent ->
+            dueEvent.eventStatus = EventStatus.PASSED
+            dataRepository.updateEntity(
+                entityCollection = DBConstant.EVENT_COLLECTION,
+                entityId = dueEvent.id,
+                entity = dueEvent
+            )
+        }
+
+        return if (dueEventList.isNotEmpty()) {
+            "Event status updated as PASSED in [${dueEventList.size}] events."
+        } else {
+            "No Events found that due from Date: [${Date()}]"
         }
     }
 }

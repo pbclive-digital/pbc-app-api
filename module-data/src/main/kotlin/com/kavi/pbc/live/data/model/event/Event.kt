@@ -7,7 +7,7 @@ data class Event(
     val id: String,
     val name: String,
     val description: String,
-    val eventStatus: EventStatus = EventStatus.DRAFT,
+    var eventStatus: EventStatus = EventStatus.DRAFT,
     val eventDate: Long,
     val startTime: String,
     val endTime: String,
