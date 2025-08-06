@@ -3,10 +3,12 @@ package com.kavi.pbc.live.api.service
 import com.kavi.pbc.live.api.dto.BaseResponse
 import com.kavi.pbc.live.api.dto.Error
 import com.kavi.pbc.live.api.dto.Status
+import com.kavi.pbc.live.api.security.AuthUserDetails
 import com.kavi.pbc.live.auth.UserAuth
 import com.kavi.pbc.live.data.model.auth.AuthToken
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 
 @Service
@@ -18,6 +20,15 @@ class AuthService {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(BaseResponse(Status.SUCCESS, userAuth.userStatus(email, userId), null))
+    }
+
+    fun findByToken(authToken: String): UserDetails {
+        userAuth.validateAuthToken(authToken)?.let {
+            val user = userAuth.getUser(it.email, it.userId)
+            return AuthUserDetails(user, it)
+        }?: run {
+            return AuthUserDetails(null, null)
+        }
     }
 
     fun requestToken(email: String, userId: String): ResponseEntity<BaseResponse<AuthToken>> {
