@@ -1,14 +1,14 @@
 package com.kavi.pbc.live.api.service
 
-import com.kavi.droid.survey.api.dto.BaseResponse
-import com.kavi.droid.survey.api.dto.Error
-import com.kavi.droid.survey.api.dto.Status
+import com.kavi.pbc.live.api.dto.BaseResponse
+import com.kavi.pbc.live.api.dto.Error
+import com.kavi.pbc.live.api.dto.Status
 import com.kavi.pbc.live.api.AppProperties
-import com.kavi.pbc.live.com.kavi.pbc.live.datastore.DataRepository
+import com.kavi.pbc.live.com.kavi.pbc.live.datastore.DatastoreRepositoryContract
 import com.kavi.pbc.live.data.model.config.AppVersionStatus
 import com.kavi.pbc.live.data.model.config.Config
-import com.kavi.pbc.live.com.kavi.pbc.live.datastore.firebase.repository.DBConstant
-import com.kavi.pbc.live.com.kavi.pbc.live.firebase.repository.FirebaseDataRepository
+import com.kavi.pbc.live.com.kavi.pbc.live.datastore.DatastoreConstant
+import com.kavi.pbc.live.com.kavi.pbc.live.firebase.repository.FirebaseDatastoreRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -20,10 +20,10 @@ class ConfigService {
     @Autowired
     lateinit var appProperties: AppProperties
 
-    private var dataRepository: DataRepository = FirebaseDataRepository()
+    private var datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
 
     fun getConfigByVersion(version: String): ResponseEntity<BaseResponse<Config>> {
-        dataRepository.getEntityFromId(DBConstant.CONFIG_COLLECTION, version, Config::class.java)?.let {
+        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.CONFIG_COLLECTION, version, Config::class.java)?.let {
             return ResponseEntity.ok(BaseResponse(Status.SUCCESS, it, null))
         }?: run {
             return ResponseEntity
@@ -38,7 +38,7 @@ class ConfigService {
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(BaseResponse(Status.SUCCESS,
-                dataRepository.createEntity(DBConstant.CONFIG_COLLECTION, version, config), null))
+                datastoreRepositoryContract.createEntity(DatastoreConstant.CONFIG_COLLECTION, version, config), null))
     }
 
     fun isApiSupportForAppVersion(deviceOS: String, appVersion: String): ResponseEntity<BaseResponse<AppVersionStatus>>? {

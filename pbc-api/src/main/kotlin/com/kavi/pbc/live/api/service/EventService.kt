@@ -1,13 +1,13 @@
 package com.kavi.pbc.live.api.service
 
-import com.kavi.droid.survey.api.dto.BaseResponse
-import com.kavi.droid.survey.api.dto.Error
-import com.kavi.droid.survey.api.dto.Status
-import com.kavi.pbc.live.com.kavi.pbc.live.datastore.DataRepository
-import com.kavi.pbc.live.com.kavi.pbc.live.firebase.repository.FirebaseDataRepository
+import com.kavi.pbc.live.api.dto.BaseResponse
+import com.kavi.pbc.live.api.dto.Error
+import com.kavi.pbc.live.api.dto.Status
+import com.kavi.pbc.live.com.kavi.pbc.live.datastore.DatastoreRepositoryContract
+import com.kavi.pbc.live.com.kavi.pbc.live.firebase.repository.FirebaseDatastoreRepository
 import com.kavi.pbc.live.data.model.event.Event
 import com.kavi.pbc.live.data.model.event.EventStatus
-import com.kavi.pbc.live.com.kavi.pbc.live.datastore.firebase.repository.DBConstant
+import com.kavi.pbc.live.com.kavi.pbc.live.datastore.DatastoreConstant
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -16,13 +16,13 @@ import java.util.Date
 @Service
 class EventService {
 
-    private var dataRepository: DataRepository = FirebaseDataRepository()
+    private var datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
 
     fun createEvent(event: Event): ResponseEntity<BaseResponse<String>>? {
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(BaseResponse(Status.SUCCESS,
-                dataRepository.createEntity(DBConstant.EVENT_COLLECTION, event.id, event), null))
+                datastoreRepositoryContract.createEntity(DatastoreConstant.EVENT_COLLECTION, event.id, event), null))
     }
 
     fun getUpcomingEvents(): ResponseEntity<BaseResponse<List<Event>>>? {
@@ -34,8 +34,8 @@ class EventService {
             "direction" to "DESC"
         )
 
-        val finalUpcomingEventList = dataRepository.getEntityListFromProperties(
-            entityCollection = DBConstant.EVENT_COLLECTION,
+        val finalUpcomingEventList = datastoreRepositoryContract.getEntityListFromProperties(
+            entityCollection = DatastoreConstant.EVENT_COLLECTION,
             propertiesMap = properties,
             orderByMap = orderBy,
             className = Event::class.java
@@ -61,8 +61,8 @@ class EventService {
             "direction" to "DESC"
         )
 
-        val finalPassedEventList = dataRepository.getEntityListFromProperties(
-            entityCollection = DBConstant.EVENT_COLLECTION,
+        val finalPassedEventList = datastoreRepositoryContract.getEntityListFromProperties(
+            entityCollection = DatastoreConstant.EVENT_COLLECTION,
             propertiesMap = properties,
             orderByMap = orderBy,
             className = Event::class.java
@@ -88,8 +88,8 @@ class EventService {
             "eventDate" to System.currentTimeMillis()
         )
 
-        val dueEventList = dataRepository.getEntityListFromProperties(
-            entityCollection = DBConstant.EVENT_COLLECTION,
+        val dueEventList = datastoreRepositoryContract.getEntityListFromProperties(
+            entityCollection = DatastoreConstant.EVENT_COLLECTION,
             propertiesMap = properties,
             lessThanMap = lessThanMap,
             className = Event::class.java
@@ -97,8 +97,8 @@ class EventService {
 
         dueEventList.forEach { dueEvent ->
             dueEvent.eventStatus = EventStatus.PASSED
-            dataRepository.updateEntity(
-                entityCollection = DBConstant.EVENT_COLLECTION,
+            datastoreRepositoryContract.updateEntity(
+                entityCollection = DatastoreConstant.EVENT_COLLECTION,
                 entityId = dueEvent.id,
                 entity = dueEvent
             )

@@ -1,4 +1,4 @@
-package com.kavi.droid.survey.api.dto
+package com.kavi.pbc.live.api.dto
 
 enum class Status {
     SUCCESS, ERROR

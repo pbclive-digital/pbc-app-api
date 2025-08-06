@@ -33,6 +33,7 @@ dependencies {
     implementation(libs.json)
     implementation(libs.kotlin.logging.jvm)
 
+    implementation(project(":module-auth"))
     implementation(project(":module-remote-datastore"))
     implementation(project(":module-data"))
 

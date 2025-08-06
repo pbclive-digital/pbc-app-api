@@ -1,12 +1,12 @@
 package com.kavi.pbc.live.api.service
 
-import com.kavi.droid.survey.api.dto.BaseResponse
-import com.kavi.droid.survey.api.dto.Error
-import com.kavi.droid.survey.api.dto.Status
-import com.kavi.pbc.live.com.kavi.pbc.live.datastore.DataRepository
-import com.kavi.pbc.live.com.kavi.pbc.live.firebase.repository.FirebaseDataRepository
+import com.kavi.pbc.live.api.dto.BaseResponse
+import com.kavi.pbc.live.api.dto.Error
+import com.kavi.pbc.live.api.dto.Status
+import com.kavi.pbc.live.com.kavi.pbc.live.datastore.DatastoreRepositoryContract
+import com.kavi.pbc.live.com.kavi.pbc.live.firebase.repository.FirebaseDatastoreRepository
 import com.kavi.pbc.live.data.model.user.User
-import com.kavi.pbc.live.com.kavi.pbc.live.datastore.firebase.repository.DBConstant
+import com.kavi.pbc.live.com.kavi.pbc.live.datastore.DatastoreConstant
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service
 @Service
 class UserService {
 
-    private var dataRepository: DataRepository = FirebaseDataRepository()
+    private var datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
 
     fun createUser(user: User): ResponseEntity<BaseResponse<String>>? {
         userFromId(user.id)?.let {
@@ -27,14 +27,14 @@ class UserService {
             return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(BaseResponse(Status.SUCCESS,
-                    dataRepository.createEntity(DBConstant.USER_COLLECTION, user.id, user), null))
+                    datastoreRepositoryContract.createEntity(DatastoreConstant.USER_COLLECTION, user.id, user), null))
         }
     }
 
     fun updateUser(userId: String, newUser: User): ResponseEntity<BaseResponse<User>>? {
         val user = getUserById(userId)
         user?.let {
-            dataRepository.updateEntity(DBConstant.USER_COLLECTION, userId, newUser)
+            datastoreRepositoryContract.updateEntity(DatastoreConstant.USER_COLLECTION, userId, newUser)
             return ResponseEntity.ok(BaseResponse(Status.SUCCESS,
                 newUser, null))
         }?: run {
@@ -71,7 +71,7 @@ class UserService {
     }
 
     private fun userFromId(userId: String): User? {
-        dataRepository.getEntityFromId(DBConstant.USER_COLLECTION, userId, User::class.java)?.let {
+        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.USER_COLLECTION, userId, User::class.java)?.let {
             return it
         }?: run {
             return null
@@ -80,7 +80,7 @@ class UserService {
 
     private fun userFromEmail(email: String): User? {
         var user: User? = null
-        val responseList: List<User> = dataRepository.getEntityListFromProperty(DBConstant.USER_COLLECTION,
+        val responseList: List<User> = datastoreRepositoryContract.getEntityListFromProperty(DatastoreConstant.USER_COLLECTION,
             "email", email, User::class.java)
         if (responseList.isNotEmpty())
             user = responseList.get(0)

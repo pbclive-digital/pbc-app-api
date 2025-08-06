@@ -1,6 +1,6 @@
 package com.kavi.pbc.live.api.controller
 
-import com.kavi.droid.survey.api.dto.BaseResponse
+import com.kavi.pbc.live.api.dto.BaseResponse
 import com.kavi.pbc.live.api.service.UserService
 import com.kavi.pbc.live.api.util.AppLogger
 import com.kavi.pbc.live.data.model.user.User

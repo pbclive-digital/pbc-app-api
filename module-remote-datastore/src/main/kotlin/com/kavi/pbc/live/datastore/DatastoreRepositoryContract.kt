@@ -2,7 +2,7 @@ package com.kavi.pbc.live.com.kavi.pbc.live.datastore
 
 import com.kavi.pbc.live.data.model.BaseModel
 
-interface DataRepository {
+interface DatastoreRepositoryContract {
     fun createEntity(entityCollection: String, entityId: String, entity: BaseModel): String?
     fun <T>createAndGetEntity(entityCollection: String, entityId: String, entity: BaseModel): T?
     fun updateEntity(entityCollection: String, entityId: String, entity: BaseModel): String?

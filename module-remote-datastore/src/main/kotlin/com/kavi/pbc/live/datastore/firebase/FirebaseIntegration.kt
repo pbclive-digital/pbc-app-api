@@ -3,9 +3,9 @@ package com.kavi.pbc.live.com.kavi.pbc.live.datastore.firebase
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
-import com.kavi.pbc.live.com.kavi.pbc.live.firebase.repository.FirebaseDataRepository
-import com.kavi.pbc.live.data.integration.DatastoreIntegration
-import com.kavi.pbc.live.data.integration.IntegrationEnv
+import com.kavi.pbc.live.com.kavi.pbc.live.datastore.DatastoreIntegration
+import com.kavi.pbc.live.com.kavi.pbc.live.datastore.IntegrationEnv
+import com.kavi.pbc.live.com.kavi.pbc.live.firebase.repository.FirebaseDatastoreRepository
 
 class FirebaseIntegration: DatastoreIntegration {
 
@@ -30,7 +30,7 @@ class FirebaseIntegration: DatastoreIntegration {
     }
 
     override fun init(env: IntegrationEnv) {
-        FirebaseDataRepository::class.java.getResourceAsStream(getEnvFilePath(env)).use {
+        FirebaseDatastoreRepository::class.java.getResourceAsStream(getEnvFilePath(env)).use {
                 inputStream ->
             inputStream?.let {
                 val options = FirebaseOptions.builder()
