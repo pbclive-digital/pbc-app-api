@@ -1,12 +1,12 @@
 #!/bin/zsh
 
-STAGING_FILE=module-firebase/src/main/resources/firebase/pbc-live-service-account-key-staging.json
-PROD_FILE=module-firebase/src/main/resources/firebase/pbc-live-service-account-key-prod.json
+STAGING_FILE=module-remote-datastore/src/main/resources/firebase/pbc-live-service-account-key-staging.json
+PROD_FILE=module-remote-datastore/src/main/resources/firebase/pbc-live-service-account-key-prod.json
 
 STAGING_SECRET=pbc-app-secrets/firebase-service-account-secrets/pbc-live-service-account-key-staging.json
 PROD_SECRET=pbc-app-secrets/firebase-service-account-secrets/pbc-live-service-account-key-prod.json
 
-SECRETS_PATH=module-firebase/src/main/resources/firebase/
+SECRETS_PATH=module-remote-datastore/src/main/resources/firebase/
 
 function clone_secrets() {
     git clone git@github.com:pbclive-digital/pbc-app-secrets.git
@@ -44,7 +44,7 @@ function move_secrets() {
         if check_prod_file_existence; then
           echo "service account key already available"
         else
-          cp $STAGING_SECRET $SECRETS_PATH
+          cp $PROD_SECRET $SECRETS_PATH
         fi
       fi
     fi

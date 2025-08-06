@@ -7,6 +7,7 @@ dependencyResolutionManagement {
 }
 
 listOf(
+    "module-auth",
     "module-remote-datastore",
     "module-data",
     "pbc-api"
