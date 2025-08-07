@@ -68,6 +68,12 @@ function deploy_execution() {
       "local")
         ./gradlew clean --no-build-cache bootRun
         ;;
+      "staging")
+        #git add -f module-remote-datastore/src/main/resources/firebase/pbc-live-service-account-key-staging.json
+        #git commit -m "Add the secret key file for heroku deployment"
+        #git push heroku-staging main
+        #git reset HEAD~
+        ;;
       *)
         echo "Coming Soon"
         ;;
