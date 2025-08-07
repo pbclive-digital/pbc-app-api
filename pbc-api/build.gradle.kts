@@ -6,8 +6,8 @@ plugins {
 	alias(libs.plugins.kotlin.serialization)
 }
 
-group = "com.kavi.pbc.live"
-version = "0.0.1-SNAPSHOT"
+group = "${project.properties["groupName"]}"
+version = "${project.properties["versionName"]}"
 
 java {
 	toolchain {

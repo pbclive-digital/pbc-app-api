@@ -41,3 +41,6 @@ out/
 
 ### Firebase secrents ###
 module-remote-datastore/src/main/resources/firebase/*
+
+### Heroku deploy file
+Procfile

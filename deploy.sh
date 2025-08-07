@@ -1,13 +1,20 @@
 #!/bin/zsh
 
-STAGING_FILE=module-remote-datastore/src/main/resources/firebase/pbc-live-service-account-key-staging.json
-PROD_FILE=module-remote-datastore/src/main/resources/firebase/pbc-live-service-account-key-prod.json
+SECRETS_PATH=module-remote-datastore/src/main/resources/firebase
+
+STAGING_FILE=$SECRETS_PATH/pbc-live-service-account-key-staging.json
+PROD_FILE=$SECRETS_PATH/pbc-live-service-account-key-prod.json
 
 SECRETS_REPO=pbc-app-secrets/
 STAGING_SECRET=pbc-app-secrets/firebase-service-account-secrets/pbc-live-service-account-key-staging.json
 PROD_SECRET=pbc-app-secrets/firebase-service-account-secrets/pbc-live-service-account-key-prod.json
 
-SECRETS_PATH=module-remote-datastore/src/main/resources/firebase/
+PROPERTY_FILE=gradle.properties
+PROPERTY_KEY=versionName
+
+function fetchApplicationVersion() {
+    APP_VERSION=`cat $PROPERTY_FILE | grep "$PROPERTY_KEY" | cut -d"=" -f2 | tr -d " "`
+}
 
 function clone_secrets() {
     git clone git@github.com:pbclive-digital/pbc-app-secrets.git
@@ -47,6 +54,7 @@ function move_secrets() {
         if check_staging_file_existence; then
           echo "service account key already available"
         else
+          mkdir -p $SECRETS_PATH
           cp $STAGING_SECRET $SECRETS_PATH
         fi
         ;;
@@ -54,6 +62,7 @@ function move_secrets() {
         if check_prod_file_existence; then
           echo "service account key already available"
         else
+          mkdir -p $SECRETS_PATH
           cp $PROD_SECRET $SECRETS_PATH
         fi
         ;;
@@ -63,16 +72,27 @@ function move_secrets() {
     esac
 }
 
+function createProcfileForStaging() {
+    echo "web: java -jar -Dspring.profiles.active=prod survey-api/build/libs/pbc-api-$APP_VERSION.jar --server.port=\$PORT" > Procfile
+}
+
+function heroku_staging_deploy() {
+    git add -f $SECRETS_PATH/pbc-live-service-account-key-staging.json
+    git add -f Procfile
+    git commit -m "Add and commit the secret key file & Procfile for heroku deployment - v$APP_VERSION"
+    heroku login
+    git push heroku-staging main
+    git reset HEAD~
+}
+
 function deploy_execution() {
     case $env in
       "local")
         ./gradlew clean --no-build-cache bootRun
         ;;
       "staging")
-        #git add -f module-remote-datastore/src/main/resources/firebase/pbc-live-service-account-key-staging.json
-        #git commit -m "Add the secret key file for heroku deployment"
-        #git push heroku-staging main
-        #git reset HEAD~
+        createProcfileForStaging
+        heroku_staging_deploy
         ;;
       *)
         echo "Coming Soon"
@@ -84,11 +104,37 @@ function deploy_execution() {
 args=()
 env=$1
 
-## Execute
-if clone_secrets; then
-  move_secrets
-  delete_clone_secrets
-  deploy_execution
-else
-  echo "Can not continue this operation without application secrets."
-fi
+## Fetching the application version defined in gradle.properties
+fetchApplicationVersion
+
+## Execute the operation according to provided environment
+case $env in
+  "local"|"staging")
+    if check_staging_file_existence; then
+      deploy_execution
+    else
+      if clone_secrets; then
+        move_secrets
+        delete_clone_secrets
+        deploy_execution
+      else
+        echo "Can not continue this operation without application secrets."
+      fi
+    fi
+    ;;
+  "prod")
+    if check_prod_file_existence; then
+      deploy_execution
+    else
+      if clone_secrets; then
+        move_secrets
+        delete_clone_secrets
+        deploy_execution
+      else
+        echo "Can not continue this operation without application secrets."
+      fi
+    fi
+    ;;
+  *)
+    ;;
+esac
