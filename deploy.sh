@@ -72,6 +72,16 @@ function move_secrets() {
     esac
 }
 
+function checkHerokuSession() {
+    HEROKU_SESSION=`heroku whoami`
+    local emailRegex="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$"
+    if [[ $HEROKU_SESSION =~ $emailRegex ]]; then
+      return 0
+    else
+      return 1
+    fi
+}
+
 function createProcfileForStaging() {
     echo "web: java -jar -Dspring.profiles.active=prod survey-api/build/libs/pbc-api-$APP_VERSION.jar --server.port=\$PORT" > Procfile
 }
@@ -80,9 +90,14 @@ function heroku_staging_deploy() {
     git add -f $SECRETS_PATH/pbc-live-service-account-key-staging.json
     git add -f Procfile
     git commit -m "Add and commit the secret key file & Procfile for heroku deployment - v$APP_VERSION"
-    heroku login
-    git push heroku-staging main
+    if checkHerokuSession; then
+      echo "Heroku Session available for user: [$HEROKU_SESSION]"
+    else
+      heroku login
+    fi
+    git push heroku-staging main --force
     git reset HEAD~
+    rm Procfile
 }
 
 function deploy_execution() {
@@ -136,5 +151,6 @@ case $env in
     fi
     ;;
   *)
+    echo "Given environment [$env] is not valid. Operation ABORT!!!"
     ;;
 esac
