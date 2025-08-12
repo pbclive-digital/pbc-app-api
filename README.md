@@ -58,6 +58,7 @@ Following are the available options developer can pass as environment.
 
 #### Prerequisites for `deploy.sh`
 - Bash/Unix environment (Mac/Linux)
+- Access to `pbc-app-secrets` repository.
 - Heroku CLI installed in the system
 - Need to add the `heroku-staging` & `heroku-prod` remotes to the local git repository.
 

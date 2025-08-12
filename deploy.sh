@@ -83,7 +83,7 @@ function checkHerokuSession() {
 }
 
 function createProcfileForStaging() {
-    echo "web: java -jar -Dspring.profiles.active=prod survey-api/build/libs/pbc-api-$APP_VERSION.jar --server.port=\$PORT" > Procfile
+    echo "web: java -jar -Dspring.profiles.active=prod pbc-api/build/libs/pbc-api-$APP_VERSION.jar --server.port=\$PORT" > Procfile
 }
 
 function heroku_staging_deploy() {
