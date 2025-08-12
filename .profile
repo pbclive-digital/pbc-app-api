@@ -1,0 +1,1 @@
+echo ${GOOGLE_CREDENTIALS} > /module-remote-datastore/src/main/resources/firebase/pbc-live-service-account-key-staging.json
