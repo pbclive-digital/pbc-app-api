@@ -21,13 +21,11 @@ dependencies {
 tasks.register<Exec>("secret-generate") {
     commandLine("echo", "Execute secret generation task")
     commandLine("echo", "\${GOOGLE_CREDENTIALS}", ">", "pbc-live-service-account-key-staging.json")
+    commandLine("pwd")
+    commandLine("ls", "-la")
     commandLine("cat", "pbc-live-service-account-key-staging.json")
     commandLine("mkdir", "-p", "src/main/resources/firebase/")
-    commandLine("mv", "pbc-live-service-account-key-staging.json", "src/main/resources/firebase/")
-}
-
-tasks.named("build") {
-    dependsOn("secret-generate")
+    //commandLine("mv", "pbc-live-service-account-key-staging.json", "src/main/resources/firebase/")
 }
 
 tasks.named("compileKotlin") {
