@@ -21,29 +21,30 @@ dependencies {
 tasks.register("secret-generate") {
     val googleServiceAccount = System.getenv("GOOGLE_CREDENTIALS")
 
-    //val file = project.file("src/main/resources/firebase/pbc-live-service-account-key-staging.json")
-    val googleServiceAccJson = project.file("pbc-live-service-account-key-staging.json")
-    val resourceDir = file("src/main/resources/firebase")
-    googleServiceAccJson.createNewFile()
-    googleServiceAccJson.writeText(googleServiceAccount)
+    googleServiceAccount?.let {
+        val googleServiceAccJson = project.file("pbc-live-service-account-key-staging.json")
+        val resourceDir = file("src/main/resources/firebase")
+        googleServiceAccJson.createNewFile()
+        googleServiceAccJson.writeText(googleServiceAccount)
 
-    if (!resourceDir.exists()) {
-        resourceDir.mkdirs()
-    }
+        if (!resourceDir.exists()) {
+            resourceDir.mkdirs()
+        }
 
-    copy {
-        from(googleServiceAccJson)
-        into(resourceDir)
-    }
+        copy {
+            from(googleServiceAccJson)
+            into(resourceDir)
+        }
 
-    doLast {
-        googleServiceAccJson.delete()
+        doLast {
+            googleServiceAccJson.delete()
+        }
     }
 }
 
-/*tasks.named("compileKotlin") {
+tasks.named("compileKotlin") {
     dependsOn("secret-generate")
-}*/
+}
 
 tasks.test {
     useJUnitPlatform()
