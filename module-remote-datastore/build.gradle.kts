@@ -18,10 +18,11 @@ dependencies {
     testImplementation(libs.kotlin.test.junit5)
 }
 
-tasks.register<Exec>("secret-generate") {
+tasks.register("secret-generate") {
     val googleServiceAccount = System.getenv("GOOGLE_CREDENTIALS")
 
-    val file = project.file("src/main/resources/firebase/pbc-live-service-account-key-staging.json")
+    //val file = project.file("src/main/resources/firebase/pbc-live-service-account-key-staging.json")
+    val file = project.file("pbc-live-service-account-key-staging.json")
     file.createNewFile()
     file.writeText(googleServiceAccount)
 
