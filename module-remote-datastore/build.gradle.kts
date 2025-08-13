@@ -22,10 +22,23 @@ tasks.register("secret-generate") {
     val googleServiceAccount = System.getenv("GOOGLE_CREDENTIALS")
 
     //val file = project.file("src/main/resources/firebase/pbc-live-service-account-key-staging.json")
-    val file = project.file("pbc-live-service-account-key-staging.json")
-    file.createNewFile()
-    file.writeText(googleServiceAccount)
+    val googleServiceAccJson = project.file("pbc-live-service-account-key-staging.json")
+    val resourceDir = file("src/main/resources/firebase")
+    googleServiceAccJson.createNewFile()
+    googleServiceAccJson.writeText(googleServiceAccount)
 
+    if (!resourceDir.exists()) {
+        resourceDir.mkdirs()
+    }
+
+    copy {
+        from(googleServiceAccJson)
+        into(resourceDir)
+    }
+
+    doLast {
+        googleServiceAccJson.delete()
+    }
 
     //commandLine("echo", "Execute secret generation task")
     //commandLine("echo", "$googleServiceAccount", ">", "pbc-live-service-account-key-staging.json")
