@@ -42,6 +42,7 @@ class FirebaseIntegration: DatastoreIntegration {
                 firebaseApplication = FirebaseApp.initializeApp(options)
             }
         }*/
+        println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Initiate Firebase with $env")
 
         val credentialsJson = System.getenv("GOOGLE_CREDENTIALS")
             ?: throw IllegalStateException("GOOGLE_CREDENTIALS is not set")
