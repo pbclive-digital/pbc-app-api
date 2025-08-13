@@ -39,18 +39,6 @@ tasks.register("secret-generate") {
     doLast {
         googleServiceAccJson.delete()
     }
-
-    //commandLine("echo", "Execute secret generation task")
-    //commandLine("echo", "$googleServiceAccount", ">", "pbc-live-service-account-key-staging.json")
-    //println(googleServiceAccount)
-    //println(commandLine("cat", "pbc-live-service-account-key-staging.json"))
-    //println(commandLine("pwd"))
-    //println(commandLine("ls", "-la"))
-    //commandLine("pwd")
-    //commandLine("ls", "-la")
-    //commandLine("cat", "pbc-live-service-account-key-staging.json")
-    //commandLine("mkdir", "-p", "src/main/resources/firebase/")
-    //commandLine("mv", "pbc-live-service-account-key-staging.json", "src/main/resources/firebase/")
 }
 
 tasks.named("compileKotlin") {
