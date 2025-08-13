@@ -23,6 +23,7 @@ tasks.register<Exec>("secret-generate") {
 
     commandLine("echo", "Execute secret generation task")
     commandLine("echo", "$googleServiceAccount", ">", "pbc-live-service-account-key-staging.json")
+    println(googleServiceAccount)
     commandLine("pwd")
     commandLine("ls", "-la")
     commandLine("cat", "pbc-live-service-account-key-staging.json")
