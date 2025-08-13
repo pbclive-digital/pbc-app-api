@@ -19,8 +19,10 @@ dependencies {
 }
 
 tasks.register<Exec>("secret-generate") {
+    val googleServiceAccount = System.getenv("GOOGLE_CREDENTIALS")
+
     commandLine("echo", "Execute secret generation task")
-    commandLine("echo", "${GOOGLE_CREDENTIALS}", ">", "pbc-live-service-account-key-staging.json")
+    commandLine("echo", "$googleServiceAccount", ">", "pbc-live-service-account-key-staging.json")
     commandLine("pwd")
     commandLine("ls", "-la")
     commandLine("cat", "pbc-live-service-account-key-staging.json")
