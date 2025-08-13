@@ -18,6 +18,18 @@ dependencies {
     testImplementation(libs.kotlin.test.junit5)
 }
 
+tasks.register<Exec>("secret-generate") {
+    commandLine("echo", "Execute secret generation task")
+    commandLine("echo", "\${GOOGLE_CREDENTIALS}", ">", "pbc-live-service-account-key-staging.json")
+    commandLine("cat", "pbc-live-service-account-key-staging.json")
+    commandLine("mkdir", "-p", "src/main/resources/firebase/")
+    commandLine("mv", "pbc-live-service-account-key-staging.json", "src/main/resources/firebase/")
+}
+
+tasks.named("build") {
+    dependsOn("secret-generate")
+}
+
 tasks.test {
     useJUnitPlatform()
 }
