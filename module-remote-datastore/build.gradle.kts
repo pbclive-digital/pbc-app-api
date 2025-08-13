@@ -21,6 +21,8 @@ dependencies {
 tasks.register("secret-generate") {
     val googleServiceAccount = System.getenv("GOOGLE_CREDENTIALS")
 
+    println("READ Google Service Account Variable: \n$googleServiceAccount")
+
     googleServiceAccount?.let {
         val googleServiceAccJson = project.file("pbc-live-service-account-key-staging.json")
         val resourceDir = file("src/main/resources/firebase")
