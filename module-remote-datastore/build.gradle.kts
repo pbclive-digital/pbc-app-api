@@ -30,6 +30,10 @@ tasks.named("build") {
     dependsOn("secret-generate")
 }
 
+tasks.named("compileKotlin") {
+    dependsOn("secret-generate")
+}
+
 tasks.test {
     useJUnitPlatform()
 }
