@@ -41,9 +41,9 @@ tasks.register("secret-generate") {
     }
 }
 
-tasks.named("compileKotlin") {
+/*tasks.named("compileKotlin") {
     dependsOn("secret-generate")
-}
+}*/
 
 tasks.test {
     useJUnitPlatform()
