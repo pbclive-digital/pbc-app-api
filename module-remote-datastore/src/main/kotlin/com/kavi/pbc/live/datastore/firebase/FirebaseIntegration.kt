@@ -46,6 +46,8 @@ class FirebaseIntegration: DatastoreIntegration {
         val credentialsJson = System.getenv("GOOGLE_CREDENTIALS")
             ?: throw IllegalStateException("GOOGLE_CREDENTIALS is not set")
 
+        println("Retrieved Google Credentials: \n $credentialsJson")
+
         val serviceAccountStream = ByteArrayInputStream(credentialsJson.toByteArray(Charsets.UTF_8))
 
         val options = FirebaseOptions.builder()
