@@ -27,6 +27,14 @@ available, our development branch will be `main` branch.
 Primary deployment is in Heroku dyno. For this application has two environments. One is for staging and other one is for
 production. Both environments are in Heroku.
 
+### Set Heroku ENVIRONMENTAL VARIABLES
+For the application functionality with firebase integration, Before we deploy, make sure in the heroku application, set the following environmental variables
+* `GOOGLE_CREDENTIALS` -> Google Firebase `google-service-account.json` file content
+* `PBC_ENV` -> According to the deployment environment, set the value as `staging` o `prod`.
+
+> [!NOTE]
+> This values already set in the existing heroku application. So no need to worry about that. But in case of new deployment, need to make sure these set-up correctly.
+
 ### Deploy any custom branch to Staging env to testing.
 If we need to deploy a change to staging server (QA) without merging to develop branch as a release, use following command
 to deploy feature branch to staging server.
