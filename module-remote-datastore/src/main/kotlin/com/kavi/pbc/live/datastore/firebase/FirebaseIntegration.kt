@@ -32,7 +32,7 @@ class FirebaseIntegration: DatastoreIntegration {
     }
 
     override fun init(env: IntegrationEnv) {
-        /*FirebaseDatastoreRepository::class.java.getResourceAsStream(getEnvFilePath(env)).use {
+        FirebaseDatastoreRepository::class.java.getResourceAsStream(getEnvFilePath(env)).use {
                 inputStream ->
             inputStream?.let {
                 val options = FirebaseOptions.builder()
@@ -41,8 +41,8 @@ class FirebaseIntegration: DatastoreIntegration {
 
                 firebaseApplication = FirebaseApp.initializeApp(options)
             }
-        }*/
-        println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Initiate Firebase with $env")
+        }
+        /*println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Initiate Firebase with $env")
 
         val credentialsJson = System.getenv("GOOGLE_CREDENTIALS")
             ?: throw IllegalStateException("GOOGLE_CREDENTIALS is not set")
@@ -57,7 +57,7 @@ class FirebaseIntegration: DatastoreIntegration {
 
         if (FirebaseApp.getApps().isEmpty()) {
             FirebaseApp.initializeApp(options)
-        }
+        }*/
     }
 
     /**
