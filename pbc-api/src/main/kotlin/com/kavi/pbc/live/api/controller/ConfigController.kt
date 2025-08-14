@@ -7,6 +7,7 @@ import com.kavi.pbc.live.api.service.ConfigService
 import com.kavi.pbc.live.api.util.AppLogger
 import com.kavi.pbc.live.data.model.config.AppVersionStatus
 import com.kavi.pbc.live.data.model.config.Config
+import com.kavi.pbc.live.data.model.config.DeviceFactor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -27,11 +28,16 @@ class ConfigController(private val configService: ConfigService) {
     lateinit var logger: AppLogger
 
     @GetMapping("/get/{version}")
-    fun getConfig(@PathVariable(value = "version") version: String): ResponseEntity<BaseResponse<Config>>? {
+    fun getConfig(@PathVariable(value = "version") version: String, @RequestHeader("X-app-device-factor") deviceFactor: String?): ResponseEntity<BaseResponse<Config>>? {
         logger.printSeparator()
         logger.printInfo("REQUEST MAPPING: GET: [/config/get/$version]", ConfigController::class.java)
 
-        val response = configService.getConfigByVersion(version)
+        var enumDeviceFactor: DeviceFactor = DeviceFactor.PHONE
+        deviceFactor?.let {
+            enumDeviceFactor = DeviceFactor.valueOf(it)
+        }
+
+        val response = configService.getConfigByVersion(version, enumDeviceFactor)
         logger.printResponseInfo(response, ConfigController::class.java)
 
         return response

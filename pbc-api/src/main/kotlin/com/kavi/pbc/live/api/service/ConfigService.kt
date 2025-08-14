@@ -9,6 +9,8 @@ import com.kavi.pbc.live.data.model.config.AppVersionStatus
 import com.kavi.pbc.live.data.model.config.Config
 import com.kavi.pbc.live.com.kavi.pbc.live.datastore.DatastoreConstant
 import com.kavi.pbc.live.com.kavi.pbc.live.firebase.repository.FirebaseDatastoreRepository
+import com.kavi.pbc.live.data.DataConstant
+import com.kavi.pbc.live.data.model.config.DeviceFactor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -22,8 +24,13 @@ class ConfigService {
 
     private var datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
 
-    fun getConfigByVersion(version: String): ResponseEntity<BaseResponse<Config>> {
+    fun getConfigByVersion(version: String, deviceFactor: DeviceFactor): ResponseEntity<BaseResponse<Config>> {
         datastoreRepositoryContract.getEntityFromId(DatastoreConstant.CONFIG_COLLECTION, version, Config::class.java)?.let {
+            when(deviceFactor) {
+                DeviceFactor.PHONE -> it.dashboardEventCount = DataConstant.DASHBOARD_EVENT_COUNT
+                DeviceFactor.INCH7TAB -> it.dashboardEventCount = DataConstant.DASHBOARD_EVENT_COUNT_7INCH_TAB
+                DeviceFactor.INCH10TAB -> it.dashboardEventCount = DataConstant.DASHBOARD_EVENT_COUNT_10INCH_TAB
+            }
             return ResponseEntity.ok(BaseResponse(Status.SUCCESS, it, null))
         }?: run {
             return ResponseEntity

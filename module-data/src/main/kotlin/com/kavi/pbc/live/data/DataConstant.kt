@@ -4,6 +4,8 @@ object DataConstant {
     const val RANDOM_TEXT_LENGTH = 3
 
     const val DASHBOARD_EVENT_COUNT = 2
+    const val DASHBOARD_EVENT_COUNT_7INCH_TAB = 3
+    const val DASHBOARD_EVENT_COUNT_10INCH_TAB = 5
 
     const val PAGINATION_KEY_LENGTH = 8
     const val PAGINATION_LIFE_TIME = 2 // From minutes
