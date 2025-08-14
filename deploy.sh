@@ -72,7 +72,7 @@ function move_secrets() {
     esac
 }
 
-function checkHerokuSession() {
+function check_heroku_session() {
     HEROKU_SESSION=`heroku whoami`
     local emailRegex="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$"
     if [[ $HEROKU_SESSION =~ $emailRegex ]]; then
@@ -82,22 +82,34 @@ function checkHerokuSession() {
     fi
 }
 
-function createProcfileForStaging() {
+function create_procfile_for_staging() {
+    echo "web: java -jar -Dspring.profiles.active=staging pbc-api/build/libs/pbc-api-$APP_VERSION.jar --server.port=\$PORT" > Procfile
+}
+
+function create_procfile_for_prod() {
     echo "web: java -jar -Dspring.profiles.active=prod pbc-api/build/libs/pbc-api-$APP_VERSION.jar --server.port=\$PORT" > Procfile
 }
 
 function heroku_staging_deploy() {
-    git add -f $SECRETS_PATH/pbc-live-service-account-key-staging.json
     git add -f Procfile
-    git commit -m "Add and commit the secret key file & Procfile for heroku deployment - v$APP_VERSION"
-    if checkHerokuSession; then
+    git commit -m "Add and commit the Procfile for heroku staging deployment - v$APP_VERSION"
+    if check_heroku_session; then
       echo "Heroku Session available for user: [$HEROKU_SESSION]"
     else
       heroku login
     fi
-    git push heroku-staging main --force
-    git reset HEAD~
-    rm Procfile
+    git push heroku-staging main
+}
+
+function heroku_prod_deploy() {
+    git add -f Procfile
+    git commit -m "Add and commit the Procfile for heroku production deployment - v$APP_VERSION"
+    if check_heroku_session; then
+      echo "Heroku Session available for user: [$HEROKU_SESSION]"
+    else
+      heroku login
+    fi
+    #git push heroku-prod main
 }
 
 function deploy_execution() {
@@ -106,11 +118,12 @@ function deploy_execution() {
         ./gradlew clean --no-build-cache bootRun
         ;;
       "staging")
-        createProcfileForStaging
+        create_procfile_for_staging
         heroku_staging_deploy
         ;;
       *)
-        echo "Coming Soon"
+        create_procfile_for_prod
+        heroku_prod_deploy
         ;;
     esac
 }
@@ -124,7 +137,7 @@ fetchApplicationVersion
 
 ## Execute the operation according to provided environment
 case $env in
-  "local"|"staging")
+  "local")
     if check_staging_file_existence; then
       deploy_execution
     else
@@ -137,18 +150,8 @@ case $env in
       fi
     fi
     ;;
-  "prod")
-    if check_prod_file_existence; then
-      deploy_execution
-    else
-      if clone_secrets; then
-        move_secrets
-        delete_clone_secrets
-        deploy_execution
-      else
-        echo "Can not continue this operation without application secrets."
-      fi
-    fi
+  "staging"|"prod")
+    deploy_execution
     ;;
   *)
     echo "Given environment [$env] is not valid. Operation ABORT!!!"
