@@ -16,7 +16,7 @@ class EventStatusCheckTask {
     @Autowired
     lateinit var eventService: EventService
 
-    @Scheduled(cron="0 05 00 * * *", zone="America/New_York") // Running this on every data at 00:05 midnight in EST time.
+    @Scheduled(cron="0 35 00 * * *", zone="America/New_York") // Running this on every data at 00:05 midnight in EST time.
     fun eventStatusCheckAndChange() {
         val result = eventService.updateEventStatusAccordingToDate()
         logger.printSeparator()
