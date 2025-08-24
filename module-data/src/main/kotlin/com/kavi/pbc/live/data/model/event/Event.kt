@@ -15,6 +15,7 @@ data class Event(
     val venueType: VenueType = VenueType.VIRTUAL,
     val venue: String?,
     val creator: String,
+    val eventImage: String? = null,
     val eventType: EventType = EventType.SPECIAL,
     val isRegistrationRequired: Boolean = false,
     val openSeatCount: Int? = null,
@@ -23,7 +24,7 @@ data class Event(
 ): BaseModel {
 
     constructor(): this (DataUtil.idGenerator("evt"), "", "", EventStatus.DRAFT, 0, "", "",
-        System.currentTimeMillis(), VenueType.VIRTUAL, null, "", EventType.SPECIAL, false,
+        System.currentTimeMillis(), VenueType.VIRTUAL, null, "", null, EventType.SPECIAL, false,
         0, false, mutableListOf()
     )
 
@@ -39,6 +40,7 @@ data class Event(
         "venueType" to venueType,
         "venue" to venue,
         "creator" to creator,
+        "eventImage" to eventImage,
         "eventType" to eventType,
         "isRegistrationRequired" to isRegistrationRequired,
         "openSeatCount" to openSeatCount,
