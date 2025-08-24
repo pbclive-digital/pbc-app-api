@@ -7,6 +7,8 @@ object DataConstant {
     const val DASHBOARD_EVENT_COUNT_7INCH_TAB = 3
     const val DASHBOARD_EVENT_COUNT_10INCH_TAB = 5
 
+    const val DASHBOARD_PAGER_EVENT_COUND = 3
+
     const val PAGINATION_KEY_LENGTH = 8
     const val PAGINATION_LIFE_TIME = 2 // From minutes
     const val PAGINATION_SCHEDULER_RUN_INTERVAL = 5 // From seconds

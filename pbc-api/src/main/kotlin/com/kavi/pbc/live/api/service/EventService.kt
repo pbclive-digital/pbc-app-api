@@ -31,7 +31,7 @@ class EventService {
         )
         val orderBy = mapOf(
             "property" to "eventDate",
-            "direction" to "DESC"
+            "direction" to "ASC"
         )
 
         val finalUpcomingEventList = datastoreRepositoryContract.getEntityListFromProperties(
