@@ -23,7 +23,7 @@ data class User(
         "email" to email,
         "firstName" to firstName,
         "lastName" to lastName,
-        "phoneNum" to phoneNumber,
+        "phoneNumber" to phoneNumber,
         "profilePicUrl" to profilePicUrl,
         "address" to address,
         "userType" to userType,
