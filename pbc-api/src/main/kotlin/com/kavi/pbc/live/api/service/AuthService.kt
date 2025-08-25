@@ -56,4 +56,8 @@ class AuthService {
             .status(HttpStatus.OK)
             .body(BaseResponse(Status.SUCCESS, userAuth.removeGivenToken(tokenId), null))
     }
+
+    fun deleteTokenFromUser(userId: String) {
+        userAuth.removeAllTokensForUser(userId)
+    }
 }

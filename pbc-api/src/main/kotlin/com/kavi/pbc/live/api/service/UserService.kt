@@ -7,12 +7,16 @@ import com.kavi.pbc.live.com.kavi.pbc.live.datastore.DatastoreRepositoryContract
 import com.kavi.pbc.live.com.kavi.pbc.live.firebase.repository.FirebaseDatastoreRepository
 import com.kavi.pbc.live.data.model.user.User
 import com.kavi.pbc.live.com.kavi.pbc.live.datastore.DatastoreConstant
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 
 @Service
 class UserService {
+
+    @Autowired
+    private val authService: AuthService? = null
 
     private var datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
 
@@ -68,6 +72,14 @@ class UserService {
                     Error(HttpStatus.NOT_FOUND.toString()))
                 ))
         }
+    }
+
+    fun deleteUserFromId(userId: String): ResponseEntity<BaseResponse<String>>? {
+        val updateTime = datastoreRepositoryContract.deleteEntity(DatastoreConstant.USER_COLLECTION, userId)
+        updateTime?.let {
+            authService?.deleteTokenFromUser(userId)
+        }
+        return ResponseEntity.ok(BaseResponse(Status.SUCCESS, updateTime, null))
     }
 
     private fun userFromId(userId: String): User? {

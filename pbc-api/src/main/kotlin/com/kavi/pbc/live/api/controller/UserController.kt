@@ -7,6 +7,7 @@ import com.kavi.pbc.live.data.model.user.User
 import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -64,6 +65,17 @@ class UserController(private val userService: UserService) {
         logger.printInfo("REQUEST MAPPING: PUT: [/user/update/$userId]", UserController::class.java)
 
         val response = userService.updateUser(userId, user)
+        logger.printResponseInfo(response, UserController::class.java)
+
+        return response
+    }
+
+    @DeleteMapping("/delete/{user-id}")
+    fun deleteUser(@PathVariable(value = "user-id") userId: String): ResponseEntity<BaseResponse<String>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: DELETE: [/user/delete/$userId]", UserController::class.java)
+
+        val response = userService.deleteUserFromId(userId)
         logger.printResponseInfo(response, UserController::class.java)
 
         return response
