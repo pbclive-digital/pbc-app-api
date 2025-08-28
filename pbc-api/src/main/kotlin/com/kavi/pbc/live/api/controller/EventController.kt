@@ -8,6 +8,7 @@ import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -33,12 +34,13 @@ class EventController(private val eventService: EventService) {
         return response
     }
 
-    @PostMapping("/add-event-image")
-    fun addEventImage(@RequestParam("eventImage") eventImage: MultipartFile): ResponseEntity<BaseResponse<String>>? {
+    @PostMapping("/add-event-image/{event-name}/{event-date}")
+    fun addEventImage(@PathVariable(value = "event-name") eventName: String,
+                      @PathVariable(value = "event-date") eventDateTimestamp: Long, @RequestParam("eventImage") eventImage: MultipartFile): ResponseEntity<BaseResponse<String>>? {
         logger.printSeparator()
-        logger.printInfo("REQUEST MAPPING: POST: [/event/add-event-image]", EventController::class.java)
+        logger.printInfo("REQUEST MAPPING: POST: [/event/add-event-image/$eventName/$eventDateTimestamp]", EventController::class.java)
 
-        val response = eventService.addEventImage(eventImage)
+        val response = eventService.addEventImage(eventImage, eventName, eventDateTimestamp)
         logger.printResponseInfo(response, EventController::class.java)
 
         return response

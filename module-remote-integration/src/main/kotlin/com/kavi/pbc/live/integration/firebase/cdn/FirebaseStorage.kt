@@ -1,8 +1,12 @@
 package com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.cdn
 
+import com.google.cloud.storage.BlobInfo
 import com.google.firebase.cloud.StorageClient
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.CDNIntegration
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import java.util.UUID
+
 
 class FirebaseStorage: CDNIntegration {
 
@@ -17,16 +21,21 @@ class FirebaseStorage: CDNIntegration {
     }
 
     override fun uploadFile(
-        folder: String,
         fileBytes: ByteArray,
-        fileName: String?,
+        fileName: String,
         fileContentType: String?
     ): String {
-        val fileName = "$folder/${UUID.randomUUID()}-${fileName}"
+        val token = UUID.randomUUID().toString()
 
-        StorageClient.getInstance().bucket(FirebaseCDNConstant.STORAGE_BUCKET_NAME)
-            .create(fileName, fileBytes, fileContentType)
+        val bucket = StorageClient.getInstance().bucket(FirebaseCDNConstant.STORAGE_BUCKET_NAME)
 
-        return "https://firebasestorage.googleapis.com/v0/b/${StorageClient.getInstance().bucket(FirebaseCDNConstant.STORAGE_BUCKET_NAME).name}/o/$fileName?alt=media"
+        val blobInfo = BlobInfo.newBuilder(bucket.name, fileName)
+            .setContentType(fileContentType)
+            .setMetadata(mapOf("firebaseStorageDownloadTokens" to token))
+            .build()
+
+        bucket.storage.create(blobInfo, fileBytes)
+
+        return "https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${fileName.replace("/", "%2F")}?alt=media&token=$token"
     }
 }

@@ -6,14 +6,13 @@ import com.kavi.pbc.live.com.kavi.pbc.live.integration.cloudinary.CloudinaryInte
 
 class CloudinaryStorage: CDNIntegration {
     override fun uploadFile(
-        folder: String,
         fileBytes: ByteArray,
-        fileName: String?,
+        fileName: String,
         fileContentType: String?
     ): String {
         val uploadResult = CloudinaryIntegration.getInstance().getCloudinary()
             ?.uploader()
-            ?.upload(fileBytes, ObjectUtils.asMap("resource_type", "auto"))
+            ?.upload(fileBytes, ObjectUtils.asMap("resource_type", "auto", "file_name", fileName))
         return uploadResult?.get("url").toString()
     }
 }
