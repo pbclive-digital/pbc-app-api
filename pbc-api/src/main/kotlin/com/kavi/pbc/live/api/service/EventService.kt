@@ -3,14 +3,17 @@ package com.kavi.pbc.live.api.service
 import com.kavi.pbc.live.api.dto.BaseResponse
 import com.kavi.pbc.live.api.dto.Error
 import com.kavi.pbc.live.api.dto.Status
-import com.kavi.pbc.live.com.kavi.pbc.live.datastore.DatastoreRepositoryContract
-import com.kavi.pbc.live.com.kavi.pbc.live.firebase.repository.FirebaseDatastoreRepository
+import com.kavi.pbc.live.com.kavi.pbc.live.integration.DatastoreRepositoryContract
+import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.cdn.FirebaseCDNConstant
+import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.cdn.FirebaseStorage
+import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository
 import com.kavi.pbc.live.data.model.event.Event
 import com.kavi.pbc.live.data.model.event.EventStatus
-import com.kavi.pbc.live.com.kavi.pbc.live.datastore.DatastoreConstant
+import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 import java.util.Date
 
 @Service
@@ -23,6 +26,15 @@ class EventService {
             .status(HttpStatus.CREATED)
             .body(BaseResponse(Status.SUCCESS,
                 datastoreRepositoryContract.createEntity(DatastoreConstant.EVENT_COLLECTION, event.id, event), null))
+    }
+
+    fun addEventImage(eventImage: MultipartFile): ResponseEntity<BaseResponse<String>>? {
+        //val url = CloudinaryCDN.getInstance().uploadFile(eventImage.bytes, eventImage.originalFilename, eventImage.contentType)
+        val url = FirebaseStorage.getInstance().uploadFile(FirebaseCDNConstant.EVENT_DIR_NAME, eventImage.bytes, eventImage.originalFilename, eventImage.contentType)
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(BaseResponse(Status.SUCCESS,
+                url, null))
     }
 
     fun getUpcomingEvents(): ResponseEntity<BaseResponse<List<Event>>>? {

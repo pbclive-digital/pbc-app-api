@@ -1,4 +1,4 @@
-package com.kavi.pbc.live.com.kavi.pbc.live.firebase.repository
+package com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore
 
 import com.google.api.core.ApiFuture
 import com.google.cloud.firestore.CollectionReference
@@ -8,7 +8,7 @@ import com.google.cloud.firestore.Query
 import com.google.cloud.firestore.QuerySnapshot
 import com.google.cloud.firestore.WriteResult
 import com.google.firebase.cloud.FirestoreClient
-import com.kavi.pbc.live.com.kavi.pbc.live.datastore.DatastoreRepositoryContract
+import com.kavi.pbc.live.com.kavi.pbc.live.integration.DatastoreRepositoryContract
 import com.kavi.pbc.live.data.model.BaseModel
 
 class FirebaseDatastoreRepository: DatastoreRepositoryContract {

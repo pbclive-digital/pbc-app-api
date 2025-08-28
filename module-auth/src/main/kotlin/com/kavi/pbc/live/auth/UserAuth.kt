@@ -1,12 +1,12 @@
 package com.kavi.pbc.live.auth
 
-import com.kavi.pbc.live.com.kavi.pbc.live.datastore.DatastoreRepositoryContract
-import com.kavi.pbc.live.com.kavi.pbc.live.firebase.repository.FirebaseDatastoreRepository
+import com.kavi.pbc.live.com.kavi.pbc.live.integration.DatastoreRepositoryContract
+import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository
 import com.kavi.pbc.live.data.DataConstant
 import com.kavi.pbc.live.data.model.auth.AuthToken
 import com.kavi.pbc.live.data.model.auth.AuthTokenStatus
 import com.kavi.pbc.live.data.model.user.User
-import com.kavi.pbc.live.com.kavi.pbc.live.datastore.DatastoreConstant
+import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
 import com.kavi.pbc.live.data.util.DataUtil
 import java.time.temporal.ChronoUnit
 

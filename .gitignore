@@ -40,7 +40,7 @@ out/
 .kotlin
 
 ### Firebase secrents ###
-module-remote-datastore/src/main/resources/firebase/*
+module-remote-integration/src/main/resources/firebase/*
 
 ### Heroku deploy file
 Procfile

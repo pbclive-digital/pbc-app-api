@@ -4,11 +4,11 @@ import com.kavi.pbc.live.api.dto.BaseResponse
 import com.kavi.pbc.live.api.dto.Error
 import com.kavi.pbc.live.api.dto.Status
 import com.kavi.pbc.live.api.AppProperties
-import com.kavi.pbc.live.com.kavi.pbc.live.datastore.DatastoreRepositoryContract
+import com.kavi.pbc.live.com.kavi.pbc.live.integration.DatastoreRepositoryContract
 import com.kavi.pbc.live.data.model.config.AppVersionStatus
 import com.kavi.pbc.live.data.model.config.Config
-import com.kavi.pbc.live.com.kavi.pbc.live.datastore.DatastoreConstant
-import com.kavi.pbc.live.com.kavi.pbc.live.firebase.repository.FirebaseDatastoreRepository
+import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
+import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository
 import com.kavi.pbc.live.data.DataConstant
 import com.kavi.pbc.live.data.model.config.DeviceFactor
 import org.springframework.beans.factory.annotation.Autowired

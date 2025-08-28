@@ -7,6 +7,7 @@ jvmVersion = "24"
 kotlinSerialization = "1.4.0"
 kotlinLogging = "3.0.5"
 jsonVersion = "20231013"
+cloudinaryVersion = "1.36.0"
 
 firebaseAdmin = "9.3.0"
 
@@ -32,6 +33,8 @@ kotlin-logging-jvm = { module = "io.github.microutils:kotlin-logging-jvm", versi
 json = { module = "org.json:json", version.ref = "jsonVersion" }
 
 firebase-admin = { module = "com.google.firebase:firebase-admin", version.ref = "firebaseAdmin"}
+
+cloudinary = { module = "com.cloudinary:cloudinary-http44", version.ref = "cloudinaryVersion" }
 
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "springBoot" }
 kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "junit5" }

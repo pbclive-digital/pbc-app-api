@@ -12,7 +12,7 @@ repositories {
 dependencies {
     implementation(libs.kotlin.serialization)
 
-    implementation(project(":module-remote-datastore"))
+    implementation(project(":module-remote-integration"))
     implementation(project(":module-data"))
 
     testImplementation(libs.kotlin.test.junit5)

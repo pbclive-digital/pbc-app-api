@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-SECRETS_PATH=module-remote-datastore/src/main/resources/firebase
+SECRETS_PATH=module-remote-integration/src/main/resources/firebase
 
 STAGING_FILE=$SECRETS_PATH/pbc-live-service-account-key-staging.json
 PROD_FILE=$SECRETS_PATH/pbc-live-service-account-key-prod.json

@@ -34,7 +34,7 @@ dependencies {
     implementation(libs.kotlin.logging.jvm)
 
     implementation(project(":module-auth"))
-    implementation(project(":module-remote-datastore"))
+    implementation(project(":module-remote-integration"))
     implementation(project(":module-data"))
 
 	testImplementation(libs.spring.boot.starter.test)

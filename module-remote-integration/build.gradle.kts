@@ -10,7 +10,8 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.firebase.admin)
+    implementation(dependencyNotation = libs.firebase.admin)
+    implementation(dependencyNotation = libs.cloudinary)
     implementation(libs.kotlin.serialization)
 
     implementation(project(":module-data"))

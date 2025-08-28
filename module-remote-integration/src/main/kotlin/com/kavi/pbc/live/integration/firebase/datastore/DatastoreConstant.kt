@@ -1,4 +1,4 @@
-package com.kavi.pbc.live.com.kavi.pbc.live.datastore
+package com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore
 
 object DatastoreConstant {
     const val CONFIG_COLLECTION = "CONFIG"

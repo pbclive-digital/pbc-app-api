@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/event")
@@ -21,11 +23,22 @@ class EventController(private val eventService: EventService) {
     lateinit var logger: AppLogger
 
     @PostMapping("/create")
-    fun createUser(@Valid @RequestBody event: Event): ResponseEntity<BaseResponse<String>>? {
+    fun createEvent(@Valid @RequestBody event: Event): ResponseEntity<BaseResponse<String>>? {
         logger.printSeparator()
         logger.printInfo("REQUEST MAPPING: POST: [/event/create]", EventController::class.java)
 
         val response = eventService.createEvent(event)
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
+    @PostMapping("/add-event-image")
+    fun addEventImage(@RequestParam("eventImage") eventImage: MultipartFile): ResponseEntity<BaseResponse<String>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: POST: [/event/add-event-image]", EventController::class.java)
+
+        val response = eventService.addEventImage(eventImage)
         logger.printResponseInfo(response, EventController::class.java)
 
         return response
