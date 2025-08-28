@@ -6,8 +6,8 @@ STAGING_FILE=$SECRETS_PATH/pbc-live-service-account-key-staging.json
 PROD_FILE=$SECRETS_PATH/pbc-live-service-account-key-prod.json
 
 SECRETS_REPO=pbc-app-secrets/
-STAGING_SECRET=pbc-app-secrets/firebase-service-account-secrets/pbc-live-service-account-key-staging.json
-PROD_SECRET=pbc-app-secrets/firebase-service-account-secrets/pbc-live-service-account-key-prod.json
+STAGING_SECRET=pbc-app-secrets/firebase-service-account-secrets/staging/pbc-live-service-account-key-staging.json
+PROD_SECRET=pbc-app-secrets/firebase-service-account-secrets/prod/pbc-live-service-account-key-prod.json
 
 PROPERTY_FILE=gradle.properties
 PROPERTY_KEY=versionName
