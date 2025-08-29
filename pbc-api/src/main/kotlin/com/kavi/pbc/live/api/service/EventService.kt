@@ -32,7 +32,6 @@ class EventService {
 
         val formatedEventName = eventName.replace(" ", "_").replace("-", "_")
         val formatFileName = "${FirebaseCDNConstant.EVENT_DIR_NAME}/$eventDateTimestamp:$formatedEventName"
-//        val formatFileName = "$eventDateTimestamp:$formatedEventName"
 
         val url = FirebaseStorage.getInstance().uploadFile(
             eventImage.bytes, formatFileName, eventImage.contentType)
