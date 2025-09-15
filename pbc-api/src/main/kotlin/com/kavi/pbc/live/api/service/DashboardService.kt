@@ -1,20 +1,33 @@
 package com.kavi.pbc.live.api.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.kavi.pbc.live.api.dto.BaseResponse
 import com.kavi.pbc.live.api.dto.Error
 import com.kavi.pbc.live.api.dto.Status
-import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.DatastoreRepositoryContract
+import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository
 import com.kavi.pbc.live.data.DataConstant.DASHBOARD_PAGER_EVENT_COUND
+import com.kavi.pbc.live.data.model.DailyQuote
 import com.kavi.pbc.live.data.model.event.Event
 import com.kavi.pbc.live.data.model.event.EventStatus
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.Resource
+import org.springframework.core.io.ResourceLoader
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import com.fasterxml.jackson.core.type.TypeReference
+import com.kavi.pbc.live.data.DataConstant
+
 
 @Service
-class DashboardService {
+class DashboardService (
+    private val objectMapper: ObjectMapper
+) {
+
+    @Autowired
+    private val resourceLoader: ResourceLoader? = null
 
     private var datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
 
@@ -39,6 +52,13 @@ class DashboardService {
                     Error(HttpStatus.NOT_FOUND.toString()))
                 ))
         }
+    }
+
+    fun getDailyQuotes(): ResponseEntity<BaseResponse<List<DailyQuote>>>? {
+        val allQuoteList: List<DailyQuote> = loadQuotes()
+
+        val randomList = allQuoteList.shuffled().take(DataConstant.DAILY_QUOTE_COUNT)
+        return ResponseEntity.ok(BaseResponse(Status.SUCCESS, randomList, null))
     }
 
     private fun upcomingEvents(): MutableList<Event> {
@@ -74,5 +94,12 @@ class DashboardService {
             limit = limit,
             className = Event::class.java
         )
+    }
+
+    private fun loadQuotes(): List<DailyQuote> {
+        val resource: Resource = resourceLoader!!.getResource("classpath:quotes/daily_quotes.json")
+        resource.inputStream.use { inputStream ->
+            return objectMapper.readValue(inputStream, object : TypeReference<List<DailyQuote>>() {})
+        }
     }
 }
