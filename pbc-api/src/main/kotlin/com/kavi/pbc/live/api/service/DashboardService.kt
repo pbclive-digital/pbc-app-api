@@ -19,6 +19,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import com.fasterxml.jackson.core.type.TypeReference
 import com.kavi.pbc.live.data.DataConstant
+import com.kavi.pbc.live.data.model.news.News
+import com.kavi.pbc.live.data.model.news.NewsStatus
 
 
 @Service
@@ -61,6 +63,20 @@ class DashboardService (
         return ResponseEntity.ok(BaseResponse(Status.SUCCESS, randomList, null))
     }
 
+    fun getNews(): ResponseEntity<BaseResponse<List<News>>> {
+        val newsList = retrieveActiveNews()
+
+        return if (newsList.isNotEmpty()) {
+            ResponseEntity.ok(BaseResponse(Status.SUCCESS, newsList, null))
+        } else {
+            ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error(HttpStatus.NOT_FOUND.toString()))
+                ))
+        }
+    }
+
     private fun upcomingEvents(): MutableList<Event> {
         val properties = mapOf(
             "eventStatus" to EventStatus.PUBLISHED
@@ -101,5 +117,18 @@ class DashboardService (
         resource.inputStream.use { inputStream ->
             return objectMapper.readValue(inputStream, object : TypeReference<List<DailyQuote>>() {})
         }
+    }
+
+    private fun retrieveActiveNews(): List<News> {
+        val properties = mapOf(
+            "newsStatus" to NewsStatus.ACTIVE
+        )
+
+        return datastoreRepositoryContract.getEntityListFromProperties(
+            entityCollection = DatastoreConstant.NEWS_COLLECTION,
+            propertiesMap = properties,
+            limit = 5,
+            className = News::class.java
+        )
     }
 }
