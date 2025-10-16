@@ -123,11 +123,16 @@ class DashboardService (
         val properties = mapOf(
             "newsStatus" to NewsStatus.ACTIVE
         )
+        val orderBy = mapOf(
+            "property" to "createdTime",
+            "direction" to "DESC"
+        )
 
         return datastoreRepositoryContract.getEntityListFromProperties(
             entityCollection = DatastoreConstant.NEWS_COLLECTION,
             propertiesMap = properties,
-            limit = 5,
+            orderByMap = orderBy,
+            limit = 3,
             className = News::class.java
         )
     }

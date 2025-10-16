@@ -8,10 +8,11 @@ data class News(
     val title: String,
     val content: String,
     val newsStatus: NewsStatus = NewsStatus.DRAFT,
-    val facebookLink: String? = null
+    val facebookLink: String? = null,
+    val createdTime: Long
 ): BaseModel {
     constructor(): this(
-        DataUtil.idGenerator("nsw"), "", "", NewsStatus.DRAFT, null
+        DataUtil.idGenerator("nsw"), "", "", NewsStatus.DRAFT, null, System.currentTimeMillis()
     )
 
     override fun toMap(): Map<String, Any?> = mapOf(
@@ -19,6 +20,7 @@ data class News(
         "title" to title,
         "content" to content,
         "newsStatus" to newsStatus,
-        "facebookLink" to facebookLink
+        "facebookLink" to facebookLink,
+        "createdTime" to createdTime
     )
 }
