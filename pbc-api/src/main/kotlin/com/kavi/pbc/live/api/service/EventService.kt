@@ -153,4 +153,12 @@ class EventService {
             "No Events found that due from Date: [${Date()}]"
         }
     }
+
+    fun deleteGivenEvent(eventId: String): ResponseEntity<BaseResponse<String>>? {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(BaseResponse(Status.SUCCESS,
+                datastoreRepositoryContract.deleteEntity(DatastoreConstant.EVENT_COLLECTION, eventId),
+                null))
+    }
 }

@@ -7,6 +7,7 @@ import com.kavi.pbc.live.data.model.event.Event
 import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -74,6 +75,18 @@ class EventController(private val eventService: EventService) {
         logger.printInfo("REQUEST MAPPING: GET: [/event/get/past]", EventController::class.java)
 
         val response = eventService.getPastEvents()
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
+    @DeleteMapping("/delete/{event-id}")
+    fun deleteEvent(@PathVariable(value = "event-id") eventId: String):
+            ResponseEntity<BaseResponse<String>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: DELETE:[/event/delete/event//$eventId]", EventController::class.java)
+
+        val response = eventService.deleteGivenEvent(eventId)
         logger.printResponseInfo(response, EventController::class.java)
 
         return response
