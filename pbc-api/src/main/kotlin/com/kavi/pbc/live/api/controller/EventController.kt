@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -80,11 +81,22 @@ class EventController(private val eventService: EventService) {
         return response
     }
 
+    @PutMapping("/put/publish/{event-id}")
+    fun publishDraftEvent(@PathVariable(value = "event-id") eventId: String, @Valid @RequestBody event: Event): ResponseEntity<BaseResponse<Event>>?? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: PUT: [/event/put/publish/$eventId]", EventController::class.java)
+
+        val response = eventService.publishDraftEvent(eventId, event)
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
     @DeleteMapping("/delete/{event-id}")
     fun deleteEvent(@PathVariable(value = "event-id") eventId: String):
             ResponseEntity<BaseResponse<String>>? {
         logger.printSeparator()
-        logger.printInfo("REQUEST MAPPING: DELETE:[/event/delete/event//$eventId]", EventController::class.java)
+        logger.printInfo("REQUEST MAPPING: DELETE:[/event/delete/event/$eventId]", EventController::class.java)
 
         val response = eventService.deleteGivenEvent(eventId)
         logger.printResponseInfo(response, EventController::class.java)

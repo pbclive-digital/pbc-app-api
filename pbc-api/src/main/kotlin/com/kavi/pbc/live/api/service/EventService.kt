@@ -154,6 +154,18 @@ class EventService {
         }
     }
 
+    fun publishDraftEvent(eventId: String, event: Event): ResponseEntity<BaseResponse<Event>>? {
+        event.eventStatus = EventStatus.PUBLISHED
+
+        datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_COLLECTION, eventId, event)
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(BaseResponse(Status.SUCCESS,
+                event,
+                null))
+    }
+
     fun deleteGivenEvent(eventId: String): ResponseEntity<BaseResponse<String>>? {
         return ResponseEntity
             .status(HttpStatus.OK)
