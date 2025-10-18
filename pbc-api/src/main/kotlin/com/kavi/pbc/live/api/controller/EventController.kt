@@ -46,6 +46,17 @@ class EventController(private val eventService: EventService) {
         return response
     }
 
+    @GetMapping("/get/draft")
+    fun getAllDraftEvents(): ResponseEntity<BaseResponse<List<Event>>>?? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET: [/event/get/draft]", EventController::class.java)
+
+        val response = eventService.getDraftEvents()
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
     @GetMapping("/get/upcoming")
     fun getAllUpcomingEvents(): ResponseEntity<BaseResponse<List<Event>>>? {
         logger.printSeparator()

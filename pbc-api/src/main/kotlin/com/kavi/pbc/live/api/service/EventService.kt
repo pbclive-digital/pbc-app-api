@@ -41,6 +41,33 @@ class EventService {
                 url, null))
     }
 
+    fun getDraftEvents(): ResponseEntity<BaseResponse<List<Event>>>? {
+        val properties = mapOf(
+            "eventStatus" to EventStatus.DRAFT
+        )
+        val orderBy = mapOf(
+            "property" to "eventDate",
+            "direction" to "ASC"
+        )
+
+        val finalDraftEventList = datastoreRepositoryContract.getEntityListFromProperties(
+            entityCollection = DatastoreConstant.EVENT_COLLECTION,
+            propertiesMap = properties,
+            orderByMap = orderBy,
+            className = Event::class.java
+        )
+
+        return if (finalDraftEventList.isNotEmpty()) {
+            ResponseEntity.ok(BaseResponse(Status.SUCCESS, finalDraftEventList, null))
+        } else {
+            ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error(HttpStatus.NOT_FOUND.toString()))
+                ))
+        }
+    }
+
     fun getUpcomingEvents(): ResponseEntity<BaseResponse<List<Event>>>? {
         val properties = mapOf(
             "eventStatus" to EventStatus.PUBLISHED
