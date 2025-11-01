@@ -28,10 +28,11 @@ class EventService {
                 datastoreRepositoryContract.createEntity(DatastoreConstant.EVENT_COLLECTION, event.id, event), null))
     }
 
-    fun addEventImage(eventImage: MultipartFile, eventName: String, eventDateTimestamp: Long): ResponseEntity<BaseResponse<String>>? {
+    fun addEventImage(eventImage: MultipartFile, eventName: String): ResponseEntity<BaseResponse<String>>? {
 
         val formatedEventName = eventName.replace(" ", "_").replace("-", "_")
-        val formatFileName = "${FirebaseCDNConstant.EVENT_DIR_NAME}/$eventDateTimestamp:$formatedEventName"
+        val createdTimestamp = System.currentTimeMillis()
+        val formatFileName = "${FirebaseCDNConstant.EVENT_DIR_NAME}/$createdTimestamp:$formatedEventName"
 
         val url = FirebaseStorage.getInstance().uploadFile(
             eventImage.bytes, formatFileName, eventImage.contentType)

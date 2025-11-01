@@ -36,13 +36,12 @@ class EventController(private val eventService: EventService) {
         return response
     }
 
-    @PostMapping("/add-event-image/{event-name}/{event-date}")
-    fun addEventImage(@PathVariable(value = "event-name") eventName: String,
-                      @PathVariable(value = "event-date") eventDateTimestamp: Long, @RequestParam("eventImage") eventImage: MultipartFile): ResponseEntity<BaseResponse<String>>? {
+    @PostMapping("/add/image/{event-name}")
+    fun addEventImage(@PathVariable(value = "event-name") eventName: String, @RequestParam("eventImage") eventImage: MultipartFile): ResponseEntity<BaseResponse<String>>? {
         logger.printSeparator()
-        logger.printInfo("REQUEST MAPPING: POST: [/event/add-event-image/$eventName/$eventDateTimestamp]", EventController::class.java)
+        logger.printInfo("REQUEST MAPPING: POST: [/event/add/image/$eventName]", EventController::class.java)
 
-        val response = eventService.addEventImage(eventImage, eventName, eventDateTimestamp)
+        val response = eventService.addEventImage(eventImage, eventName)
         logger.printResponseInfo(response, EventController::class.java)
 
         return response
