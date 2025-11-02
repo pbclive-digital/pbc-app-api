@@ -11,20 +11,20 @@ data class Event(
     val eventDate: Long,
     val startTime: String,
     val endTime: String,
-    val createdTime: Long,
-    val venueType: VenueType = VenueType.VIRTUAL,
+    val createdTime: Long = System.currentTimeMillis(),
+    val venueType: VenueType = VenueType.DRAFT,
     val venue: String?,
     val creator: String,
     val eventImage: String? = null,
-    val eventType: EventType = EventType.SPECIAL,
-    val isRegistrationRequired: Boolean = false,
+    val eventType: EventType = EventType.DRAFT,
+    val registrationRequired: Boolean = false,
     val openSeatCount: Int? = null,
-    val isPotluckAvailable: Boolean = false,
+    val potluckAvailable: Boolean = false,
     val potluckItemList: MutableList<PotluckItem>? = mutableListOf()
 ): BaseModel {
 
     constructor(): this (DataUtil.idGenerator("evt"), "", "", EventStatus.DRAFT, 0, "", "",
-        System.currentTimeMillis(), VenueType.VIRTUAL, null, "", null, EventType.SPECIAL, false,
+        System.currentTimeMillis(), VenueType.DRAFT, null, "", null, EventType.DRAFT, false,
         0, false, mutableListOf()
     )
 
@@ -42,9 +42,9 @@ data class Event(
         "creator" to creator,
         "eventImage" to eventImage,
         "eventType" to eventType,
-        "isRegistrationRequired" to isRegistrationRequired,
+        "registrationRequired" to registrationRequired,
         "openSeatCount" to openSeatCount,
-        "isPotluckAvailable" to isPotluckAvailable,
+        "potluckAvailable" to potluckAvailable,
         "potluckItemList" to potluckItemList
     )
 }
