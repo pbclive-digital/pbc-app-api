@@ -14,6 +14,8 @@ data class Event(
     val createdTime: Long = System.currentTimeMillis(),
     val venueType: VenueType = VenueType.DRAFT,
     val venue: String?,
+    val venueAddress: String?,
+    val meetingUrl: String?,
     val creator: String,
     val eventImage: String? = null,
     val eventType: EventType = EventType.DRAFT,
@@ -24,7 +26,7 @@ data class Event(
 ): BaseModel {
 
     constructor(): this (DataUtil.idGenerator("evt"), "", "", EventStatus.DRAFT, 0, "", "",
-        System.currentTimeMillis(), VenueType.DRAFT, null, "", null, EventType.DRAFT, false,
+        System.currentTimeMillis(), VenueType.DRAFT, null, null, null,"", null, EventType.DRAFT, false,
         0, false, mutableListOf()
     )
 
@@ -39,6 +41,8 @@ data class Event(
         "createdTime" to createdTime,
         "venueType" to venueType,
         "venue" to venue,
+        "venueAddress" to venueAddress,
+        "meetingUrl" to meetingUrl,
         "creator" to creator,
         "eventImage" to eventImage,
         "eventType" to eventType,
