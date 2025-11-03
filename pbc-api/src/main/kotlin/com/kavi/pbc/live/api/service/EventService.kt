@@ -201,7 +201,7 @@ class EventService {
                 eventRegistration.registrationList.add(eventRegistrationItem)
 
             return ResponseEntity
-                .status(HttpStatus.OK)
+                .status(HttpStatus.CREATED)
                 .body(BaseResponse(Status.SUCCESS,
                     datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventRegistration.id, eventRegistration),
                     null))
