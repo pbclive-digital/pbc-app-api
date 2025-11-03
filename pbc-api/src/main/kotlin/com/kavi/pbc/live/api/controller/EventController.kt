@@ -4,6 +4,7 @@ import com.kavi.pbc.live.api.dto.BaseResponse
 import com.kavi.pbc.live.api.service.EventService
 import com.kavi.pbc.live.api.util.AppLogger
 import com.kavi.pbc.live.data.model.event.Event
+import com.kavi.pbc.live.data.model.event.register.EventRegistrationItem
 import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -84,7 +85,7 @@ class EventController(private val eventService: EventService) {
     fun updateEvent(@PathVariable(value = "event-id") eventId: String,
                     @Valid @RequestBody event: Event): ResponseEntity<BaseResponse<Event>>? {
         logger.printSeparator()
-        logger.printInfo("REQUEST MAPPING: GET: [/event/update/$eventId]", EventController::class.java)
+        logger.printInfo("REQUEST MAPPING: PUT: [/event/update/$eventId]", EventController::class.java)
 
         val response = eventService.updateEvent(eventId, event)
         logger.printResponseInfo(response, EventController::class.java)
@@ -110,6 +111,18 @@ class EventController(private val eventService: EventService) {
         logger.printInfo("REQUEST MAPPING: DELETE:[/event/delete/event/$eventId]", EventController::class.java)
 
         val response = eventService.deleteGivenEvent(eventId)
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
+    @PostMapping("/register/{event-id}")
+    fun registerToEvent(@PathVariable(value = "event-id") eventId: String, @Valid @RequestBody eventRegItem: EventRegistrationItem):
+            ResponseEntity<BaseResponse<String>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: POST:[/event/register/$eventId]", EventController::class.java)
+
+        val response = eventService.registerToEvent(eventId, eventRegItem)
         logger.printResponseInfo(response, EventController::class.java)
 
         return response

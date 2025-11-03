@@ -10,6 +10,8 @@ import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.Fireba
 import com.kavi.pbc.live.data.model.event.Event
 import com.kavi.pbc.live.data.model.event.EventStatus
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
+import com.kavi.pbc.live.data.model.event.register.EventRegistration
+import com.kavi.pbc.live.data.model.event.register.EventRegistrationItem
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -22,10 +24,18 @@ class EventService {
     private var datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
 
     fun createEvent(event: Event): ResponseEntity<BaseResponse<String>>? {
+
+        val eventCreationRes = datastoreRepositoryContract.createEntity(DatastoreConstant.EVENT_COLLECTION, event.id, event)
+
+        if (event.registrationRequired) {
+            val eventRegistration = EventRegistration(event.id, event.openSeatCount!!)
+            datastoreRepositoryContract.createEntity(DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventRegistration.id, eventRegistration)
+        }
+
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(BaseResponse(Status.SUCCESS,
-                datastoreRepositoryContract.createEntity(DatastoreConstant.EVENT_COLLECTION, event.id, event), null))
+                eventCreationRes, null))
     }
 
     fun addEventImage(eventImage: MultipartFile, eventName: String): ResponseEntity<BaseResponse<String>>? {
@@ -183,5 +193,24 @@ class EventService {
             .body(BaseResponse(Status.SUCCESS,
                 datastoreRepositoryContract.deleteEntity(DatastoreConstant.EVENT_COLLECTION, eventId),
                 null))
+    }
+
+    fun registerToEvent(eventId: String, eventRegistrationItem: EventRegistrationItem): ResponseEntity<BaseResponse<String>>? {
+        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventId,
+            EventRegistration::class.java)?.let { eventRegistration ->
+                eventRegistration.registrationList.add(eventRegistrationItem)
+
+            return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse(Status.SUCCESS,
+                    datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventRegistration.id, eventRegistration),
+                    null))
+        }?: run {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error(HttpStatus.NOT_FOUND.toString()))
+                ))
+        }
     }
 }
