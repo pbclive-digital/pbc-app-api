@@ -80,6 +80,18 @@ class EventController(private val eventService: EventService) {
         return response
     }
 
+    @PutMapping("/update/{event-id}")
+    fun updateEvent(@PathVariable(value = "event-id") eventId: String,
+                    @Valid @RequestBody event: Event): ResponseEntity<BaseResponse<Event>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET: [/event/update/$eventId]", EventController::class.java)
+
+        val response = eventService.updateEvent(eventId, event)
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
     @PutMapping("/put/publish/{event-id}")
     fun publishDraftEvent(@PathVariable(value = "event-id") eventId: String, @Valid @RequestBody event: Event): ResponseEntity<BaseResponse<Event>>?? {
         logger.printSeparator()
