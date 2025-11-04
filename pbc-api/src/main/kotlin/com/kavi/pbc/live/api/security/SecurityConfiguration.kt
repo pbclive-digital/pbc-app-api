@@ -15,7 +15,14 @@ class SecurityConfiguration {
             .csrf { it.disable() }
             .authorizeHttpRequests { requests ->
                 requests
+                    .requestMatchers("/event/get/draft/**").authenticated()
                     .requestMatchers("/event/create/**").authenticated()
+                    .requestMatchers("/event/add/image/**").authenticated()
+                    .requestMatchers("/event/register/**").authenticated()
+                    .requestMatchers("/event/unregister/**").authenticated()
+                    .requestMatchers("/event/put/publish/**").authenticated()
+                    .requestMatchers("/event/update/**").authenticated()
+                    .requestMatchers("/event/delete/**").authenticated()
                     .requestMatchers("/user/update/**").authenticated()
                     .anyRequest().permitAll()
             }

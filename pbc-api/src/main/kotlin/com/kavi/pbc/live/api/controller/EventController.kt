@@ -129,6 +129,18 @@ class EventController(private val eventService: EventService) {
         return response
     }
 
+    @DeleteMapping("/unregister/{event-id}/{user-id}")
+    fun unregisterFromEvent(@PathVariable(value = "event-id") eventId: String, @PathVariable(value = "user-id") userId: String):
+            ResponseEntity<BaseResponse<String>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: POST:[/event/unregister/$eventId/$userId]", EventController::class.java)
+
+        val response = eventService.unregisterFromEvent(eventId, userId)
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
     @GetMapping("/get/registration/{event-id}")
     fun getEventRegistration(@PathVariable(value = "event-id") eventId: String): ResponseEntity<BaseResponse<EventRegistration>>? {
         logger.printSeparator()

@@ -233,6 +233,25 @@ class EventService {
         }
     }
 
+    fun unregisterFromEvent(eventId: String, userId: String): ResponseEntity<BaseResponse<String>>? {
+        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventId,
+            EventRegistration::class.java)?.let { eventRegistration ->
+            eventRegistration.registrationList.removeIf { it.participantUserId == userId }
+
+            return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(BaseResponse(Status.SUCCESS,
+                    datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventRegistration.id, eventRegistration),
+                    null))
+        }?: run {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error(HttpStatus.NOT_FOUND.toString()))
+                ))
+        }
+    }
+
     fun getEventRegistrationRecord(eventId: String): ResponseEntity<BaseResponse<EventRegistration>>? {
         datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventId,
             EventRegistration::class.java)?.let {
