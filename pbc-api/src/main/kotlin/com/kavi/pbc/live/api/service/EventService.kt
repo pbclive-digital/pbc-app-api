@@ -3,6 +3,7 @@ package com.kavi.pbc.live.api.service
 import com.kavi.pbc.live.api.dto.BaseResponse
 import com.kavi.pbc.live.api.dto.Error
 import com.kavi.pbc.live.api.dto.Status
+import com.kavi.pbc.live.api.util.AppLogger
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.DatastoreRepositoryContract
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.cdn.FirebaseCDNConstant
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.cdn.FirebaseStorage
@@ -12,6 +13,7 @@ import com.kavi.pbc.live.data.model.event.EventStatus
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
 import com.kavi.pbc.live.data.model.event.register.EventRegistration
 import com.kavi.pbc.live.data.model.event.register.EventRegistrationItem
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -21,6 +23,8 @@ import java.util.Date
 @Service
 class EventService {
 
+    @Autowired
+    lateinit var logger: AppLogger
     private var datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
 
     fun createEvent(event: Event): ResponseEntity<BaseResponse<String>>? {
@@ -168,6 +172,21 @@ class EventService {
     fun updateEvent(eventId: String, event: Event): ResponseEntity<BaseResponse<Event>>? {
 
         datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_COLLECTION, eventId, event)
+
+        if (event.registrationRequired) {
+            datastoreRepositoryContract.getEntityFromId(
+                DatastoreConstant.EVENT_REGISTRATION_COLLECTION, entityId = eventId,
+                EventRegistration::class.java
+            )?.let {
+                logger.printInfo("Record already available to the " +
+                        "event:$eventId in ${DatastoreConstant.EVENT_REGISTRATION_COLLECTION} collection.", EventService::class.java)
+            }?: run {
+                val eventRegistration = EventRegistration(event.id, event.openSeatCount!!)
+                datastoreRepositoryContract
+                    .createEntity(DatastoreConstant.EVENT_REGISTRATION_COLLECTION,
+                        eventRegistration.id, eventRegistration)
+            }
+        }
 
         return ResponseEntity
             .status(HttpStatus.OK)
