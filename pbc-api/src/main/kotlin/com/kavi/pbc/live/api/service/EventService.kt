@@ -214,15 +214,16 @@ class EventService {
                 null))
     }
 
-    fun registerToEvent(eventId: String, eventRegistrationItem: EventRegistrationItem): ResponseEntity<BaseResponse<String>>? {
+    fun registerToEvent(eventId: String, eventRegistrationItem: EventRegistrationItem): ResponseEntity<BaseResponse<EventRegistration>>? {
         datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventId,
             EventRegistration::class.java)?.let { eventRegistration ->
                 eventRegistration.registrationList.add(eventRegistrationItem)
+            datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventRegistration.id, eventRegistration)
 
             return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(BaseResponse(Status.SUCCESS,
-                    datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventRegistration.id, eventRegistration),
+                    eventRegistration,
                     null))
         }?: run {
             return ResponseEntity
@@ -233,15 +234,16 @@ class EventService {
         }
     }
 
-    fun unregisterFromEvent(eventId: String, userId: String): ResponseEntity<BaseResponse<String>>? {
+    fun unregisterFromEvent(eventId: String, userId: String): ResponseEntity<BaseResponse<EventRegistration>>? {
         datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventId,
             EventRegistration::class.java)?.let { eventRegistration ->
             eventRegistration.registrationList.removeIf { it.participantUserId == userId }
+            datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventRegistration.id, eventRegistration)
 
             return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
                 .body(BaseResponse(Status.SUCCESS,
-                    datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventRegistration.id, eventRegistration),
+                    eventRegistration,
                     null))
         }?: run {
             return ResponseEntity
