@@ -232,4 +232,21 @@ class EventService {
                 ))
         }
     }
+
+    fun getEventRegistrationRecord(eventId: String): ResponseEntity<BaseResponse<EventRegistration>>? {
+        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventId,
+            EventRegistration::class.java)?.let {
+            return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse(Status.SUCCESS,
+                    it,
+                    null))
+        }?: run {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error(HttpStatus.NOT_FOUND.toString()))
+                ))
+        }
+    }
 }

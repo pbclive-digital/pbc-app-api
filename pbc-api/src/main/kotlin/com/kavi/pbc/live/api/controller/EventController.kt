@@ -4,6 +4,7 @@ import com.kavi.pbc.live.api.dto.BaseResponse
 import com.kavi.pbc.live.api.service.EventService
 import com.kavi.pbc.live.api.util.AppLogger
 import com.kavi.pbc.live.data.model.event.Event
+import com.kavi.pbc.live.data.model.event.register.EventRegistration
 import com.kavi.pbc.live.data.model.event.register.EventRegistrationItem
 import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
@@ -123,6 +124,17 @@ class EventController(private val eventService: EventService) {
         logger.printInfo("REQUEST MAPPING: POST:[/event/register/$eventId]", EventController::class.java)
 
         val response = eventService.registerToEvent(eventId, eventRegItem)
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
+    @GetMapping("/get/registration/{event-id}")
+    fun getEventRegistration(@PathVariable(value = "event-id") eventId: String): ResponseEntity<BaseResponse<EventRegistration>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET:[/event/get/registration/$eventId]", EventController::class.java)
+
+        val response = eventService.getEventRegistrationRecord(eventId)
         logger.printResponseInfo(response, EventController::class.java)
 
         return response
