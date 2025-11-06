@@ -2,7 +2,9 @@ package com.kavi.pbc.live.data.model.user
 
 import com.kavi.pbc.live.data.model.BaseModel
 import com.kavi.pbc.live.data.util.DataUtil
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class User(
     val id: String,
     val email: String,
