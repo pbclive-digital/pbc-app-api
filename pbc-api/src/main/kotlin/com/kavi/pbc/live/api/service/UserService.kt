@@ -28,6 +28,9 @@ class UserService {
                     Error(HttpStatus.CONFLICT.toString()))
                 ))
         }?: run {
+            user.uppercaseFirstName = user.firstName?.uppercase()
+            user.uppercaseLastName = user.lastName?.uppercase()
+
             return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(BaseResponse(Status.SUCCESS,
@@ -74,6 +77,25 @@ class UserService {
         }
     }
 
+    fun searchUserByName(name: String): ResponseEntity<BaseResponse<List<User>>>? {
+        searchUserFromName(name)?.let {
+            if (it.isNotEmpty())
+                return ResponseEntity.ok(BaseResponse(Status.SUCCESS, it, null))
+            else
+                return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(BaseResponse(Status.ERROR, null, listOf(
+                        Error(HttpStatus.NOT_FOUND.toString()))
+                    ))
+        }?:run {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error("${HttpStatus.NOT_FOUND.toString()} due to No valid name provided to search"))
+                ))
+        }
+    }
+
     fun deleteUserFromId(userId: String): ResponseEntity<BaseResponse<String>>? {
         val updateTime = datastoreRepositoryContract.deleteEntity(DatastoreConstant.USER_COLLECTION, userId)
         updateTime?.let {
@@ -98,5 +120,26 @@ class UserService {
             user = responseList.get(0)
 
         return user
+    }
+
+    private fun searchUserFromName(name: String): MutableList<User> {
+
+        val names = name.split("_")
+
+        val properties = mutableMapOf<String, String>()
+        if (names.isNotEmpty()) {
+            if (names.size >= 2) {
+                properties["uppercaseFirstName"] = names[0].uppercase()
+                properties["uppercaseLastName"] = names[1].uppercase()
+            } else {
+                properties["uppercaseFirstName"] = names[0].uppercase()
+            }
+        }
+
+        return datastoreRepositoryContract.getEntityListFromProperties(
+            entityCollection = DatastoreConstant.USER_COLLECTION,
+            propertiesMap = properties,
+            className = User::class.java
+        )
     }
 }

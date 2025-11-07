@@ -9,7 +9,9 @@ data class User(
     val id: String,
     val email: String,
     val firstName: String?,
+    var uppercaseFirstName: String?,
     val lastName: String?,
+    var uppercaseLastName: String?,
     val phoneNumber: String? = null,
     val profilePicUrl: String? = null,
     val address: String? = null,
@@ -17,14 +19,16 @@ data class User(
     val userAuthType: UserAuthType? = UserAuthType.NONE,
 ): BaseModel {
     constructor(): this(
-        DataUtil.idGenerator("usr"), "", null, null, null,
+        DataUtil.idGenerator("usr"), "", null, null,null, null,null,
         null, null, UserType.CONSUMER, UserAuthType.NONE)
 
     override fun toMap(): Map<String, Any?> = mapOf(
         "id" to id,
         "email" to email,
         "firstName" to firstName,
+        "uppercaseFirstName" to uppercaseFirstName,
         "lastName" to lastName,
+        "uppercaseLastName" to uppercaseLastName,
         "phoneNumber" to phoneNumber,
         "profilePicUrl" to profilePicUrl,
         "address" to address,

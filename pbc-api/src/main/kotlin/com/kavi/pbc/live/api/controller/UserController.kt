@@ -58,6 +58,17 @@ class UserController(private val userService: UserService) {
         return response
     }
 
+    @GetMapping("/get/name/{name}")
+    fun searchUserByName(@PathVariable(value = "name") name: String): ResponseEntity<BaseResponse<List<User>>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET: [/user/get/name/$name]", UserController::class.java)
+
+        val response = userService.searchUserByName(name)
+        logger.printResponseInfo(response, UserController::class.java)
+
+        return response
+    }
+
     @PutMapping("/update/{user-id}")
     fun updateUser(@PathVariable(value = "user-id") userId: String, @Valid @RequestBody user: User):
             ResponseEntity<BaseResponse<User>>? {
