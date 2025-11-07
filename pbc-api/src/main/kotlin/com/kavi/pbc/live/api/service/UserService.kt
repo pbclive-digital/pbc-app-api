@@ -42,6 +42,9 @@ class UserService {
     fun updateUser(userId: String, newUser: User): ResponseEntity<BaseResponse<User>>? {
         val user = getUserById(userId)
         user?.let {
+            newUser.uppercaseFirstName = newUser.firstName?.uppercase()
+            newUser.uppercaseLastName = newUser.lastName?.uppercase()
+
             datastoreRepositoryContract.updateEntity(DatastoreConstant.USER_COLLECTION, userId, newUser)
             return ResponseEntity.ok(BaseResponse(Status.SUCCESS,
                 newUser, null))
@@ -62,6 +65,9 @@ class UserService {
             UserType.CONSUMER.name -> UserType.CONSUMER
             else -> UserType.CONSUMER
         }
+
+        user.uppercaseFirstName = user.firstName?.uppercase()
+        user.uppercaseLastName = user.lastName?.uppercase()
 
         datastoreRepositoryContract.updateEntity(DatastoreConstant.USER_COLLECTION, user.id, user)
 
