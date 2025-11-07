@@ -81,6 +81,17 @@ class UserController(private val userService: UserService) {
         return response
     }
 
+    @PutMapping("/update/userType/{new-role}")
+    fun modifyUserRole(@PathVariable(value = "new-role") newRole: String, @Valid @RequestBody user: User): ResponseEntity<BaseResponse<User>>?? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: PUT: [/user/update/userType/$newRole]", UserController::class.java)
+
+        val response = userService.modifyUserRole(newRole, user)
+        logger.printResponseInfo(response, UserController::class.java)
+
+        return response
+    }
+
     @DeleteMapping("/delete/{user-id}")
     fun deleteUser(@PathVariable(value = "user-id") userId: String): ResponseEntity<BaseResponse<String>>? {
         logger.printSeparator()

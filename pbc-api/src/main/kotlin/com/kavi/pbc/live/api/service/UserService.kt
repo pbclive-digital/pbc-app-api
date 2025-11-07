@@ -7,6 +7,7 @@ import com.kavi.pbc.live.com.kavi.pbc.live.integration.DatastoreRepositoryContra
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository
 import com.kavi.pbc.live.data.model.user.User
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
+import com.kavi.pbc.live.data.model.user.UserType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -51,6 +52,24 @@ class UserService {
                     Error(HttpStatus.NOT_FOUND.toString()))
                 ))
         }
+    }
+
+    fun modifyUserRole(newRole: String, user: User): ResponseEntity<BaseResponse<User>>? {
+        user.userType = when(newRole) {
+            UserType.ADMIN.name -> UserType.ADMIN
+            UserType.MANAGER.name -> UserType.MANAGER
+            UserType.MONK.name -> UserType.MONK
+            UserType.CONSUMER.name -> UserType.CONSUMER
+            else -> UserType.CONSUMER
+        }
+
+        datastoreRepositoryContract.updateEntity(DatastoreConstant.USER_COLLECTION, user.id, user)
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(BaseResponse(Status.SUCCESS,
+                user,
+                null))
     }
 
     fun getUserById(userId: String): ResponseEntity<BaseResponse<User>>? {

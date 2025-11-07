@@ -15,7 +15,7 @@ data class User(
     val phoneNumber: String? = null,
     val profilePicUrl: String? = null,
     val address: String? = null,
-    val userType: UserType = UserType.CONSUMER,
+    var userType: UserType = UserType.CONSUMER,
     val userAuthType: UserAuthType? = UserAuthType.NONE,
 ): BaseModel {
     constructor(): this(
