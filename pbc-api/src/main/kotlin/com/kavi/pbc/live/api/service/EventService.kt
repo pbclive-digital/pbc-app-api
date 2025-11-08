@@ -141,7 +141,6 @@ class EventService {
         val properties = mapOf(
             "eventStatus" to EventStatus.PUBLISHED
         )
-        println("Current Time: ${System.currentTimeMillis()}")
         val lessThanMap = mapOf(
             "eventDate" to System.currentTimeMillis()
         )

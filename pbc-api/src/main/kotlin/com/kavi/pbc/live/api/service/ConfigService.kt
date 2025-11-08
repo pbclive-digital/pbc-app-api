@@ -11,6 +11,8 @@ import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.Datast
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository
 import com.kavi.pbc.live.data.DataConstant
 import com.kavi.pbc.live.data.model.config.DeviceFactor
+import com.kavi.pbc.live.data.model.user.User
+import com.kavi.pbc.live.data.model.user.UserType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -25,12 +27,24 @@ class ConfigService {
     private var datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
 
     fun getConfigByVersion(version: String, deviceFactor: DeviceFactor): ResponseEntity<BaseResponse<Config>> {
+        val properties = mapOf(
+            "userType" to UserType.MONK,
+            "residentMonk" to true
+        )
+
+        val residentMonkList = datastoreRepositoryContract.getEntityListFromProperties(
+            entityCollection = DatastoreConstant.USER_COLLECTION,
+            propertiesMap = properties,
+            className = User::class.java
+        )
+
         datastoreRepositoryContract.getEntityFromId(DatastoreConstant.CONFIG_COLLECTION, version, Config::class.java)?.let {
             when(deviceFactor) {
                 DeviceFactor.PHONE -> it.dashboardEventCount = DataConstant.DASHBOARD_EVENT_COUNT
                 DeviceFactor.INCH7TAB -> it.dashboardEventCount = DataConstant.DASHBOARD_EVENT_COUNT_7INCH_TAB
                 DeviceFactor.INCH10TAB -> it.dashboardEventCount = DataConstant.DASHBOARD_EVENT_COUNT_10INCH_TAB
             }
+            it.residentMonkList = residentMonkList
             return ResponseEntity.ok(BaseResponse(Status.SUCCESS, it, null))
         }?: run {
             return ResponseEntity
