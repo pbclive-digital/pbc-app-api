@@ -7,6 +7,7 @@ import com.kavi.pbc.live.com.kavi.pbc.live.integration.DatastoreRepositoryContra
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository
 import com.kavi.pbc.live.data.model.user.User
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
+import com.kavi.pbc.live.data.model.user.UserRoleUpdateReq
 import com.kavi.pbc.live.data.model.user.UserType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -57,8 +58,8 @@ class UserService {
         }
     }
 
-    fun modifyUserRole(newRole: String, user: User): ResponseEntity<BaseResponse<User>>? {
-        user.userType = when(newRole) {
+    fun modifyUserRole(userRoleUpdateReq: UserRoleUpdateReq): ResponseEntity<BaseResponse<User>>? {
+        userRoleUpdateReq.user.userType = when(userRoleUpdateReq.newRole) {
             UserType.ADMIN.name -> UserType.ADMIN
             UserType.MANAGER.name -> UserType.MANAGER
             UserType.MONK.name -> UserType.MONK
@@ -66,15 +67,15 @@ class UserService {
             else -> UserType.CONSUMER
         }
 
-        user.uppercaseFirstName = user.firstName?.uppercase()
-        user.uppercaseLastName = user.lastName?.uppercase()
+        userRoleUpdateReq.user.uppercaseFirstName = userRoleUpdateReq.user.firstName?.uppercase()
+        userRoleUpdateReq.user.uppercaseLastName = userRoleUpdateReq.user.lastName?.uppercase()
 
-        datastoreRepositoryContract.updateEntity(DatastoreConstant.USER_COLLECTION, user.id, user)
+        datastoreRepositoryContract.updateEntity(DatastoreConstant.USER_COLLECTION, userRoleUpdateReq.user.id, userRoleUpdateReq)
 
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(BaseResponse(Status.SUCCESS,
-                user,
+                userRoleUpdateReq.user,
                 null))
     }
 

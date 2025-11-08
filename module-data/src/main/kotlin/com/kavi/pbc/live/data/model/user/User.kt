@@ -16,11 +16,12 @@ data class User(
     val profilePicUrl: String? = null,
     val address: String? = null,
     var userType: UserType = UserType.CONSUMER,
+    var residentMonk: Boolean = false,
     val userAuthType: UserAuthType? = UserAuthType.NONE,
 ): BaseModel {
     constructor(): this(
         DataUtil.idGenerator("usr"), "", null, null,null, null,null,
-        null, null, UserType.CONSUMER, UserAuthType.NONE)
+        null, null, UserType.CONSUMER, false, UserAuthType.NONE)
 
     override fun toMap(): Map<String, Any?> = mapOf(
         "id" to id,
@@ -33,6 +34,7 @@ data class User(
         "profilePicUrl" to profilePicUrl,
         "address" to address,
         "userType" to userType,
+        "residentMonk" to residentMonk,
         "userAuthType" to userAuthType
     )
 }

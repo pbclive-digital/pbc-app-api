@@ -4,6 +4,7 @@ import com.kavi.pbc.live.api.dto.BaseResponse
 import com.kavi.pbc.live.api.service.UserService
 import com.kavi.pbc.live.api.util.AppLogger
 import com.kavi.pbc.live.data.model.user.User
+import com.kavi.pbc.live.data.model.user.UserRoleUpdateReq
 import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -81,12 +82,12 @@ class UserController(private val userService: UserService) {
         return response
     }
 
-    @PutMapping("/update/userType/{new-role}")
-    fun modifyUserRole(@PathVariable(value = "new-role") newRole: String, @Valid @RequestBody user: User): ResponseEntity<BaseResponse<User>>?? {
+    @PutMapping("/update/userType")
+    fun modifyUserRole(@Valid @RequestBody userRoleUpdateReq: UserRoleUpdateReq): ResponseEntity<BaseResponse<User>>?? {
         logger.printSeparator()
-        logger.printInfo("REQUEST MAPPING: PUT: [/user/update/userType/$newRole]", UserController::class.java)
+        logger.printInfo("REQUEST MAPPING: PUT: [/user/update/userType]", UserController::class.java)
 
-        val response = userService.modifyUserRole(newRole, user)
+        val response = userService.modifyUserRole(userRoleUpdateReq)
         logger.printResponseInfo(response, UserController::class.java)
 
         return response
