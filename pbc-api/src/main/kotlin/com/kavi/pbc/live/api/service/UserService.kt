@@ -70,7 +70,9 @@ class UserService {
         userRoleUpdateReq.user.uppercaseFirstName = userRoleUpdateReq.user.firstName?.uppercase()
         userRoleUpdateReq.user.uppercaseLastName = userRoleUpdateReq.user.lastName?.uppercase()
 
-        datastoreRepositoryContract.updateEntity(DatastoreConstant.USER_COLLECTION, userRoleUpdateReq.user.id, userRoleUpdateReq)
+        userRoleUpdateReq.user.residentMonk = userRoleUpdateReq.residentMonkFlag
+
+        datastoreRepositoryContract.updateEntity(DatastoreConstant.USER_COLLECTION, userRoleUpdateReq.user.id, userRoleUpdateReq.user)
 
         return ResponseEntity
             .status(HttpStatus.OK)
