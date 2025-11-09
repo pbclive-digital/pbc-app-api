@@ -28,6 +28,7 @@ class AppointmentService {
                 id = DataUtil.idGenerator("apt"),
                 userId = user.id,
                 user = user,
+                selectedMonk = appointmentReq.monk,
                 dateAndTime = appointmentReq.dateAndTime,
                 reason = appointmentReq.reasonForAppointment
             )
