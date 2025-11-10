@@ -84,7 +84,7 @@ class AppointmentService {
         )
 
         val orderBy = mapOf(
-            "property" to "dateAndTime",
+            "property" to "date",
             "direction" to "ASC"
         )
 
@@ -102,7 +102,7 @@ class AppointmentService {
         )
 
         val orderBy = mapOf(
-            "property" to "dateAndTime",
+            "property" to "date",
             "direction" to "ASC"
         )
 

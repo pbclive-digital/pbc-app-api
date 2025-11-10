@@ -117,10 +117,10 @@ class FirebaseDatastoreRepository: DatastoreRepositoryContract {
 
         propertiesMap?.keys?.forEach {
             val propertyItem = propertiesMap[it]
-            if (propertyItem is List<*>) {
-                collectionQuery = collectionQuery.whereIn(it, propertyItem)
+            collectionQuery = if (propertyItem is List<*>) {
+                collectionQuery.whereIn(it, propertyItem)
             } else {
-                collectionQuery = collectionQuery.whereEqualTo(it, propertyItem)
+                collectionQuery.whereEqualTo(it, propertyItem)
             }
         }
         lessThanMap?.keys?.forEach {
