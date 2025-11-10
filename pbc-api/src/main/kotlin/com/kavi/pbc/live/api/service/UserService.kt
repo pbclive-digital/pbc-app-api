@@ -59,18 +59,27 @@ class UserService {
     }
 
     fun modifyUserRole(userRoleUpdateReq: UserRoleUpdateReq): ResponseEntity<BaseResponse<User>>? {
-        userRoleUpdateReq.user.userType = when(userRoleUpdateReq.newRole) {
-            UserType.ADMIN.name -> UserType.ADMIN
-            UserType.MANAGER.name -> UserType.MANAGER
-            UserType.MONK.name -> UserType.MONK
-            UserType.CONSUMER.name -> UserType.CONSUMER
-            else -> UserType.CONSUMER
+         when(userRoleUpdateReq.newRole) {
+            UserType.ADMIN.name -> {
+                userRoleUpdateReq.user.userType = UserType.ADMIN
+                userRoleUpdateReq.user.residentMonk = false
+            }
+            UserType.MANAGER.name -> {
+                userRoleUpdateReq.user.userType = UserType.MANAGER
+                userRoleUpdateReq.user.residentMonk = false
+            }
+            UserType.MONK.name -> {
+                userRoleUpdateReq.user.userType = UserType.MONK
+                userRoleUpdateReq.user.residentMonk = userRoleUpdateReq.residentMonkFlag
+            }
+            UserType.CONSUMER.name -> {
+                userRoleUpdateReq.user.userType = UserType.CONSUMER
+                userRoleUpdateReq.user.residentMonk = false
+            }
         }
 
         userRoleUpdateReq.user.uppercaseFirstName = userRoleUpdateReq.user.firstName?.uppercase()
         userRoleUpdateReq.user.uppercaseLastName = userRoleUpdateReq.user.lastName?.uppercase()
-
-        userRoleUpdateReq.user.residentMonk = userRoleUpdateReq.residentMonkFlag
 
         datastoreRepositoryContract.updateEntity(DatastoreConstant.USER_COLLECTION, userRoleUpdateReq.user.id, userRoleUpdateReq.user)
 

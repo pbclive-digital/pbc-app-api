@@ -38,11 +38,12 @@ class AppointmentController(private val appointmentService: AppointmentService) 
     }
 
     @GetMapping("/get/{user-id}")
-    fun getUserAppointments(@PathVariable(value = "user-id") userId: String): ResponseEntity<BaseResponse<List<Appointment>>>? {
+    fun getUserAppointments(@PathVariable(value = "user-id") userId: String,
+                            @RequestHeader("X-app-user") userString: String?): ResponseEntity<BaseResponse<List<Appointment>>>? {
         logger.printSeparator()
         logger.printInfo("REQUEST MAPPING: GET: [/appointment/get/$userId]", AppointmentController::class.java)
 
-        val response = appointmentService.getUserAppointmentList(userId = userId)
+        val response = appointmentService.getUserAppointmentList(userId = userId, userString = userString)
         logger.printResponseInfo(response, AppointmentController::class.java)
 
         return response

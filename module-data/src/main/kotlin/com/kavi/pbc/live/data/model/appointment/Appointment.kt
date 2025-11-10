@@ -8,19 +8,21 @@ data class Appointment(
     val id: String,
     val userId: String,
     val user: User,
+    val selectedMonkId: String,
     val selectedMonk: User? = null,
     val dateAndTime: Long,
     val reason: String,
     val appointmentStatus: AppointmentStatus = AppointmentStatus.PENDING
 ): BaseModel {
 
-    constructor(): this(DataUtil.idGenerator("apt"), "", User(), null,
+    constructor(): this(DataUtil.idGenerator("apt"), "", User(), "none", null,
         0, "", AppointmentStatus.PENDING)
 
     override fun toMap(): Map<String, Any?> = mapOf(
         "id" to id,
         "userId" to userId,
         "user" to user,
+        "selectedMonkId" to selectedMonkId,
         "selectedMonk" to selectedMonk,
         "dateAndTime" to dateAndTime,
         "reason" to reason,

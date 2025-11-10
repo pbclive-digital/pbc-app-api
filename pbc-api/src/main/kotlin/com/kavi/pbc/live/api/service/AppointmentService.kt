@@ -9,6 +9,7 @@ import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.Fireba
 import com.kavi.pbc.live.data.model.appointment.Appointment
 import com.kavi.pbc.live.data.model.appointment.AppointmentRequest
 import com.kavi.pbc.live.data.model.user.User
+import com.kavi.pbc.live.data.model.user.UserType
 import com.kavi.pbc.live.data.util.DataUtil
 import kotlinx.serialization.json.Json
 import org.springframework.http.HttpStatus
@@ -28,6 +29,7 @@ class AppointmentService {
                 id = DataUtil.idGenerator("apt"),
                 userId = user.id,
                 user = user,
+                selectedMonkId = appointmentReq.monk?.id?.let { id -> id }?: run { "none" },
                 selectedMonk = appointmentReq.monk,
                 dateAndTime = appointmentReq.dateAndTime,
                 reason = appointmentReq.reasonForAppointment
@@ -46,7 +48,36 @@ class AppointmentService {
         }
     }
 
-    fun getUserAppointmentList(userId: String): ResponseEntity<BaseResponse<List<Appointment>>> {
+    fun getUserAppointmentList(userId: String, userString: String?): ResponseEntity<BaseResponse<List<Appointment>>> {
+
+        val finalAppointmentList = if (userString != null && userString.isNotEmpty()) {
+            val user = Json.decodeFromString<User>(userString)
+
+            if (user.userType == UserType.MONK && user.residentMonk) {
+                retrieveAppointmentForMonk(monkId = userId)
+            } else {
+                retrieveAppointmentForUser(userId)
+            }
+        } else {
+            retrieveAppointmentForUser(userId)
+        }
+
+        return if (finalAppointmentList.isNotEmpty()) {
+            ResponseEntity.ok(BaseResponse(Status.SUCCESS, finalAppointmentList, null))
+        } else {
+            ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(
+                    BaseResponse(
+                        Status.ERROR, null, listOf(
+                            Error(HttpStatus.NOT_FOUND.toString())
+                        )
+                    )
+                )
+        }
+    }
+
+    private fun retrieveAppointmentForUser(userId: String): List<Appointment> {
         val properties = mapOf(
             "userId" to userId
         )
@@ -56,21 +87,29 @@ class AppointmentService {
             "direction" to "ASC"
         )
 
-        val userAppointmentList = datastoreRepositoryContract.getEntityListFromProperties(
+        return datastoreRepositoryContract.getEntityListFromProperties(
             entityCollection = DatastoreConstant.APPOINTMENT_COLLECTION,
             propertiesMap = properties,
             orderByMap = orderBy,
             className = Appointment::class.java
         )
+    }
 
-        return if (userAppointmentList.isNotEmpty()) {
-            ResponseEntity.ok(BaseResponse(Status.SUCCESS, userAppointmentList, null))
-        } else {
-            ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(BaseResponse(Status.ERROR, null, listOf(
-                    Error(HttpStatus.NOT_FOUND.toString()))
-                ))
-        }
+    private fun retrieveAppointmentForMonk(monkId: String): List<Appointment> {
+        val properties = mapOf(
+            "selectedMonkId" to listOf(monkId, "none")
+        )
+
+        val orderBy = mapOf(
+            "property" to "dateAndTime",
+            "direction" to "ASC"
+        )
+
+        return datastoreRepositoryContract.getEntityListFromProperties(
+            entityCollection = DatastoreConstant.APPOINTMENT_COLLECTION,
+            propertiesMap = properties,
+            orderByMap = orderBy,
+            className = Appointment::class.java
+        )
     }
 }
