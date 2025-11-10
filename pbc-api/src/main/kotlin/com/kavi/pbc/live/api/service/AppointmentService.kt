@@ -31,7 +31,8 @@ class AppointmentService {
                 user = user,
                 selectedMonkId = appointmentReq.monk?.id?.let { id -> id }?: run { "none" },
                 selectedMonk = appointmentReq.monk,
-                dateAndTime = appointmentReq.dateAndTime,
+                date = appointmentReq.date,
+                time = appointmentReq.time,
                 reason = appointmentReq.reasonForAppointment
             )
 

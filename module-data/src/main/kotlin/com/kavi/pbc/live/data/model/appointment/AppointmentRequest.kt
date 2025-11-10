@@ -5,15 +5,17 @@ import com.kavi.pbc.live.data.model.user.User
 
 data class AppointmentRequest(
     val monk: User? = null,
-    val dateAndTime: Long,
+    val date: Long,
+    val time: String,
     val reasonForAppointment: String
 ): BaseModel {
 
-    constructor(): this(null,0, "")
+    constructor(): this(null,0, "", "")
 
     override fun toMap(): Map<String, Any?> = mapOf(
         "monk" to monk,
-        "dateAndTime" to dateAndTime,
+        "date" to date,
+        "time" to time,
         "reasonForAppointment" to reasonForAppointment
     )
 
