@@ -11,6 +11,8 @@ import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.Fireba
 import com.kavi.pbc.live.data.model.event.Event
 import com.kavi.pbc.live.data.model.event.EventStatus
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
+import com.kavi.pbc.live.data.model.event.potluck.EventPotluck
+import com.kavi.pbc.live.data.model.event.potluck.EventPotluckItem
 import com.kavi.pbc.live.data.model.event.register.EventRegistration
 import com.kavi.pbc.live.data.model.event.register.EventRegistrationItem
 import org.springframework.beans.factory.annotation.Autowired
@@ -34,6 +36,18 @@ class EventService {
         if (event.registrationRequired) {
             val eventRegistration = EventRegistration(event.id, event.openSeatCount!!)
             datastoreRepositoryContract.createEntity(DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventRegistration.id, eventRegistration)
+        }
+
+        if (event.potluckAvailable) {
+            if (!event.potluckItemList.isNullOrEmpty()) {
+                val potluckItemList = mutableListOf<EventPotluckItem>()
+                event.potluckItemList?.forEach { potluckItem ->
+                    potluckItemList.add(EventPotluckItem(potluckItem.itemName, potluckItem.itemCount))
+                }
+
+                val eventPotluck = EventPotluck(event.id, potluckItemList)
+                datastoreRepositoryContract.createEntity(DatastoreConstant.EVENT_POTLUCK_COLLECTION, eventPotluck.id, eventPotluck)
+            }
         }
 
         return ResponseEntity
@@ -187,6 +201,26 @@ class EventService {
             }
         }
 
+        if (event.potluckAvailable) {
+            datastoreRepositoryContract.getEntityFromId(
+                DatastoreConstant.EVENT_POTLUCK_COLLECTION, entityId = eventId,
+                EventPotluck::class.java
+            )?.let {
+                logger.printInfo("Record already available to the " +
+                        "event:$eventId in ${DatastoreConstant.EVENT_POTLUCK_COLLECTION} collection.", EventService::class.java)
+            }?: run {
+                if (!event.potluckItemList.isNullOrEmpty()) {
+                    val potluckItemList = mutableListOf<EventPotluckItem>()
+                    event.potluckItemList?.forEach { potluckItem ->
+                        potluckItemList.add(EventPotluckItem(potluckItem.itemName, potluckItem.itemCount))
+                    }
+
+                    val eventPotluck = EventPotluck(event.id, potluckItemList)
+                    datastoreRepositoryContract.createEntity(DatastoreConstant.EVENT_POTLUCK_COLLECTION, eventPotluck.id, eventPotluck)
+                }
+            }
+        }
+
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(BaseResponse(Status.SUCCESS,
@@ -256,6 +290,23 @@ class EventService {
     fun getEventRegistrationRecord(eventId: String): ResponseEntity<BaseResponse<EventRegistration>>? {
         datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventId,
             EventRegistration::class.java)?.let {
+            return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse(Status.SUCCESS,
+                    it,
+                    null))
+        }?: run {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error(HttpStatus.NOT_FOUND.toString()))
+                ))
+        }
+    }
+
+    fun getEventPotluckRecord(eventId: String): ResponseEntity<BaseResponse<EventPotluck>>? {
+        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_POTLUCK_COLLECTION, eventId,
+            EventPotluck::class.java)?.let {
             return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(BaseResponse(Status.SUCCESS,

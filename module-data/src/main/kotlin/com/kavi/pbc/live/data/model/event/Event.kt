@@ -22,7 +22,7 @@ data class Event(
     val registrationRequired: Boolean = false,
     val openSeatCount: Int? = null,
     val potluckAvailable: Boolean = false,
-    val potluckItemList: MutableList<PotluckItem>? = mutableListOf()
+    val potluckItemList: MutableList<ContributionItem>? = mutableListOf()
 ): BaseModel {
 
     constructor(): this (DataUtil.idGenerator("evt"), "", "", EventStatus.DRAFT, 0, "", "",

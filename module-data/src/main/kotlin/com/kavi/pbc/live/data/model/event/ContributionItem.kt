@@ -2,7 +2,7 @@ package com.kavi.pbc.live.data.model.event
 
 import com.kavi.pbc.live.data.model.BaseModel
 
-data class PotluckItem(
+data class ContributionItem(
     val itemName: String,
     val itemCount: Int
 ): BaseModel {
