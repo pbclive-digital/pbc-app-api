@@ -31,13 +31,15 @@ data class EventPotluckItem(
 }
 
 data class EventPotluckContributor(
+    val contributorId: String,
     val contributorName: String,
     val contributorContactNumber: String
 ): BaseModel {
 
-    constructor(): this("", "")
+    constructor(): this("", "", "")
 
     override fun toMap(): Map<String, Any?> = mapOf(
+        "contributorId" to contributorId,
         "contributorName" to contributorName,
         "contributorContactNumber" to contributorContactNumber
     )
