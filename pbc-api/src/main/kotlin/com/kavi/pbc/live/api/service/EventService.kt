@@ -12,6 +12,7 @@ import com.kavi.pbc.live.data.model.event.Event
 import com.kavi.pbc.live.data.model.event.EventStatus
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluck
+import com.kavi.pbc.live.data.model.event.potluck.EventPotluckContributor
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluckItem
 import com.kavi.pbc.live.data.model.event.register.EventRegistration
 import com.kavi.pbc.live.data.model.event.register.EventRegistrationItem
@@ -21,6 +22,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.util.Date
+import java.util.UUID
 
 @Service
 class EventService {
@@ -42,7 +44,8 @@ class EventService {
             if (!event.potluckItemList.isNullOrEmpty()) {
                 val potluckItemList = mutableListOf<EventPotluckItem>()
                 event.potluckItemList?.forEach { potluckItem ->
-                    potluckItemList.add(EventPotluckItem(potluckItem.itemName, potluckItem.itemCount))
+                    potluckItemList.add(EventPotluckItem(UUID.randomUUID().toString(),
+                        potluckItem.itemName, potluckItem.itemCount))
                 }
 
                 val eventPotluck = EventPotluck(event.id, potluckItemList)
@@ -212,7 +215,8 @@ class EventService {
                 if (!event.potluckItemList.isNullOrEmpty()) {
                     val potluckItemList = mutableListOf<EventPotluckItem>()
                     event.potluckItemList?.forEach { potluckItem ->
-                        potluckItemList.add(EventPotluckItem(potluckItem.itemName, potluckItem.itemCount))
+                        potluckItemList.add(EventPotluckItem(UUID.randomUUID().toString(),
+                            potluckItem.itemName, potluckItem.itemCount))
                     }
 
                     val eventPotluck = EventPotluck(event.id, potluckItemList)
@@ -317,6 +321,47 @@ class EventService {
                 .status(HttpStatus.NOT_FOUND)
                 .body(BaseResponse(Status.ERROR, null, listOf(
                     Error(HttpStatus.NOT_FOUND.toString()))
+                ))
+        }
+    }
+
+    fun signUpGivenContributorToPotluckItem(eventId: String, potluckItemId: String, contributor: EventPotluckContributor):
+            ResponseEntity<BaseResponse<EventPotluck>>? {
+        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_POTLUCK_COLLECTION, eventId,
+            EventPotluck::class.java)?.let { potluck ->
+            val updatedPotluck = potluck.copy()
+
+            val filteredPotluckItem = potluck.potluckItemList.filter { it.itemId == potluckItemId }
+
+            if (filteredPotluckItem.isNotEmpty()) {
+                val selectedPotluckItem = filteredPotluckItem[0]
+
+                selectedPotluckItem.contributorList.add(contributor)
+
+                updatedPotluck.potluckItemList.removeIf { it.itemId == potluckItemId }
+                updatedPotluck.potluckItemList.add(selectedPotluckItem)
+
+                datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_POTLUCK_COLLECTION, updatedPotluck.id, updatedPotluck)
+
+                return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(BaseResponse(Status.SUCCESS,
+                        updatedPotluck,
+                        null))
+            } else {
+                return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(BaseResponse(
+                        Status.ERROR, null, listOf(
+                            Error("${HttpStatus.NOT_FOUND} due to potluck item not found")
+                        ))
+                    )
+            }
+        }?: run {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error("${HttpStatus.NOT_FOUND} due to potluck not found"))
                 ))
         }
     }

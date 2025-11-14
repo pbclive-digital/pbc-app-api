@@ -5,6 +5,7 @@ import com.kavi.pbc.live.api.service.EventService
 import com.kavi.pbc.live.api.util.AppLogger
 import com.kavi.pbc.live.data.model.event.Event
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluck
+import com.kavi.pbc.live.data.model.event.potluck.EventPotluckContributor
 import com.kavi.pbc.live.data.model.event.register.EventRegistration
 import com.kavi.pbc.live.data.model.event.register.EventRegistrationItem
 import jakarta.validation.Valid
@@ -159,6 +160,20 @@ class EventController(private val eventService: EventService) {
         logger.printInfo("REQUEST MAPPING: GET:[/event/get/potluck/$eventId]", EventController::class.java)
 
         val response = eventService.getEventPotluckRecord(eventId)
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
+    @PostMapping("/potluck/sign-up/{event-id}/{potluck-item-id}")
+    fun signUpToPotluck(@PathVariable(value = "event-id") eventId: String,
+                        @PathVariable(value = "potluck-item-id") potluckItemId: String,
+                        @Valid @RequestBody contributor: EventPotluckContributor):
+            ResponseEntity<BaseResponse<EventPotluck>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: POST:[/event/potluck/sign-up/$eventId/$potluckItemId]", EventController::class.java)
+
+        val response = eventService.signUpGivenContributorToPotluckItem(eventId, potluckItemId, contributor)
         logger.printResponseInfo(response, EventController::class.java)
 
         return response

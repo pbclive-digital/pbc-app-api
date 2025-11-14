@@ -16,14 +16,16 @@ data class EventPotluck(
 }
 
 data class EventPotluckItem(
+    val itemId: String,
     val itemName: String,
     val availableCount: Int,
     val contributorList: MutableList<EventPotluckContributor> = mutableListOf()
 ): BaseModel {
 
-    constructor(): this("", 0, mutableListOf())
+    constructor(): this("","", 0, mutableListOf())
 
     override fun toMap(): Map<String, Any?> = mapOf(
+        "itemId" to itemId,
         "itemName" to itemName,
         "availableCount" to availableCount,
         "contributorList" to contributorList
