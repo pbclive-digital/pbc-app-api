@@ -338,16 +338,33 @@ class EventService {
 
                 selectedPotluckItem.contributorList.add(contributor)
 
-                updatedPotluck.potluckItemList.removeIf { it.itemId == potluckItemId }
-                updatedPotluck.potluckItemList.add(selectedPotluckItem)
+                val itemIndexList = updatedPotluck.potluckItemList.withIndex()
+                    .filter { (_, value) -> value.itemId == potluckItemId }
+                    .map { it.index }
 
-                datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_POTLUCK_COLLECTION, updatedPotluck.id, updatedPotluck)
+                if (itemIndexList.isNotEmpty()) {
+                    val itemIndex = itemIndexList[0]
 
-                return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(BaseResponse(Status.SUCCESS,
-                        updatedPotluck,
-                        null))
+                    //updatedPotluck.potluckItemList.removeIf { it.itemId == potluckItemId }
+                    updatedPotluck.potluckItemList.removeAt(itemIndex)
+                    updatedPotluck.potluckItemList.add(itemIndex, selectedPotluckItem)
+
+                    datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_POTLUCK_COLLECTION, updatedPotluck.id, updatedPotluck)
+
+                    return ResponseEntity
+                        .status(HttpStatus.OK)
+                        .body(BaseResponse(Status.SUCCESS,
+                            updatedPotluck,
+                            null))
+                } else {
+                    return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body(BaseResponse(
+                            Status.ERROR, null, listOf(
+                                Error("${HttpStatus.NOT_FOUND} due to potluck item not found")
+                            ))
+                        )
+                }
             } else {
                 return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
