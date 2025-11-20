@@ -392,7 +392,16 @@ class EventService {
             if (filteredPotluckItem.isNotEmpty()) {
                 val selectedPotluckItem = filteredPotluckItem[0]
 
-                val isRemoved = selectedPotluckItem.contributorList.removeIf { it.contributorId == contributorId }
+                val contributorIndexList = selectedPotluckItem
+                    .contributorList.withIndex()
+                    .filter { (_, value) -> value.contributorId == contributorId }
+                    .map { it.index }
+
+                var isRemoved = false
+                if (contributorIndexList.isNotEmpty()) {
+                    val elementToRemove = selectedPotluckItem.contributorList[contributorIndexList[0]]
+                    isRemoved = selectedPotluckItem.contributorList.remove(elementToRemove)
+                }
 
                 if (isRemoved) {
                     val itemIndexList = updatedPotluck.potluckItemList.withIndex()
