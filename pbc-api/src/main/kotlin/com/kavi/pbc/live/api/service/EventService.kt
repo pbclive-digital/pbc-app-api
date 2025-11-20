@@ -345,7 +345,6 @@ class EventService {
                 if (itemIndexList.isNotEmpty()) {
                     val itemIndex = itemIndexList[0]
 
-                    //updatedPotluck.potluckItemList.removeIf { it.itemId == potluckItemId }
                     updatedPotluck.potluckItemList.removeAt(itemIndex)
                     updatedPotluck.potluckItemList.add(itemIndex, selectedPotluckItem)
 
@@ -362,6 +361,72 @@ class EventService {
                         .body(BaseResponse(
                             Status.ERROR, null, listOf(
                                 Error("${HttpStatus.NOT_FOUND} due to potluck item not found")
+                            ))
+                        )
+                }
+            } else {
+                return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(BaseResponse(
+                        Status.ERROR, null, listOf(
+                            Error("${HttpStatus.NOT_FOUND} due to potluck item not found")
+                        ))
+                    )
+            }
+        }?: run {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error("${HttpStatus.NOT_FOUND} due to potluck not found"))
+                ))
+        }
+    }
+
+    fun signOutGivenContributorFromPotluckItem(eventId: String, potluckItemId: String, contributorId: String):
+            ResponseEntity<BaseResponse<EventPotluck>>?{
+        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_POTLUCK_COLLECTION, eventId,
+            EventPotluck::class.java)?.let { potluck ->
+            val updatedPotluck = potluck.copy()
+            val filteredPotluckItem = potluck.potluckItemList.filter { it.itemId == potluckItemId }
+
+            if (filteredPotluckItem.isNotEmpty()) {
+                val selectedPotluckItem = filteredPotluckItem[0]
+
+                val isRemoved = selectedPotluckItem.contributorList.removeIf { it.contributorId == contributorId }
+
+                if (isRemoved) {
+                    val itemIndexList = updatedPotluck.potluckItemList.withIndex()
+                        .filter { (_, value) -> value.itemId == potluckItemId }
+                        .map { it.index }
+
+                    if (itemIndexList.isNotEmpty()) {
+                        val itemIndex = itemIndexList[0]
+
+                        updatedPotluck.potluckItemList.removeAt(itemIndex)
+                        updatedPotluck.potluckItemList.add(itemIndex, selectedPotluckItem)
+
+                        datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_POTLUCK_COLLECTION, updatedPotluck.id, updatedPotluck)
+
+                        return ResponseEntity
+                            .status(HttpStatus.OK)
+                            .body(BaseResponse(Status.SUCCESS,
+                                updatedPotluck,
+                                null))
+                    } else {
+                        return ResponseEntity
+                            .status(HttpStatus.NOT_FOUND)
+                            .body(BaseResponse(
+                                Status.ERROR, null, listOf(
+                                    Error("${HttpStatus.NOT_FOUND} due to potluck item not found")
+                                ))
+                            )
+                    }
+                } else {
+                    return ResponseEntity
+                        .status(HttpStatus.SERVICE_UNAVAILABLE)
+                        .body(BaseResponse(
+                            Status.ERROR, null, listOf(
+                                Error("${HttpStatus.SERVICE_UNAVAILABLE} Failed to remove the contributor")
                             ))
                         )
                 }

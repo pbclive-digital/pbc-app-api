@@ -178,4 +178,19 @@ class EventController(private val eventService: EventService) {
 
         return response
     }
+
+    @DeleteMapping("/potluck/sign-out/{event-id}/{potluck-item-id}/{contributor-id}")
+    fun signOutFromPotluck(@PathVariable(value = "event-id") eventId: String,
+                           @PathVariable(value = "potluck-item-id") potluckItemId: String,
+                           @PathVariable(value = "contributor-id") contributorId: String):
+            ResponseEntity<BaseResponse<EventPotluck>>? {
+
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: DELETE:[/event/potluck/sign-out/$eventId/$potluckItemId/$contributorId]", EventController::class.java)
+
+        val response = eventService.signOutGivenContributorFromPotluckItem(eventId, potluckItemId, contributorId)
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
 }
