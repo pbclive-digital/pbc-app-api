@@ -27,6 +27,7 @@ class AppointmentService {
 
             val appointment = Appointment(
                 id = DataUtil.idGenerator("apt"),
+                title = appointmentReq.title,
                 userId = user.id,
                 user = user,
                 selectedMonkId = appointmentReq.monk?.id?.let { id -> id }?: run { "none" },

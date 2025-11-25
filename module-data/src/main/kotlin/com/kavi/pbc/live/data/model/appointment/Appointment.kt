@@ -6,6 +6,7 @@ import com.kavi.pbc.live.data.util.DataUtil
 
 data class Appointment(
     val id: String,
+    val title: String,
     val userId: String,
     val user: User,
     val selectedMonkId: String,
@@ -16,11 +17,12 @@ data class Appointment(
     val appointmentStatus: AppointmentStatus = AppointmentStatus.PENDING
 ): BaseModel {
 
-    constructor(): this(DataUtil.idGenerator("apt"), "", User(), "none", null,
+    constructor(): this(DataUtil.idGenerator("apt"), "", "", User(), "none", null,
         0, "", "", AppointmentStatus.PENDING)
 
     override fun toMap(): Map<String, Any?> = mapOf(
         "id" to id,
+        "title" to title,
         "userId" to userId,
         "user" to user,
         "selectedMonkId" to selectedMonkId,
