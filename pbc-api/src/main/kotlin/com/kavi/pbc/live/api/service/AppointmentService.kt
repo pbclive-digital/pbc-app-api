@@ -7,7 +7,6 @@ import com.kavi.pbc.live.com.kavi.pbc.live.integration.DatastoreRepositoryContra
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository
 import com.kavi.pbc.live.data.model.appointment.Appointment
-import com.kavi.pbc.live.data.model.appointment.AppointmentRequest
 import com.kavi.pbc.live.data.model.user.User
 import com.kavi.pbc.live.data.model.user.UserType
 import com.kavi.pbc.live.data.util.DataUtil
@@ -21,22 +20,8 @@ class AppointmentService {
 
     private var datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
 
-    fun createNewAppointment(appointmentReq: AppointmentRequest, userString: String?): ResponseEntity<BaseResponse<String>> {
+    fun createNewAppointment(appointment: Appointment, userString: String?): ResponseEntity<BaseResponse<String>> {
         userString?.let {
-            val user = Json.decodeFromString<User>(it)
-
-            val appointment = Appointment(
-                id = DataUtil.idGenerator("apt"),
-                title = appointmentReq.title,
-                userId = user.id,
-                user = user,
-                selectedMonkId = appointmentReq.monk?.id?.let { id -> id }?: run { "none" },
-                selectedMonk = appointmentReq.monk,
-                date = appointmentReq.date,
-                time = appointmentReq.time,
-                reason = appointmentReq.reasonForAppointment
-            )
-
             return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(BaseResponse(Status.SUCCESS,

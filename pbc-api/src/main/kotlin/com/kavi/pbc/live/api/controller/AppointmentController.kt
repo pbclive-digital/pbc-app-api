@@ -4,7 +4,6 @@ import com.kavi.pbc.live.api.dto.BaseResponse
 import com.kavi.pbc.live.api.service.AppointmentService
 import com.kavi.pbc.live.api.util.AppLogger
 import com.kavi.pbc.live.data.model.appointment.Appointment
-import com.kavi.pbc.live.data.model.appointment.AppointmentRequest
 import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -24,14 +23,14 @@ class AppointmentController(private val appointmentService: AppointmentService) 
     lateinit var logger: AppLogger
 
     @PostMapping("/create")
-    fun createNewAppointment(@Valid @RequestBody appointmentReq: AppointmentRequest,
+    fun createNewAppointment(@Valid @RequestBody appointment: Appointment,
                              @RequestHeader("X-app-user") userString: String?): ResponseEntity<BaseResponse<String>>? {
         println(userString)
 
         logger.printSeparator()
         logger.printInfo("REQUEST MAPPING: POST: [/appointment/create]", AppointmentController::class.java)
 
-        val response = appointmentService.createNewAppointment(appointmentReq = appointmentReq, userString = userString)
+        val response = appointmentService.createNewAppointment(appointment = appointment, userString = userString)
         logger.printResponseInfo(response, AppointmentController::class.java)
 
         return response
