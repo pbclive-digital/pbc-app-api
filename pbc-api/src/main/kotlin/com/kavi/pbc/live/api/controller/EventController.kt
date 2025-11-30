@@ -111,7 +111,7 @@ class EventController(private val eventService: EventService) {
     fun deleteEvent(@PathVariable(value = "event-id") eventId: String):
             ResponseEntity<BaseResponse<String>>? {
         logger.printSeparator()
-        logger.printInfo("REQUEST MAPPING: DELETE:[/event/delete/event/$eventId]", EventController::class.java)
+        logger.printInfo("REQUEST MAPPING: DELETE:[/event/delete/$eventId]", EventController::class.java)
 
         val response = eventService.deleteGivenEvent(eventId)
         logger.printResponseInfo(response, EventController::class.java)

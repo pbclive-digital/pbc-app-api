@@ -24,6 +24,7 @@ class SecurityConfiguration {
                     .requestMatchers("/event/update/**").authenticated()
                     .requestMatchers("/event/delete/**").authenticated()
                     .requestMatchers("/user/update/**").authenticated()
+                    .requestMatchers("/appointment/**").authenticated()
                     .anyRequest().permitAll()
             }
             .addFilterBefore(tokenFilter, BasicAuthenticationFilter::class.java)

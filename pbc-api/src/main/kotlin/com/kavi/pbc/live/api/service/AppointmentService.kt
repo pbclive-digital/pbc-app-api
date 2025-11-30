@@ -20,19 +20,11 @@ class AppointmentService {
 
     private var datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
 
-    fun createNewAppointment(appointment: Appointment, userString: String?): ResponseEntity<BaseResponse<String>> {
-        userString?.let {
-            return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(BaseResponse(Status.SUCCESS,
-                    datastoreRepositoryContract.createEntity(DatastoreConstant.APPOINTMENT_COLLECTION, appointment.id, appointment), null))
-        }?: run {
-            return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(BaseResponse(Status.ERROR, null, listOf(
-                    Error("${HttpStatus.BAD_REQUEST.toString()} due to no valid user found on request"))
-                ))
-        }
+    fun createNewAppointment(appointment: Appointment): ResponseEntity<BaseResponse<String>> {
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(BaseResponse(Status.SUCCESS,
+                datastoreRepositoryContract.createEntity(DatastoreConstant.APPOINTMENT_COLLECTION, appointment.id, appointment), null))
     }
 
     fun getUserAppointmentList(userId: String, userString: String?): ResponseEntity<BaseResponse<List<Appointment>>> {
@@ -62,6 +54,14 @@ class AppointmentService {
                     )
                 )
         }
+    }
+
+    fun deleteAppointment(appointmentId: String): ResponseEntity<BaseResponse<String>>? {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(BaseResponse(Status.SUCCESS,
+                datastoreRepositoryContract.deleteEntity(DatastoreConstant.APPOINTMENT_COLLECTION, appointmentId),
+                null))
     }
 
     private fun retrieveAppointmentForUser(userId: String): List<Appointment> {

@@ -10,7 +10,7 @@ class AppLogger {
     private val kLogger = KotlinLogging.logger {}
 
     fun printSeparator() {
-        kLogger.info { System.getProperty("line.separator") }
+        kLogger.info { System.lineSeparator() }
     }
 
     fun <T>printInfo(message: String, javaClass: Class<T>) {

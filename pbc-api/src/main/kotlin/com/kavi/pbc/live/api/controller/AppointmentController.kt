@@ -7,6 +7,7 @@ import com.kavi.pbc.live.data.model.appointment.Appointment
 import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -23,14 +24,11 @@ class AppointmentController(private val appointmentService: AppointmentService) 
     lateinit var logger: AppLogger
 
     @PostMapping("/create")
-    fun createNewAppointment(@Valid @RequestBody appointment: Appointment,
-                             @RequestHeader("X-app-user") userString: String?): ResponseEntity<BaseResponse<String>>? {
-        println(userString)
-
+    fun createNewAppointment(@Valid @RequestBody appointment: Appointment): ResponseEntity<BaseResponse<String>>? {
         logger.printSeparator()
         logger.printInfo("REQUEST MAPPING: POST: [/appointment/create]", AppointmentController::class.java)
 
-        val response = appointmentService.createNewAppointment(appointment = appointment, userString = userString)
+        val response = appointmentService.createNewAppointment(appointment = appointment)
         logger.printResponseInfo(response, AppointmentController::class.java)
 
         return response
@@ -43,6 +41,18 @@ class AppointmentController(private val appointmentService: AppointmentService) 
         logger.printInfo("REQUEST MAPPING: GET: [/appointment/get/$userId]", AppointmentController::class.java)
 
         val response = appointmentService.getUserAppointmentList(userId = userId, userString = userString)
+        logger.printResponseInfo(response, AppointmentController::class.java)
+
+        return response
+    }
+
+    @DeleteMapping("/delete/{appointment-id}")
+    fun deleteAppointment(@PathVariable(value = "appointment-id") appointmentId: String):
+            ResponseEntity<BaseResponse<String>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: DELETE:[/appointment/delete/$appointmentId]", AppointmentController::class.java)
+
+        val response = appointmentService.deleteAppointment(appointmentId)
         logger.printResponseInfo(response, AppointmentController::class.java)
 
         return response
