@@ -4,6 +4,7 @@ import com.kavi.pbc.live.api.dto.BaseResponse
 import com.kavi.pbc.live.api.service.AppointmentService
 import com.kavi.pbc.live.api.util.AppLogger
 import com.kavi.pbc.live.data.model.appointment.Appointment
+import com.kavi.pbc.live.data.model.appointment.AppointmentRequest
 import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -34,6 +35,17 @@ class AppointmentController(private val appointmentService: AppointmentService) 
         return response
     }
 
+    @PostMapping("/request/create")
+    fun createNewAppointmentRequest(@Valid @RequestBody appointmentReq: AppointmentRequest): ResponseEntity<BaseResponse<String>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: POST: [/appointment/request/create]", AppointmentController::class.java)
+
+        val response = appointmentService.createNewAppointmentRequest(appointmentReq = appointmentReq)
+        logger.printResponseInfo(response, AppointmentController::class.java)
+
+        return response
+    }
+
     @GetMapping("/get/{user-id}")
     fun getUserAppointments(@PathVariable(value = "user-id") userId: String,
                             @RequestHeader("X-app-user") userString: String?): ResponseEntity<BaseResponse<List<Appointment>>>? {
@@ -46,6 +58,18 @@ class AppointmentController(private val appointmentService: AppointmentService) 
         return response
     }
 
+    @GetMapping("/request/get/{user-id}")
+    fun getUserAppointmentRequests(@PathVariable(value = "user-id") userId: String,
+                            @RequestHeader("X-app-user") userString: String?): ResponseEntity<BaseResponse<List<AppointmentRequest>>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET: [/appointment/request/get/$userId]", AppointmentController::class.java)
+
+        val response = appointmentService.getUserAppointmentRequestList(userId = userId, userString = userString)
+        logger.printResponseInfo(response, AppointmentController::class.java)
+
+        return response
+    }
+
     @DeleteMapping("/delete/{appointment-id}")
     fun deleteAppointment(@PathVariable(value = "appointment-id") appointmentId: String):
             ResponseEntity<BaseResponse<String>>? {
@@ -53,6 +77,18 @@ class AppointmentController(private val appointmentService: AppointmentService) 
         logger.printInfo("REQUEST MAPPING: DELETE:[/appointment/delete/$appointmentId]", AppointmentController::class.java)
 
         val response = appointmentService.deleteAppointment(appointmentId)
+        logger.printResponseInfo(response, AppointmentController::class.java)
+
+        return response
+    }
+
+    @DeleteMapping("/request/delete/{appointment-id}")
+    fun deleteAppointmentRequest(@PathVariable(value = "appointment-req-id") appointmentReqId: String):
+            ResponseEntity<BaseResponse<String>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: DELETE:[/appointment/request/delete/$appointmentReqId]", AppointmentController::class.java)
+
+        val response = appointmentService.deleteAppointmentRequest(appointmentReqId)
         logger.printResponseInfo(response, AppointmentController::class.java)
 
         return response
