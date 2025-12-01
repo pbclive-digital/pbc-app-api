@@ -4,6 +4,7 @@ import com.kavi.pbc.live.api.dto.BaseResponse
 import com.kavi.pbc.live.api.service.AppointmentService
 import com.kavi.pbc.live.api.util.AppLogger
 import com.kavi.pbc.live.data.model.appointment.Appointment
+import com.kavi.pbc.live.data.model.appointment.AppointmentCountValidate
 import com.kavi.pbc.live.data.model.appointment.AppointmentRequest
 import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
@@ -36,7 +37,8 @@ class AppointmentController(private val appointmentService: AppointmentService) 
     }
 
     @PostMapping("/request/create")
-    fun createNewAppointmentRequest(@Valid @RequestBody appointmentReq: AppointmentRequest): ResponseEntity<BaseResponse<String>>? {
+    fun createNewAppointmentRequest(@Valid @RequestBody appointmentReq: AppointmentRequest):
+            ResponseEntity<BaseResponse<String>>? {
         logger.printSeparator()
         logger.printInfo("REQUEST MAPPING: POST: [/appointment/request/create]", AppointmentController::class.java)
 
@@ -48,7 +50,8 @@ class AppointmentController(private val appointmentService: AppointmentService) 
 
     @GetMapping("/get/{user-id}")
     fun getUserAppointments(@PathVariable(value = "user-id") userId: String,
-                            @RequestHeader("X-app-user") userString: String?): ResponseEntity<BaseResponse<List<Appointment>>>? {
+                            @RequestHeader("X-app-user") userString: String?):
+            ResponseEntity<BaseResponse<List<Appointment>>>? {
         logger.printSeparator()
         logger.printInfo("REQUEST MAPPING: GET: [/appointment/get/$userId]", AppointmentController::class.java)
 
@@ -60,11 +63,24 @@ class AppointmentController(private val appointmentService: AppointmentService) 
 
     @GetMapping("/request/get/{user-id}")
     fun getUserAppointmentRequests(@PathVariable(value = "user-id") userId: String,
-                            @RequestHeader("X-app-user") userString: String?): ResponseEntity<BaseResponse<List<AppointmentRequest>>>? {
+                            @RequestHeader("X-app-user") userString: String?):
+            ResponseEntity<BaseResponse<List<AppointmentRequest>>>? {
         logger.printSeparator()
         logger.printInfo("REQUEST MAPPING: GET: [/appointment/request/get/$userId]", AppointmentController::class.java)
 
         val response = appointmentService.getUserAppointmentRequestList(userId = userId, userString = userString)
+        logger.printResponseInfo(response, AppointmentController::class.java)
+
+        return response
+    }
+
+    @GetMapping("/validate/count/{user-id}")
+    fun validateAppointmentCountPerUser(@PathVariable(value = "user-id") userId: String):
+            ResponseEntity<BaseResponse<AppointmentCountValidate>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET: [/appointment/validate/count/$userId]", AppointmentController::class.java)
+
+        val response = appointmentService.validateAppointmentCount(userId = userId)
         logger.printResponseInfo(response, AppointmentController::class.java)
 
         return response

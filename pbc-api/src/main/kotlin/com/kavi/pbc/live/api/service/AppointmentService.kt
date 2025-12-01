@@ -7,6 +7,7 @@ import com.kavi.pbc.live.com.kavi.pbc.live.integration.DatastoreRepositoryContra
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository
 import com.kavi.pbc.live.data.model.appointment.Appointment
+import com.kavi.pbc.live.data.model.appointment.AppointmentCountValidate
 import com.kavi.pbc.live.data.model.appointment.AppointmentRequest
 import com.kavi.pbc.live.data.model.user.User
 import com.kavi.pbc.live.data.model.user.UserType
@@ -91,6 +92,34 @@ class AppointmentService {
                     )
                 )
         }
+    }
+
+    fun validateAppointmentCount(userId: String): ResponseEntity<BaseResponse<AppointmentCountValidate>>? {
+        val properties = mapOf("userId" to userId)
+
+        val requestList = datastoreRepositoryContract.getEntityListFromProperties(
+            entityCollection = DatastoreConstant.APPOINTMENT_REQUEST_COLLECTION,
+            propertiesMap = properties,
+            className = AppointmentRequest::class.java
+        )
+
+        val appointmentList = datastoreRepositoryContract.getEntityListFromProperties(
+            entityCollection = DatastoreConstant.APPOINTMENT_COLLECTION,
+            propertiesMap = properties,
+            className = Appointment::class.java
+        )
+
+
+        val allowToCreate = !(appointmentList.size >= 3 || requestList.size >= 3)
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(BaseResponse(Status.SUCCESS,
+                AppointmentCountValidate(
+                    requestCount = requestList.size,
+                    acceptedCount = appointmentList.size,
+                    allowToCreateRequest = allowToCreate
+                ), null))
     }
 
     fun deleteAppointment(appointmentId: String): ResponseEntity<BaseResponse<String>>? {
