@@ -7,7 +7,7 @@ import com.kavi.pbc.live.com.kavi.pbc.live.integration.DatastoreRepositoryContra
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository
 import com.kavi.pbc.live.data.model.appointment.Appointment
-import com.kavi.pbc.live.data.model.appointment.AppointmentCountValidate
+import com.kavi.pbc.live.data.model.appointment.AppointmentRequestEligibility
 import com.kavi.pbc.live.data.model.appointment.AppointmentRequest
 import com.kavi.pbc.live.data.model.user.User
 import com.kavi.pbc.live.data.model.user.UserType
@@ -94,7 +94,7 @@ class AppointmentService {
         }
     }
 
-    fun validateAppointmentCount(userId: String): ResponseEntity<BaseResponse<AppointmentCountValidate>>? {
+    fun validateRequestCreateEligibility(userId: String): ResponseEntity<BaseResponse<AppointmentRequestEligibility>>? {
         val properties = mapOf("userId" to userId)
 
         val requestList = datastoreRepositoryContract.getEntityListFromProperties(
@@ -115,7 +115,7 @@ class AppointmentService {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(BaseResponse(Status.SUCCESS,
-                AppointmentCountValidate(
+                AppointmentRequestEligibility(
                     requestCount = requestList.size,
                     acceptedCount = appointmentList.size,
                     allowToCreateRequest = allowToCreate

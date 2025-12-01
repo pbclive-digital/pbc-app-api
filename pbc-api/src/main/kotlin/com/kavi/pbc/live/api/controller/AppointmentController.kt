@@ -4,7 +4,7 @@ import com.kavi.pbc.live.api.dto.BaseResponse
 import com.kavi.pbc.live.api.service.AppointmentService
 import com.kavi.pbc.live.api.util.AppLogger
 import com.kavi.pbc.live.data.model.appointment.Appointment
-import com.kavi.pbc.live.data.model.appointment.AppointmentCountValidate
+import com.kavi.pbc.live.data.model.appointment.AppointmentRequestEligibility
 import com.kavi.pbc.live.data.model.appointment.AppointmentRequest
 import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
@@ -74,13 +74,13 @@ class AppointmentController(private val appointmentService: AppointmentService) 
         return response
     }
 
-    @GetMapping("/validate/count/{user-id}")
-    fun validateAppointmentCountPerUser(@PathVariable(value = "user-id") userId: String):
-            ResponseEntity<BaseResponse<AppointmentCountValidate>>? {
+    @GetMapping("/request/create/eligibility/{user-id}")
+    fun validateRequestCreateEligibility(@PathVariable(value = "user-id") userId: String):
+            ResponseEntity<BaseResponse<AppointmentRequestEligibility>>? {
         logger.printSeparator()
         logger.printInfo("REQUEST MAPPING: GET: [/appointment/validate/count/$userId]", AppointmentController::class.java)
 
-        val response = appointmentService.validateAppointmentCount(userId = userId)
+        val response = appointmentService.validateRequestCreateEligibility(userId = userId)
         logger.printResponseInfo(response, AppointmentController::class.java)
 
         return response

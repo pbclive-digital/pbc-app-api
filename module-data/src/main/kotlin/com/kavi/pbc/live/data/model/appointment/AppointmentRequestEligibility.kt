@@ -2,7 +2,7 @@ package com.kavi.pbc.live.data.model.appointment
 
 import com.kavi.pbc.live.data.model.BaseModel
 
-data class AppointmentCountValidate(
+data class AppointmentRequestEligibility(
     val acceptedCount: Int,
     val requestCount: Int,
     val allowToCreateRequest: Boolean
