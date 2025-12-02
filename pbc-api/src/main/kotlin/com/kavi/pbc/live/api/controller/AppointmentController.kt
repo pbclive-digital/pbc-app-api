@@ -98,7 +98,7 @@ class AppointmentController(private val appointmentService: AppointmentService) 
         return response
     }
 
-    @DeleteMapping("/request/delete/{appointment-id}")
+    @DeleteMapping("/request/delete/{appointment-req-id}")
     fun deleteAppointmentRequest(@PathVariable(value = "appointment-req-id") appointmentReqId: String):
             ResponseEntity<BaseResponse<String>>? {
         logger.printSeparator()
