@@ -28,12 +28,30 @@ class AppointmentService {
                 datastoreRepositoryContract.createEntity(DatastoreConstant.APPOINTMENT_COLLECTION, appointment.id, appointment), null))
     }
 
+    fun updateAppointment(appointment: Appointment): ResponseEntity<BaseResponse<Appointment>> {
+        datastoreRepositoryContract.updateEntity(DatastoreConstant.APPOINTMENT_COLLECTION, appointment.id, appointment)
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(BaseResponse(Status.SUCCESS,
+                appointment, null))
+    }
+
     fun createNewAppointmentRequest(appointmentReq: AppointmentRequest): ResponseEntity<BaseResponse<String>> {
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(BaseResponse(Status.SUCCESS,
                 datastoreRepositoryContract
                     .createEntity(DatastoreConstant.APPOINTMENT_REQUEST_COLLECTION, appointmentReq.id, appointmentReq), null))
+    }
+
+    fun updateAppointmentRequest(appointmentReq: AppointmentRequest): ResponseEntity<BaseResponse<AppointmentRequest>> {
+        datastoreRepositoryContract.updateEntity(DatastoreConstant.APPOINTMENT_REQUEST_COLLECTION, appointmentReq.id, appointmentReq)
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(BaseResponse(Status.SUCCESS,
+                appointmentReq, null))
     }
 
     fun getUserAppointmentList(userId: String, userString: String?): ResponseEntity<BaseResponse<List<Appointment>>> {

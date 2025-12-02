@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
@@ -36,6 +37,17 @@ class AppointmentController(private val appointmentService: AppointmentService) 
         return response
     }
 
+    @PutMapping("/update")
+    fun updateAppointment(@Valid @RequestBody appointment: Appointment): ResponseEntity<BaseResponse<Appointment>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: PUT: [/appointment/update]", AppointmentController::class.java)
+
+        val response = appointmentService.updateAppointment(appointment = appointment)
+        logger.printResponseInfo(response, AppointmentController::class.java)
+
+        return response
+    }
+
     @PostMapping("/request/create")
     fun createNewAppointmentRequest(@Valid @RequestBody appointmentReq: AppointmentRequest):
             ResponseEntity<BaseResponse<String>>? {
@@ -43,6 +55,17 @@ class AppointmentController(private val appointmentService: AppointmentService) 
         logger.printInfo("REQUEST MAPPING: POST: [/appointment/request/create]", AppointmentController::class.java)
 
         val response = appointmentService.createNewAppointmentRequest(appointmentReq = appointmentReq)
+        logger.printResponseInfo(response, AppointmentController::class.java)
+
+        return response
+    }
+
+    @PutMapping("/request/update")
+    fun updateAppointmentRequest(@Valid @RequestBody appointmentReq: AppointmentRequest): ResponseEntity<BaseResponse<AppointmentRequest>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: PUT: [/appointment/request/update]", AppointmentController::class.java)
+
+        val response = appointmentService.updateAppointmentRequest(appointmentReq = appointmentReq)
         logger.printResponseInfo(response, AppointmentController::class.java)
 
         return response
