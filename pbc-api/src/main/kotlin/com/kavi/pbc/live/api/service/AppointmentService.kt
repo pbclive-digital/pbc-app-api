@@ -9,12 +9,15 @@ import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.Fireba
 import com.kavi.pbc.live.data.model.appointment.Appointment
 import com.kavi.pbc.live.data.model.appointment.AppointmentRequestEligibility
 import com.kavi.pbc.live.data.model.appointment.AppointmentRequest
+import com.kavi.pbc.live.data.model.appointment.AppointmentStatus
+import com.kavi.pbc.live.data.model.event.EventStatus
 import com.kavi.pbc.live.data.model.user.User
 import com.kavi.pbc.live.data.model.user.UserType
 import kotlinx.serialization.json.Json
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import java.util.Date
 
 @Service
 class AppointmentService {
@@ -154,6 +157,37 @@ class AppointmentService {
             .body(BaseResponse(Status.SUCCESS,
                 datastoreRepositoryContract.deleteEntity(DatastoreConstant.APPOINTMENT_REQUEST_COLLECTION, appointmentReqId),
                 null))
+    }
+
+    fun updateAppointmentStatusAccordingToDate(): String? {
+        val properties = mapOf(
+            "appointmentStatus" to EventStatus.PUBLISHED
+        )
+        val lessThanMap = mapOf(
+            "date" to System.currentTimeMillis()
+        )
+
+        val dueAppointmentList = datastoreRepositoryContract.getEntityListFromProperties(
+            entityCollection = DatastoreConstant.APPOINTMENT_COLLECTION,
+            propertiesMap = properties,
+            lessThanMap = lessThanMap,
+            className = Appointment::class.java
+        )
+
+        dueAppointmentList.forEach { dueAppointment ->
+            dueAppointment.appointmentStatus = AppointmentStatus.OVERDUE
+            datastoreRepositoryContract.updateEntity(
+                entityCollection = DatastoreConstant.APPOINTMENT_COLLECTION,
+                entityId = dueAppointment.id,
+                entity = dueAppointment
+            )
+        }
+
+        return if (dueAppointmentList.isNotEmpty()) {
+            "Appointment status updated as OVERDUE in [${dueAppointmentList.size}] Appointments."
+        } else {
+            "No Appointments found that due from Date: [${Date()}]"
+        }
     }
 
     private fun retrieveAppointmentForUser(userId: String): List<Appointment> {

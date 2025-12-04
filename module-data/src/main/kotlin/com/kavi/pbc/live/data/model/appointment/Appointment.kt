@@ -14,7 +14,7 @@ data class Appointment(
     val date: Long,
     val time: String,
     val reason: String,
-    val appointmentStatus: AppointmentStatus = AppointmentStatus.PENDING
+    var appointmentStatus: AppointmentStatus = AppointmentStatus.PENDING
 ): BaseModel {
 
     constructor(): this(DataUtil.idGenerator("apt"), "", "", User(), "none", null,
