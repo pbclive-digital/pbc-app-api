@@ -57,7 +57,7 @@ class NewsService {
         )
         val orderBy = mapOf(
             "property" to "createdTime",
-            "direction" to "ASC"
+            "direction" to "DESC"
         )
 
         val finalActiveNewsList = datastoreRepositoryContract.getEntityListFromProperties(
@@ -76,6 +76,19 @@ class NewsService {
                     Error(HttpStatus.NOT_FOUND.toString()))
                 ))
         }
+    }
+
+    fun publishDraftNews(newsId: String, news: News): ResponseEntity<BaseResponse<News>>? {
+        news.newsStatus = NewsStatus.ACTIVE
+        news.publishedTime = System.currentTimeMillis()
+
+        datastoreRepositoryContract.updateEntity(DatastoreConstant.NEWS_COLLECTION, newsId, news)
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(BaseResponse(Status.SUCCESS,
+                news,
+                null))
     }
 
     fun updateNews(newsId: String, news: News): ResponseEntity<BaseResponse<News>> {

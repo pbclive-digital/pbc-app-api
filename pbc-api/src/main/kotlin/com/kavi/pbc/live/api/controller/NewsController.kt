@@ -56,6 +56,17 @@ class NewsController(private val newsService: NewsService) {
         return response
     }
 
+    @PutMapping("/update/publish/{news-id}")
+    fun publishDraftNews(@PathVariable(value = "news-id") newsId: String, @Valid @RequestBody news: News): ResponseEntity<BaseResponse<News>>?? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: PUT: [/news/put/publish/$newsId]", NewsController::class.java)
+
+        val response = newsService.publishDraftNews(newsId, news)
+        logger.printResponseInfo(response, NewsController::class.java)
+
+        return response
+    }
+
     @PutMapping("/update/{news-id}")
     fun updateNews(@PathVariable(value = "news-id") newsId: String,
                     @Valid @RequestBody news: News): ResponseEntity<BaseResponse<News>>? {
@@ -69,7 +80,7 @@ class NewsController(private val newsService: NewsService) {
     }
 
     @DeleteMapping("/delete/{news-id}")
-    fun deleteEvent(@PathVariable(value = "news-id") newsId: String):
+    fun deleteNews(@PathVariable(value = "news-id") newsId: String):
             ResponseEntity<BaseResponse<String>>? {
         logger.printSeparator()
         logger.printInfo("REQUEST MAPPING: DELETE:[/news/delete/$newsId]", NewsController::class.java)
