@@ -74,11 +74,22 @@ class EventController(private val eventService: EventService) {
     }
 
     @GetMapping("/get/past")
-    fun getAllPassEvents(): ResponseEntity<BaseResponse<List<Event>>>?? {
+    fun getAllPassEvents(): ResponseEntity<BaseResponse<List<Event>>>? {
         logger.printSeparator()
         logger.printInfo("REQUEST MAPPING: GET: [/event/get/past]", EventController::class.java)
 
         val response = eventService.getPastEvents()
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
+    @GetMapping("/get/{event-id}")
+    fun getEventById(@PathVariable(value = "event-id") eventId: String): ResponseEntity<BaseResponse<Event>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET: [/event/get/$eventId]", EventController::class.java)
+
+        val response = eventService.getEventById(eventId = eventId)
         logger.printResponseInfo(response, EventController::class.java)
 
         return response

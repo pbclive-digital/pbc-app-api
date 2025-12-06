@@ -16,6 +16,7 @@ import com.kavi.pbc.live.data.model.event.potluck.EventPotluckContributor
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluckItem
 import com.kavi.pbc.live.data.model.event.register.EventRegistration
 import com.kavi.pbc.live.data.model.event.register.EventRegistrationItem
+import com.kavi.pbc.live.data.model.user.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -147,6 +148,19 @@ class EventService {
             ResponseEntity.ok(BaseResponse(Status.SUCCESS, finalPassedEventList, null))
         } else {
             ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error(HttpStatus.NOT_FOUND.toString()))
+                ))
+        }
+    }
+
+    fun getEventById(eventId: String): ResponseEntity<BaseResponse<Event>>? {
+        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_COLLECTION,
+            eventId, Event::class.java)?.let {
+            return ResponseEntity.ok(BaseResponse(Status.SUCCESS, it, null))
+        }?: run {
+            return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(BaseResponse(Status.ERROR, null, listOf(
                     Error(HttpStatus.NOT_FOUND.toString()))
