@@ -11,6 +11,9 @@ import com.kavi.pbc.live.data.model.news.NewsStatus
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import java.time.Duration
+import java.time.Instant
+import java.util.Date
 
 @Service
 class NewsService {
@@ -107,5 +110,39 @@ class NewsService {
             .body(BaseResponse(Status.SUCCESS,
                 datastoreRepositoryContract.deleteEntity(DatastoreConstant.NEWS_COLLECTION, newsId),
                 null))
+    }
+
+    fun updateNewsStatusAccordingToDate(): String? {
+
+        val oneMonthBefore = Instant.now().minus(Duration.ofDays(30)).toEpochMilli()
+
+        val properties = mapOf(
+            "newsStatus" to NewsStatus.ACTIVE
+        )
+        val lessThanMap = mapOf(
+            "publishedTime" to oneMonthBefore
+        )
+
+        val oldNewsList = datastoreRepositoryContract.getEntityListFromProperties(
+            entityCollection = DatastoreConstant.NEWS_COLLECTION,
+            propertiesMap = properties,
+            lessThanMap = lessThanMap,
+            className = News::class.java
+        )
+
+        oldNewsList.forEach { oldNews ->
+            oldNews.newsStatus = NewsStatus.ARCHIVE
+            datastoreRepositoryContract.updateEntity(
+                entityCollection = DatastoreConstant.NEWS_COLLECTION,
+                entityId = oldNews.id,
+                entity = oldNews
+            )
+        }
+
+        return if (oldNewsList.isNotEmpty()) {
+            "News status updated as ARCHIVE in [${oldNewsList.size}] news."
+        } else {
+            "No News found that due from Date: [${Date()}]"
+        }
     }
 }
