@@ -81,6 +81,19 @@ class NewsService {
         }
     }
 
+    fun getNewsById(newsId: String): ResponseEntity<BaseResponse<News>>? {
+        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.NEWS_COLLECTION,
+            newsId, News::class.java)?.let {
+            return ResponseEntity.ok(BaseResponse(Status.SUCCESS, it, null))
+        }?: run {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error(HttpStatus.NOT_FOUND.toString()))
+                ))
+        }
+    }
+
     fun publishDraftNews(newsId: String, news: News): ResponseEntity<BaseResponse<News>>? {
         news.newsStatus = NewsStatus.ACTIVE
         news.publishedTime = System.currentTimeMillis()

@@ -10,8 +10,6 @@ import com.kavi.pbc.live.data.model.appointment.Appointment
 import com.kavi.pbc.live.data.model.appointment.AppointmentRequestEligibility
 import com.kavi.pbc.live.data.model.appointment.AppointmentRequest
 import com.kavi.pbc.live.data.model.appointment.AppointmentStatus
-import com.kavi.pbc.live.data.model.event.Event
-import com.kavi.pbc.live.data.model.event.EventStatus
 import com.kavi.pbc.live.data.model.user.User
 import com.kavi.pbc.live.data.model.user.UserType
 import kotlinx.serialization.json.Json
@@ -188,7 +186,7 @@ class AppointmentService {
 
     fun updateAppointmentStatusAccordingToDate(): String? {
         val properties = mapOf(
-            "appointmentStatus" to EventStatus.PUBLISHED
+            "appointmentStatus" to AppointmentStatus.ACCEPTED
         )
         val lessThanMap = mapOf(
             "date" to System.currentTimeMillis()

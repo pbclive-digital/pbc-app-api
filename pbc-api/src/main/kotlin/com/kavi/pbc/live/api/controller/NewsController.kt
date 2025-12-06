@@ -56,6 +56,17 @@ class NewsController(private val newsService: NewsService) {
         return response
     }
 
+    @GetMapping("/get/{news-id}")
+    fun getNewsById(@PathVariable(value = "news-id") newsId: String): ResponseEntity<BaseResponse<News>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET: [/news/get/$newsId]", NewsController::class.java)
+
+        val response = newsService.getNewsById(newsId = newsId)
+        logger.printResponseInfo(response, NewsController::class.java)
+
+        return response
+    }
+
     @PutMapping("/update/publish/{news-id}")
     fun publishDraftNews(@PathVariable(value = "news-id") newsId: String, @Valid @RequestBody news: News): ResponseEntity<BaseResponse<News>>?? {
         logger.printSeparator()
