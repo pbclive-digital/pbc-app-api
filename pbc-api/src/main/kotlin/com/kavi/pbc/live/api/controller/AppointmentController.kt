@@ -97,6 +97,31 @@ class AppointmentController(private val appointmentService: AppointmentService) 
         return response
     }
 
+    @GetMapping("/get/{appointment-id}")
+    fun getAppointmentById(@PathVariable(value = "appointment-id") appointmentId: String):
+            ResponseEntity<BaseResponse<Appointment>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET: [/appointment/get/$appointmentId]", AppointmentController::class.java)
+
+        val response = appointmentService.getAppointmentById(appointmentId = appointmentId)
+        logger.printResponseInfo(response, AppointmentController::class.java)
+
+        return response
+    }
+
+    @GetMapping("/request/get/{appointment-req-id}")
+    fun getAppointmentRequestById(@PathVariable(value = "appointment-req-id") appointmentReqId: String):
+            ResponseEntity<BaseResponse<AppointmentRequest>>? {
+
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET: [/appointment/request/get/$appointmentReqId]", AppointmentController::class.java)
+
+        val response = appointmentService.getAppointmentReqById(appointmentReqId = appointmentReqId)
+        logger.printResponseInfo(response, AppointmentController::class.java)
+
+        return response
+    }
+
     @GetMapping("/request/create/eligibility/{user-id}")
     fun validateRequestCreateEligibility(@PathVariable(value = "user-id") userId: String):
             ResponseEntity<BaseResponse<AppointmentRequestEligibility>>? {

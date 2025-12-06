@@ -10,6 +10,7 @@ import com.kavi.pbc.live.data.model.appointment.Appointment
 import com.kavi.pbc.live.data.model.appointment.AppointmentRequestEligibility
 import com.kavi.pbc.live.data.model.appointment.AppointmentRequest
 import com.kavi.pbc.live.data.model.appointment.AppointmentStatus
+import com.kavi.pbc.live.data.model.event.Event
 import com.kavi.pbc.live.data.model.event.EventStatus
 import com.kavi.pbc.live.data.model.user.User
 import com.kavi.pbc.live.data.model.user.UserType
@@ -83,6 +84,32 @@ class AppointmentService {
                         )
                     )
                 )
+        }
+    }
+
+    fun getAppointmentById(appointmentId: String): ResponseEntity<BaseResponse<Appointment>>? {
+        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.APPOINTMENT_COLLECTION,
+            appointmentId, Appointment::class.java)?.let {
+            return ResponseEntity.ok(BaseResponse(Status.SUCCESS, it, null))
+        }?: run {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error(HttpStatus.NOT_FOUND.toString()))
+                ))
+        }
+    }
+
+    fun getAppointmentReqById(appointmentReqId: String): ResponseEntity<BaseResponse<AppointmentRequest>>? {
+        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.APPOINTMENT_REQUEST_COLLECTION,
+            appointmentReqId, AppointmentRequest::class.java)?.let {
+            return ResponseEntity.ok(BaseResponse(Status.SUCCESS, it, null))
+        }?: run {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error(HttpStatus.NOT_FOUND.toString()))
+                ))
         }
     }
 
