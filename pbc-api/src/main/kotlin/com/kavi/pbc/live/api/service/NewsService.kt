@@ -33,7 +33,7 @@ class NewsService {
     fun addNewsImage(newsImage: MultipartFile, newsTitle: String): ResponseEntity<BaseResponse<String>>? {
         val formatedNewsTitle = newsTitle.replace(" ", "_").replace("-", "_")
         val createdTimestamp = System.currentTimeMillis()
-        val formatFileName = "${FirebaseCDNConstant.EVENT_DIR_NAME}/$createdTimestamp:$formatedNewsTitle"
+        val formatFileName = "${FirebaseCDNConstant.NEWS_DIR_NAME}/$createdTimestamp:$formatedNewsTitle"
 
         val url = FirebaseStorage.getInstance().uploadFile(
             newsImage.bytes, formatFileName, newsImage.contentType)
