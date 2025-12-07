@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/news")
@@ -29,6 +31,17 @@ class NewsController(private val newsService: NewsService) {
         logger.printInfo("REQUEST MAPPING: POST: [/news/create]", NewsController::class.java)
 
         val response = newsService.createNews(news)
+        logger.printResponseInfo(response, NewsController::class.java)
+
+        return response
+    }
+
+    @PostMapping("/add/image/{news-title}")
+    fun addEventImage(@PathVariable(value = "news-title") newsTitle: String, @RequestParam("newsImage") newsImage: MultipartFile): ResponseEntity<BaseResponse<String>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: POST: [/news/add/image/$newsTitle]", NewsController::class.java)
+
+        val response = newsService.addNewsImage(newsImage, newsTitle)
         logger.printResponseInfo(response, NewsController::class.java)
 
         return response

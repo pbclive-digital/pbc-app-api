@@ -4,6 +4,8 @@ import com.kavi.pbc.live.api.dto.BaseResponse
 import com.kavi.pbc.live.api.dto.Error
 import com.kavi.pbc.live.api.dto.Status
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.DatastoreRepositoryContract
+import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.cdn.FirebaseCDNConstant
+import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.cdn.FirebaseStorage
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository
 import com.kavi.pbc.live.data.model.news.News
@@ -11,6 +13,7 @@ import com.kavi.pbc.live.data.model.news.NewsStatus
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 import java.time.Duration
 import java.time.Instant
 import java.util.Date
@@ -25,6 +28,19 @@ class NewsService {
             .status(HttpStatus.CREATED)
             .body(BaseResponse(Status.SUCCESS,
                 datastoreRepositoryContract.createEntity(DatastoreConstant.NEWS_COLLECTION, news.id, news), null))
+    }
+
+    fun addNewsImage(newsImage: MultipartFile, newsTitle: String): ResponseEntity<BaseResponse<String>>? {
+        val formatedNewsTitle = newsTitle.replace(" ", "_").replace("-", "_")
+        val createdTimestamp = System.currentTimeMillis()
+        val formatFileName = "${FirebaseCDNConstant.EVENT_DIR_NAME}/$createdTimestamp:$formatedNewsTitle"
+
+        val url = FirebaseStorage.getInstance().uploadFile(
+            newsImage.bytes, formatFileName, newsImage.contentType)
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(BaseResponse(Status.SUCCESS,
+                url, null))
     }
 
     fun getDraftNews(): ResponseEntity<BaseResponse<List<News>>>? {
