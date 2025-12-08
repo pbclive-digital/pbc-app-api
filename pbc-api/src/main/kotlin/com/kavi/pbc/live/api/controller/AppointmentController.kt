@@ -71,7 +71,7 @@ class AppointmentController(private val appointmentService: AppointmentService) 
         return response
     }
 
-    @GetMapping("/get/{user-id}")
+    @GetMapping("/get/user/{user-id}")
     fun getUserAppointments(@PathVariable(value = "user-id") userId: String,
                             @RequestHeader("X-app-user") userString: String?):
             ResponseEntity<BaseResponse<List<Appointment>>>? {
@@ -84,7 +84,7 @@ class AppointmentController(private val appointmentService: AppointmentService) 
         return response
     }
 
-    @GetMapping("/request/get/{user-id}")
+    @GetMapping("/request/get/user/{user-id}")
     fun getUserAppointmentRequests(@PathVariable(value = "user-id") userId: String,
                             @RequestHeader("X-app-user") userString: String?):
             ResponseEntity<BaseResponse<List<AppointmentRequest>>>? {
