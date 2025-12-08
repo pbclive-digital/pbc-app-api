@@ -76,7 +76,7 @@ class AppointmentController(private val appointmentService: AppointmentService) 
                             @RequestHeader("X-app-user") userString: String?):
             ResponseEntity<BaseResponse<List<Appointment>>>? {
         logger.printSeparator()
-        logger.printInfo("REQUEST MAPPING: GET: [/appointment/get/$userId]", AppointmentController::class.java)
+        logger.printInfo("REQUEST MAPPING: GET: [/appointment/get/user/$userId]", AppointmentController::class.java)
 
         val response = appointmentService.getUserAppointmentList(userId = userId, userString = userString)
         logger.printResponseInfo(response, AppointmentController::class.java)
@@ -89,7 +89,7 @@ class AppointmentController(private val appointmentService: AppointmentService) 
                             @RequestHeader("X-app-user") userString: String?):
             ResponseEntity<BaseResponse<List<AppointmentRequest>>>? {
         logger.printSeparator()
-        logger.printInfo("REQUEST MAPPING: GET: [/appointment/request/get/$userId]", AppointmentController::class.java)
+        logger.printInfo("REQUEST MAPPING: GET: [/appointment/request/get/user/$userId]", AppointmentController::class.java)
 
         val response = appointmentService.getUserAppointmentRequestList(userId = userId, userString = userString)
         logger.printResponseInfo(response, AppointmentController::class.java)
