@@ -3,6 +3,7 @@ package com.kavi.pbc.live.api.controller
 import com.kavi.pbc.live.api.dto.BaseResponse
 import com.kavi.pbc.live.api.service.UserService
 import com.kavi.pbc.live.api.util.AppLogger
+import com.kavi.pbc.live.data.model.notification.PushTokenData
 import com.kavi.pbc.live.data.model.user.User
 import com.kavi.pbc.live.data.model.user.UserRoleUpdateReq
 import jakarta.validation.Valid
@@ -88,6 +89,18 @@ class UserController(private val userService: UserService) {
         logger.printInfo("REQUEST MAPPING: PUT: [/user/update/userType]", UserController::class.java)
 
         val response = userService.modifyUserRole(userRoleUpdateReq)
+        logger.printResponseInfo(response, UserController::class.java)
+
+        return response
+    }
+
+    @PutMapping("/update/push-token/{user-id}")
+    fun updateUserPushToken(@PathVariable(value = "user-id") userId: String, @Valid @RequestBody tokenData: PushTokenData):
+            ResponseEntity<BaseResponse<String>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: PUT: [/user/update/push-token/$userId]", UserController::class.java)
+
+        val response = userService.updateUserPushNotificationToken(userId, tokenData)
         logger.printResponseInfo(response, UserController::class.java)
 
         return response

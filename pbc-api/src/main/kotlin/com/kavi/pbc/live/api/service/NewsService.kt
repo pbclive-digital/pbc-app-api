@@ -143,7 +143,7 @@ class NewsService {
 
     fun updateNewsStatusAccordingToDate(): String? {
 
-        val oneMonthBefore = Instant.now().minus(Duration.ofDays(30)).toEpochMilli()
+        val oneMonthBefore = Instant.now().minus(Duration.ofDays(90)).toEpochMilli()
 
         val properties = mapOf(
             "newsStatus" to NewsStatus.ACTIVE
