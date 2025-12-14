@@ -21,7 +21,7 @@ class AppStartupListener: ApplicationListener<ContextRefreshedEvent> {
     private fun initializeFirebase() {
         when(appProperties.appEnv) {
             "staging" -> {
-                FirebaseIntegration.getInstance().init(IntegrationEnv.STAGING)
+                FirebaseIntegration.shared.init(IntegrationEnv.STAGING)
             }
         }
     }

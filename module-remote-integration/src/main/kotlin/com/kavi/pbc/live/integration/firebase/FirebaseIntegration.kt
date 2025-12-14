@@ -12,13 +12,7 @@ class FirebaseIntegration: IntegrationContract {
     private var firebaseApplication: FirebaseApp? = null
 
     companion object {
-        private var firebaseIntegration: FirebaseIntegration? = null
-        fun getInstance(): FirebaseIntegration {
-            return firebaseIntegration ?: run {
-                firebaseIntegration = FirebaseIntegration()
-                return firebaseIntegration as FirebaseIntegration
-            }
-        }
+        var shared: FirebaseIntegration = FirebaseIntegration()
     }
 
     fun getFirebaseApp(): FirebaseApp? {

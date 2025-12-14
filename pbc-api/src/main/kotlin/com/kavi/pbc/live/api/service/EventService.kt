@@ -16,7 +16,6 @@ import com.kavi.pbc.live.data.model.event.potluck.EventPotluckContributor
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluckItem
 import com.kavi.pbc.live.data.model.event.register.EventRegistration
 import com.kavi.pbc.live.data.model.event.register.EventRegistrationItem
-import com.kavi.pbc.live.data.model.user.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

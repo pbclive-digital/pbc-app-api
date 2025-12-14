@@ -8,7 +8,6 @@ import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.Fireba
 import com.kavi.pbc.live.data.model.user.User
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
 import com.kavi.pbc.live.data.model.notification.PushTokenData
-import com.kavi.pbc.live.data.model.notification.UserPushToken
 import com.kavi.pbc.live.data.model.user.UserRoleUpdateReq
 import com.kavi.pbc.live.data.model.user.UserType
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,6 +20,9 @@ class UserService {
 
     @Autowired
     private val authService: AuthService? = null
+
+    @Autowired
+    private val pushTokenService: PushTokenService? = null
 
     private var datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
 
@@ -93,33 +95,7 @@ class UserService {
     }
 
     fun updateUserPushNotificationToken(userId: String, pushTokenData: PushTokenData): ResponseEntity<BaseResponse<String>>? {
-        val userPushToken = getUserPushTokenFromId(userId)
-        userPushToken?.let {
-            if (it.pushTokenList.contains(pushTokenData.pushToken)) {
-                return ResponseEntity
-                    .status(HttpStatus.CONFLICT)
-                    .body(BaseResponse(Status.ERROR, null, listOf(
-                        Error("Provided PushNotification Token is already available for given User."))
-                    ))
-            } else {
-                it.pushTokenList.add(pushTokenData.pushToken)
-                return ResponseEntity.ok(BaseResponse(Status.SUCCESS,
-                    datastoreRepositoryContract.updateEntity(
-                        DatastoreConstant.USER_PUSH_TOKEN_COLLECTION,
-                        userId, it),
-                    null)
-                )
-            }
-        }?: run {
-            val pushToken = UserPushToken(userId, pushTokenData.email, mutableListOf(pushTokenData.pushToken))
-
-            return ResponseEntity.ok(BaseResponse(Status.SUCCESS,
-                datastoreRepositoryContract.createEntity(
-                    DatastoreConstant.USER_PUSH_TOKEN_COLLECTION,
-                    userId, pushToken),
-                null)
-            )
-        }
+        return pushTokenService?.updatePushNotificationToken(userId, pushTokenData)
     }
 
     fun getUserById(userId: String): ResponseEntity<BaseResponse<User>>? {
@@ -210,11 +186,5 @@ class UserService {
             propertiesMap = properties,
             className = User::class.java
         )
-    }
-
-    private fun getUserPushTokenFromId(userId: String): UserPushToken? {
-        return datastoreRepositoryContract.getEntityFromId(
-            DatastoreConstant.USER_PUSH_TOKEN_COLLECTION,
-            userId, UserPushToken::class.java)
     }
 }
