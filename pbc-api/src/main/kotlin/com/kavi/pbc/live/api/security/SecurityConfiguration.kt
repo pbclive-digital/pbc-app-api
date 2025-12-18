@@ -25,6 +25,13 @@ class SecurityConfiguration {
                     .requestMatchers("/event/delete/**").authenticated()
                     .requestMatchers("/user/update/**").authenticated()
                     .requestMatchers("/appointment/**").authenticated()
+                    .requestMatchers("/news/create/**").authenticated()
+                    .requestMatchers("/news/update/**").authenticated()
+                    .requestMatchers("/news/get/draft/**").authenticated()
+                    .requestMatchers("/news/update/publish/**").authenticated()
+                    .requestMatchers("/news/delete/**").authenticated()
+                    .requestMatchers("/news/add/image/**").authenticated()
+                    .requestMatchers("/broadcast/message/**").authenticated()
                     .anyRequest().permitAll()
             }
             .addFilterBefore(tokenFilter, BasicAuthenticationFilter::class.java)
