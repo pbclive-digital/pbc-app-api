@@ -1,6 +1,7 @@
 package com.kavi.pbc.live.data.model.news
 
 import com.kavi.pbc.live.data.model.BaseModel
+import com.kavi.pbc.live.data.model.user.UserSummary
 import com.kavi.pbc.live.data.util.DataUtil
 
 data class News(
@@ -11,11 +12,12 @@ data class News(
     val facebookLink: String? = null,
     val newsImage: String? = null,
     val createdTime: Long,
-    var publishedTime: Long = 0
+    var publishedTime: Long = 0,
+    var author: UserSummary = UserSummary()
 ): BaseModel {
     constructor(): this(
         DataUtil.idGenerator("nsw"), "", "", NewsStatus.DRAFT, null, null,
-        System.currentTimeMillis(), 0
+        System.currentTimeMillis(), 0, UserSummary()
     )
 
     override fun toMap(): Map<String, Any?> = mapOf(
@@ -26,6 +28,7 @@ data class News(
         "facebookLink" to facebookLink,
         "newsImage" to newsImage,
         "createdTime" to createdTime,
-        "publishedTime" to publishedTime
+        "publishedTime" to publishedTime,
+        "author" to author
     )
 }
