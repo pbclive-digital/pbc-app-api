@@ -3,6 +3,7 @@ package com.kavi.pbc.live.api.controller
 import com.kavi.pbc.live.api.dto.BaseResponse
 import com.kavi.pbc.live.api.service.QuestionService
 import com.kavi.pbc.live.api.util.AppLogger
+import com.kavi.pbc.live.data.model.news.News
 import com.kavi.pbc.live.data.model.question.Answer
 import com.kavi.pbc.live.data.model.question.Question
 import com.kavi.pbc.live.integration.firebase.datastore.pagination.model.PaginationRequest
@@ -66,6 +67,18 @@ class QuestionController(private val questionService: QuestionService) {
         logger.printInfo("REQUEST MAPPING: GET: [/question/get/user/$userId]", QuestionController::class.java)
 
         val response = questionService.getUserQuestionList(userId)
+        logger.printResponseInfo(response, QuestionController::class.java)
+
+        return response
+    }
+
+    @PutMapping("/update/{question-id}")
+    fun updateQuestion(@PathVariable(value = "question-id") questionId: String,
+                   @Valid @RequestBody question: Question): ResponseEntity<BaseResponse<Question>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: PUT: [/question/update/$questionId]", QuestionController::class.java)
+
+        val response = questionService.updateQuestion(questionId, question)
         logger.printResponseInfo(response, QuestionController::class.java)
 
         return response

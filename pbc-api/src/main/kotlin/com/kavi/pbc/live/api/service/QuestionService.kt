@@ -6,6 +6,7 @@ import com.kavi.pbc.live.api.dto.Status
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.DatastoreRepositoryContract
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository
+import com.kavi.pbc.live.data.model.news.News
 import com.kavi.pbc.live.data.model.question.Answer
 import com.kavi.pbc.live.data.model.question.Question
 import com.kavi.pbc.live.integration.firebase.datastore.pagination.helper.QuestionPaginationHelper
@@ -106,5 +107,15 @@ class QuestionService {
                     Error(HttpStatus.NOT_FOUND.toString()))
                 ))
         }
+    }
+
+    fun updateQuestion(questionId: String, question: Question): ResponseEntity<BaseResponse<Question>> {
+        datastoreRepositoryContract.updateEntity(DatastoreConstant.QUESTION_COLLECTION,
+            questionId, question)
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(BaseResponse(Status.SUCCESS,
+                question, null))
     }
 }
