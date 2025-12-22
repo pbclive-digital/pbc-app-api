@@ -3,7 +3,6 @@ package com.kavi.pbc.live.api.controller
 import com.kavi.pbc.live.api.dto.BaseResponse
 import com.kavi.pbc.live.api.service.QuestionService
 import com.kavi.pbc.live.api.util.AppLogger
-import com.kavi.pbc.live.data.model.news.News
 import com.kavi.pbc.live.data.model.question.Answer
 import com.kavi.pbc.live.data.model.question.Question
 import com.kavi.pbc.live.integration.firebase.datastore.pagination.model.PaginationRequest
@@ -11,6 +10,7 @@ import com.kavi.pbc.live.integration.firebase.datastore.pagination.model.Paginat
 import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -79,6 +79,18 @@ class QuestionController(private val questionService: QuestionService) {
         logger.printInfo("REQUEST MAPPING: PUT: [/question/update/$questionId]", QuestionController::class.java)
 
         val response = questionService.updateQuestion(questionId, question)
+        logger.printResponseInfo(response, QuestionController::class.java)
+
+        return response
+    }
+
+    @DeleteMapping("/delete/{question-id}")
+    fun deleteNews(@PathVariable(value = "question-id") questionId: String):
+            ResponseEntity<BaseResponse<String>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: DELETE:[/question/delete/$questionId]", QuestionController::class.java)
+
+        val response = questionService.deleteGivenQuestion(questionId)
         logger.printResponseInfo(response, QuestionController::class.java)
 
         return response

@@ -6,7 +6,6 @@ import com.kavi.pbc.live.api.dto.Status
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.DatastoreRepositoryContract
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository
-import com.kavi.pbc.live.data.model.news.News
 import com.kavi.pbc.live.data.model.question.Answer
 import com.kavi.pbc.live.data.model.question.Question
 import com.kavi.pbc.live.integration.firebase.datastore.pagination.helper.QuestionPaginationHelper
@@ -117,5 +116,13 @@ class QuestionService {
             .status(HttpStatus.OK)
             .body(BaseResponse(Status.SUCCESS,
                 question, null))
+    }
+
+    fun deleteGivenQuestion(questionId: String): ResponseEntity<BaseResponse<String>>? {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(BaseResponse(Status.SUCCESS,
+                datastoreRepositoryContract.deleteEntity(DatastoreConstant.QUESTION_COLLECTION, questionId),
+                null))
     }
 }
