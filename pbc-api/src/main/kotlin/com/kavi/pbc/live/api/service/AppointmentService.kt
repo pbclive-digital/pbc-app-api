@@ -6,6 +6,7 @@ import com.kavi.pbc.live.api.dto.Status
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.DatastoreRepositoryContract
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository
+import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.notification.FirebasePushNotification
 import com.kavi.pbc.live.data.model.appointment.Appointment
 import com.kavi.pbc.live.data.model.appointment.AppointmentRequestEligibility
 import com.kavi.pbc.live.data.model.appointment.AppointmentRequest
@@ -13,6 +14,7 @@ import com.kavi.pbc.live.data.model.appointment.AppointmentStatus
 import com.kavi.pbc.live.data.model.user.User
 import com.kavi.pbc.live.data.model.user.UserType
 import kotlinx.serialization.json.Json
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -21,9 +23,24 @@ import java.util.Date
 @Service
 class AppointmentService {
 
+    @Autowired
+    lateinit var pushTokenService: PushTokenService
+
     private var datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
 
     fun createNewAppointment(appointment: Appointment): ResponseEntity<BaseResponse<String>> {
+        val pushNotificationData = mapOf(
+            "CHANNEL" to FirebasePushNotification.APPOINTMENT_CHANNEL_ID,
+            "APPOINTMENT_ID" to appointment.id
+        )
+
+        FirebasePushNotification.shared.sendNotificationToMultipleTokens(
+            title = "Accepted you appointment request.",
+            message = "Your appointment request was accepted by Bhanthe ${appointment.selectedMonk?.lastName}.",
+            tokens = pushTokenService.getPushTokensForUser(userId = appointment.user.id),
+            data = pushNotificationData
+        )
+
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(BaseResponse(Status.SUCCESS,

@@ -14,6 +14,7 @@ class FirebasePushNotification: PushNotificationContract {
         const val EVENT_CHANNEL_ID = "EVENT_CHANNEL_ID"
         const val NEWS_CHANNEL_ID = "NEWS_CHANNEL_ID"
         const val BROADCAST_CHANNEL_ID = "BROADCAST_CHANNEL_ID"
+        const val APPOINTMENT_CHANNEL_ID = "APPOINTMENT_CHANNEL_ID"
 
         var shared: FirebasePushNotification = FirebasePushNotification()
     }

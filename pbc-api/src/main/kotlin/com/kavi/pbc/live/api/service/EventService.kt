@@ -11,6 +11,7 @@ import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.Fireba
 import com.kavi.pbc.live.data.model.event.Event
 import com.kavi.pbc.live.data.model.event.EventStatus
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
+import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.notification.FirebasePushNotification
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluck
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluckContributor
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluckItem
@@ -29,6 +30,10 @@ class EventService {
 
     @Autowired
     lateinit var logger: AppLogger
+
+    @Autowired
+    lateinit var pushTokenService: PushTokenService
+
     private var datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
 
     fun createEvent(event: Event): ResponseEntity<BaseResponse<String>>? {
@@ -248,6 +253,18 @@ class EventService {
         event.eventStatus = EventStatus.PUBLISHED
 
         datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_COLLECTION, eventId, event)
+
+        val pushNotificationData = mapOf(
+            "CHANNEL" to FirebasePushNotification.EVENT_CHANNEL_ID,
+            "NEWS_ID" to eventId
+        )
+
+        FirebasePushNotification.shared.sendNotificationToMultipleTokens(
+            title = "EVENT: ${event.name}",
+            message = event.description,
+            tokens = pushTokenService.getAllPushTokens(),
+            data = pushNotificationData
+        )
 
         return ResponseEntity
             .status(HttpStatus.OK)

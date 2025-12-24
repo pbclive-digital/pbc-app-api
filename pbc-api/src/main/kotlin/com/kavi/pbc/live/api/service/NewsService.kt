@@ -8,8 +8,10 @@ import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.cdn.FirebaseCDNC
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.cdn.FirebaseStorage
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository
+import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.notification.FirebasePushNotification
 import com.kavi.pbc.live.data.model.news.News
 import com.kavi.pbc.live.data.model.news.NewsStatus
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -22,6 +24,9 @@ import java.util.Date
 class NewsService {
 
     private var datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
+
+    @Autowired
+    lateinit var pushTokenService: PushTokenService
 
     fun createNews(news: News): ResponseEntity<BaseResponse<String>>? {
         return ResponseEntity
@@ -115,6 +120,18 @@ class NewsService {
         news.publishedTime = System.currentTimeMillis()
 
         datastoreRepositoryContract.updateEntity(DatastoreConstant.NEWS_COLLECTION, newsId, news)
+
+        val pushNotificationData = mapOf(
+            "CHANNEL" to FirebasePushNotification.NEWS_CHANNEL_ID,
+            "NEWS_ID" to newsId
+        )
+
+        FirebasePushNotification.shared.sendNotificationToMultipleTokens(
+            title = "NEWS: ${news.title}",
+            message = news.content,
+            tokens = pushTokenService.getAllPushTokens(),
+            data = pushNotificationData
+        )
 
         return ResponseEntity
             .status(HttpStatus.OK)

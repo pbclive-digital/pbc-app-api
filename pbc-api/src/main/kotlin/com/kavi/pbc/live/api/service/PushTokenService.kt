@@ -62,6 +62,14 @@ class PushTokenService {
         return allAvailableTokenList
     }
 
+    fun getPushTokensForUser(userId: String): List<String> {
+        getUserPushTokenFromId(userId)?.let {
+            return it.pushTokenList
+        }?: run {
+            return emptyList()
+        }
+    }
+
     private fun getUserPushTokenFromId(userId: String): UserPushToken? {
         return datastoreRepositoryContract.getEntityFromId(
             DatastoreConstant.USER_PUSH_TOKEN_COLLECTION,

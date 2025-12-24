@@ -20,7 +20,6 @@ class BroadcastService {
     lateinit var pushTokenService: PushTokenService
 
     fun broadcastMessage(broadCastMessage: BroadcastMessage): ResponseEntity<BaseResponse<String>>? {
-        pushTokenService.getAllPushTokens()
         val data = mapOf(
             "CHANNEL" to FirebasePushNotification.BROADCAST_CHANNEL_ID,
         )
