@@ -8,6 +8,9 @@ import com.kavi.pbc.live.data.model.event.potluck.EventPotluck
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluckContributor
 import com.kavi.pbc.live.data.model.event.register.EventRegistration
 import com.kavi.pbc.live.data.model.event.register.EventRegistrationItem
+import com.kavi.pbc.live.data.model.event.signup.sheet.EventSighUpSheet
+import com.kavi.pbc.live.data.model.event.signup.sheet.SheetContributor
+import com.kavi.pbc.live.data.model.event.signup.sheet.SignUpSheetItem
 import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -200,6 +203,47 @@ class EventController(private val eventService: EventService) {
         logger.printInfo("REQUEST MAPPING: DELETE:[/event/potluck/sign-out/$eventId/$potluckItemId/$contributorId]", EventController::class.java)
 
         val response = eventService.signOutGivenContributorFromPotluckItem(eventId, potluckItemId, contributorId)
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
+    @GetMapping("/get/sign-up-sheet/{event-id}/{sheet-id}")
+    fun getSignUpSheet(@PathVariable(value = "event-id") eventId: String,
+                       @PathVariable(value = "sheet-id") sheetId: String): ResponseEntity<BaseResponse<SignUpSheetItem>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET:[/event/get/sign-up-sheet/$eventId/$sheetId]", EventController::class.java)
+
+        val response = eventService.getEventSignUpSheetRecord(eventId, sheetId)
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
+    @PostMapping("/sign-up-sheet/sign-up/{event-id}/{sheet-id}")
+    fun signUpToSignUpSheet(@PathVariable(value = "event-id") eventId: String,
+                        @PathVariable(value = "sheet-id") sheetId: String,
+                        @Valid @RequestBody contributor: SheetContributor):
+            ResponseEntity<BaseResponse<SignUpSheetItem>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: POST:[/event/sign-up-sheet/sign-up/$eventId/$sheetId]", EventController::class.java)
+
+        val response = eventService.signUpGivenContributorToSignUpSheet(eventId, sheetId, contributor)
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
+    @DeleteMapping("/sign-up-sheet/sign-out/{event-id}/{sheet-id}/{contributor-id}")
+    fun signOutFromSignUpSheet(@PathVariable(value = "event-id") eventId: String,
+                           @PathVariable(value = "sheet-id") sheetId: String,
+                           @PathVariable(value = "contributor-id") contributorId: String):
+            ResponseEntity<BaseResponse<SignUpSheetItem>>? {
+
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: DELETE:[/event/sign-up-sheet/sign-out/$eventId/$sheetId/$contributorId]", EventController::class.java)
+
+        val response = eventService.signOutGivenContributorFromSignUpSheet(eventId, sheetId, contributorId)
         logger.printResponseInfo(response, EventController::class.java)
 
         return response

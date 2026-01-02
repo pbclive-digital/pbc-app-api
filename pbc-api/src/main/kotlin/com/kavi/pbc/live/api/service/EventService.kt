@@ -18,6 +18,7 @@ import com.kavi.pbc.live.data.model.event.potluck.EventPotluckItem
 import com.kavi.pbc.live.data.model.event.register.EventRegistration
 import com.kavi.pbc.live.data.model.event.register.EventRegistrationItem
 import com.kavi.pbc.live.data.model.event.signup.sheet.EventSighUpSheet
+import com.kavi.pbc.live.data.model.event.signup.sheet.SheetContributor
 import com.kavi.pbc.live.data.model.event.signup.sheet.SignUpSheetItem
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -520,6 +521,165 @@ class EventService {
                 .status(HttpStatus.NOT_FOUND)
                 .body(BaseResponse(Status.ERROR, null, listOf(
                     Error("${HttpStatus.NOT_FOUND} due to potluck not found"))
+                ))
+        }
+    }
+
+    fun getEventSignUpSheetRecord(eventId: String, sheetId: String): ResponseEntity<BaseResponse<SignUpSheetItem>>? {
+        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventId,
+            EventSighUpSheet::class.java)?.let { eventSighUpSheet ->
+
+            val filteredListFromSheetId = eventSighUpSheet.signUpSheetItemList.filter { it.sheetId == sheetId }
+            if (filteredListFromSheetId.isNotEmpty()) {
+                return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(BaseResponse(Status.SUCCESS,
+                        filteredListFromSheetId.get(0),
+                        null))
+            } else {
+                return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(BaseResponse(Status.ERROR, null, listOf(
+                        Error(HttpStatus.NOT_FOUND.toString()))
+                    ))
+            }
+        }?: run {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error(HttpStatus.NOT_FOUND.toString()))
+                ))
+        }
+    }
+
+    fun signUpGivenContributorToSignUpSheet(eventId: String, sheetId: String, contributor: SheetContributor):
+            ResponseEntity<BaseResponse<SignUpSheetItem>>? {
+        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventId,
+            EventSighUpSheet::class.java)?.let { eventSighUpSheet ->
+            val updatedEventSighUpSheet = eventSighUpSheet.copy()
+
+            val filteredSignUpSheet = eventSighUpSheet.signUpSheetItemList.filter { it.sheetId == sheetId }
+
+            if (filteredSignUpSheet.isNotEmpty()) {
+                val selectedSignUpSheet = filteredSignUpSheet[0]
+
+                selectedSignUpSheet.contributorList.add(contributor)
+
+                val sheetIndexList = updatedEventSighUpSheet.signUpSheetItemList.withIndex()
+                    .filter { (_, value) -> value.sheetId == sheetId }
+                    .map { it.index }
+
+                if (sheetIndexList.isNotEmpty()) {
+                    val sheetIndex = sheetIndexList[0]
+
+                    updatedEventSighUpSheet.signUpSheetItemList.removeAt(sheetIndex)
+                    updatedEventSighUpSheet.signUpSheetItemList.add(sheetIndex, selectedSignUpSheet)
+
+                    datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, updatedEventSighUpSheet.id, updatedEventSighUpSheet)
+
+                    return ResponseEntity
+                        .status(HttpStatus.OK)
+                        .body(BaseResponse(Status.SUCCESS,
+                            selectedSignUpSheet,
+                            null))
+                } else {
+                    return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body(BaseResponse(
+                            Status.ERROR, null, listOf(
+                                Error("${HttpStatus.NOT_FOUND} due to sign-up sheet not found")
+                            ))
+                        )
+                }
+            } else {
+                return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(BaseResponse(
+                        Status.ERROR, null, listOf(
+                            Error("${HttpStatus.NOT_FOUND} due to sign-up sheet not found")
+                        ))
+                    )
+            }
+        }?: run {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error("${HttpStatus.NOT_FOUND} due to sign-up sheet not found"))
+                ))
+        }
+    }
+
+    fun signOutGivenContributorFromSignUpSheet(eventId: String, sheetId: String, contributorId: String):
+            ResponseEntity<BaseResponse<SignUpSheetItem>>?{
+        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventId,
+            EventSighUpSheet::class.java)?.let { eventSignUpSheet ->
+            val updatedEventSignUpSheet = eventSignUpSheet.copy()
+            val filteredSignUpSheet = eventSignUpSheet.signUpSheetItemList.filter { it.sheetId == sheetId }
+
+            if (filteredSignUpSheet.isNotEmpty()) {
+                val selectedSignUpSheet = filteredSignUpSheet[0]
+
+                val contributorIndexList = selectedSignUpSheet
+                    .contributorList.withIndex()
+                    .filter { (_, value) -> value.contributorId == contributorId }
+                    .map { it.index }
+
+                var isRemoved = false
+                if (contributorIndexList.isNotEmpty()) {
+                    val elementToRemove = selectedSignUpSheet.contributorList[contributorIndexList[0]]
+                    isRemoved = selectedSignUpSheet.contributorList.remove(elementToRemove)
+                }
+
+                if (isRemoved) {
+                    val sheetIndexList = updatedEventSignUpSheet.signUpSheetItemList.withIndex()
+                        .filter { (_, value) -> value.sheetId == sheetId }
+                        .map { it.index }
+
+                    if (sheetIndexList.isNotEmpty()) {
+                        val sheetIndex = sheetIndexList[0]
+
+                        updatedEventSignUpSheet.signUpSheetItemList.removeAt(sheetIndex)
+                        updatedEventSignUpSheet.signUpSheetItemList.add(sheetIndex, selectedSignUpSheet)
+
+                        datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, updatedEventSignUpSheet.id, updatedEventSignUpSheet)
+
+                        return ResponseEntity
+                            .status(HttpStatus.OK)
+                            .body(BaseResponse(Status.SUCCESS,
+                                selectedSignUpSheet,
+                                null))
+                    } else {
+                        return ResponseEntity
+                            .status(HttpStatus.NOT_FOUND)
+                            .body(BaseResponse(
+                                Status.ERROR, null, listOf(
+                                    Error("${HttpStatus.NOT_FOUND} due to sign-up sheet not found")
+                                ))
+                            )
+                    }
+                } else {
+                    return ResponseEntity
+                        .status(HttpStatus.SERVICE_UNAVAILABLE)
+                        .body(BaseResponse(
+                            Status.ERROR, null, listOf(
+                                Error("${HttpStatus.SERVICE_UNAVAILABLE} Failed to remove the contributor")
+                            ))
+                        )
+                }
+            } else {
+                return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(BaseResponse(
+                        Status.ERROR, null, listOf(
+                            Error("${HttpStatus.NOT_FOUND} due to sign-up sheet not found")
+                        ))
+                    )
+            }
+        }?: run {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error("${HttpStatus.NOT_FOUND} due to sign-up sheet not found"))
                 ))
         }
     }
