@@ -1,6 +1,7 @@
 package com.kavi.pbc.live.data.model.event
 
 import com.kavi.pbc.live.data.model.BaseModel
+import com.kavi.pbc.live.data.model.event.signup.sheet.SignUpSheet
 import com.kavi.pbc.live.data.util.DataUtil
 
 data class Event(
@@ -22,12 +23,14 @@ data class Event(
     val registrationRequired: Boolean = false,
     val openSeatCount: Int? = null,
     val potluckAvailable: Boolean = false,
-    val potluckItemList: MutableList<ContributionItem>? = mutableListOf()
+    val potluckItemList: MutableList<ContributionItem>? = mutableListOf(),
+    val signUpSheetAvailable: Boolean = false,
+    val signUpSheetList: MutableList<SignUpSheet>? = mutableListOf()
 ): BaseModel {
 
     constructor(): this (DataUtil.idGenerator("evt"), "", "", EventStatus.DRAFT, 0, "", "",
         System.currentTimeMillis(), VenueType.DRAFT, null, null, null,"", null, EventType.DRAFT, false,
-        0, false, mutableListOf()
+        0, false, mutableListOf(), false, mutableListOf()
     )
 
     override fun toMap(): Map<String, Any?> = mapOf(
@@ -49,6 +52,8 @@ data class Event(
         "registrationRequired" to registrationRequired,
         "openSeatCount" to openSeatCount,
         "potluckAvailable" to potluckAvailable,
-        "potluckItemList" to potluckItemList
+        "potluckItemList" to potluckItemList,
+        "signUpSheetAvailable" to signUpSheetAvailable,
+        "signUpSheetList" to signUpSheetList
     )
 }
