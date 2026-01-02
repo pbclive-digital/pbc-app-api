@@ -17,7 +17,7 @@ import com.kavi.pbc.live.data.model.event.potluck.EventPotluckContributor
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluckItem
 import com.kavi.pbc.live.data.model.event.register.EventRegistration
 import com.kavi.pbc.live.data.model.event.register.EventRegistrationItem
-import com.kavi.pbc.live.data.model.event.signup.sheet.EventSighUpSheets
+import com.kavi.pbc.live.data.model.event.signup.sheet.EventSighUpSheet
 import com.kavi.pbc.live.data.model.event.signup.sheet.SignUpSheetItem
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -67,8 +67,8 @@ class EventService {
                     signUpSheetItemList.add(SignUpSheetItem(UUID.randomUUID().toString(), sheetItem.sheetName, sheetItem.signUpAvailabilityCount))
                 }
 
-                val eventSighUpSheets = EventSighUpSheets(event.id, signUpSheetItemList)
-                datastoreRepositoryContract.createEntity(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventSighUpSheets.id, eventSighUpSheets)
+                val eventSighUpSheet = EventSighUpSheet(event.id, signUpSheetItemList)
+                datastoreRepositoryContract.createEntity(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventSighUpSheet.id, eventSighUpSheet)
             }
         }
 
@@ -260,7 +260,7 @@ class EventService {
         if (event.signUpSheetAvailable) {
             datastoreRepositoryContract.getEntityFromId(
                 DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, entityId = eventId,
-                EventSighUpSheets::class.java
+                EventSighUpSheet::class.java
             )?.let {
                 logger.printInfo("Record already available to the " +
                         "event:$eventId in ${DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION} collection.", EventService::class.java)
@@ -274,8 +274,8 @@ class EventService {
                         )
                     }
 
-                    val eventSignUpSheets = EventSighUpSheets(event.id, signUpSheetItemList)
-                    datastoreRepositoryContract.createEntity(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventSignUpSheets.id, eventSignUpSheets)
+                    val eventSignUpSheet = EventSighUpSheet(event.id, signUpSheetItemList)
+                    datastoreRepositoryContract.createEntity(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventSignUpSheet.id, eventSignUpSheet)
                 }
             }
         }
