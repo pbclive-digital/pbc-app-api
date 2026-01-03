@@ -4,12 +4,14 @@ import com.kavi.pbc.live.data.model.BaseModel
 
 data class SignUpSheet(
     val sheetName: String,
-    val signUpAvailabilityCount: Int
+    val sheetDescription: String,
+    val availableCount: Int
 ): BaseModel {
-    constructor(): this("", 0)
+    constructor(): this("", "", 0)
 
     override fun toMap(): Map<String, Any?> = mapOf(
         "sheetName" to sheetName,
-        "signUpAvailabilityCount" to signUpAvailabilityCount
+        "sheetDescription" to sheetDescription,
+        "availableCount" to availableCount
     )
 }

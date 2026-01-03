@@ -65,7 +65,7 @@ class EventService {
             if (!event.signUpSheetList.isNullOrEmpty()) {
                 val signUpSheetItemList = mutableListOf<SignUpSheetItem>()
                 event.signUpSheetList?.forEach { sheetItem ->
-                    signUpSheetItemList.add(SignUpSheetItem(UUID.randomUUID().toString(), sheetItem.sheetName, sheetItem.signUpAvailabilityCount))
+                    signUpSheetItemList.add(SignUpSheetItem(UUID.randomUUID().toString(), sheetItem.sheetName, sheetItem.sheetDescription, sheetItem.availableCount))
                 }
 
                 val eventSighUpSheet = EventSighUpSheet(event.id, signUpSheetItemList)
@@ -271,7 +271,7 @@ class EventService {
                     event.signUpSheetList?.forEach { signUpSheetItem ->
                         signUpSheetItemList.add(
                             SignUpSheetItem(UUID.randomUUID().toString(),
-                                signUpSheetItem.sheetName, signUpSheetItem.signUpAvailabilityCount)
+                                signUpSheetItem.sheetName, signUpSheetItem.sheetDescription, signUpSheetItem.availableCount)
                         )
                     }
 
