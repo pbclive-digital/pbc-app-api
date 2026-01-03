@@ -8,7 +8,7 @@ import com.kavi.pbc.live.data.model.event.potluck.EventPotluck
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluckContributor
 import com.kavi.pbc.live.data.model.event.register.EventRegistration
 import com.kavi.pbc.live.data.model.event.register.EventRegistrationItem
-import com.kavi.pbc.live.data.model.event.signup.sheet.EventSighUpSheet
+import com.kavi.pbc.live.data.model.event.signup.sheet.EventSignUpSheet
 import com.kavi.pbc.live.data.model.event.signup.sheet.SheetContributor
 import com.kavi.pbc.live.data.model.event.signup.sheet.SignUpSheetItem
 import jakarta.validation.Valid
@@ -203,6 +203,17 @@ class EventController(private val eventService: EventService) {
         logger.printInfo("REQUEST MAPPING: DELETE:[/event/potluck/sign-out/$eventId/$potluckItemId/$contributorId]", EventController::class.java)
 
         val response = eventService.signOutGivenContributorFromPotluckItem(eventId, potluckItemId, contributorId)
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
+    @GetMapping("/get/sign-up-sheet/{event-id}")
+    fun getSignUpSheetList(@PathVariable(value = "event-id") eventId: String): ResponseEntity<BaseResponse<EventSignUpSheet>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET:[/event/get/sign-up-sheet/$eventId]", EventController::class.java)
+
+        val response = eventService.getEventSignUpSheetList(eventId)
         logger.printResponseInfo(response, EventController::class.java)
 
         return response

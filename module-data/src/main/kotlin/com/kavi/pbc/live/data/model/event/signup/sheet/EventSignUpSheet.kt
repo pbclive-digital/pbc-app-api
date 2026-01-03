@@ -2,7 +2,7 @@ package com.kavi.pbc.live.data.model.event.signup.sheet
 
 import com.kavi.pbc.live.data.model.BaseModel
 
-data class EventSighUpSheet (
+data class EventSignUpSheet (
     val id: String,
     val signUpSheetItemList: MutableList<SignUpSheetItem> = mutableListOf()
 ): BaseModel {
