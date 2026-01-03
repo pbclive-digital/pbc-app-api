@@ -235,7 +235,7 @@ class EventController(private val eventService: EventService) {
     fun signUpToSignUpSheet(@PathVariable(value = "event-id") eventId: String,
                         @PathVariable(value = "sheet-id") sheetId: String,
                         @Valid @RequestBody contributor: SheetContributor):
-            ResponseEntity<BaseResponse<SignUpSheetItem>>? {
+            ResponseEntity<BaseResponse<EventSignUpSheet>>? {
         logger.printSeparator()
         logger.printInfo("REQUEST MAPPING: POST:[/event/sign-up-sheet/sign-up/$eventId/$sheetId]", EventController::class.java)
 
@@ -249,7 +249,7 @@ class EventController(private val eventService: EventService) {
     fun signOutFromSignUpSheet(@PathVariable(value = "event-id") eventId: String,
                            @PathVariable(value = "sheet-id") sheetId: String,
                            @PathVariable(value = "contributor-id") contributorId: String):
-            ResponseEntity<BaseResponse<SignUpSheetItem>>? {
+            ResponseEntity<BaseResponse<EventSignUpSheet>>? {
 
         logger.printSeparator()
         logger.printInfo("REQUEST MAPPING: DELETE:[/event/sign-up-sheet/sign-out/$eventId/$sheetId/$contributorId]", EventController::class.java)

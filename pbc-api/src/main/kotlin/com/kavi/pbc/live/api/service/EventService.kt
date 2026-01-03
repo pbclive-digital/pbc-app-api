@@ -570,7 +570,7 @@ class EventService {
     }
 
     fun signUpGivenContributorToSignUpSheet(eventId: String, sheetId: String, contributor: SheetContributor):
-            ResponseEntity<BaseResponse<SignUpSheetItem>>? {
+            ResponseEntity<BaseResponse<EventSignUpSheet>>? {
         datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventId,
             EventSignUpSheet::class.java)?.let { eventSighUpSheet ->
             val updatedEventSighUpSheet = eventSighUpSheet.copy()
@@ -597,7 +597,7 @@ class EventService {
                     return ResponseEntity
                         .status(HttpStatus.OK)
                         .body(BaseResponse(Status.SUCCESS,
-                            selectedSignUpSheet,
+                            updatedEventSighUpSheet,
                             null))
                 } else {
                     return ResponseEntity
@@ -627,7 +627,7 @@ class EventService {
     }
 
     fun signOutGivenContributorFromSignUpSheet(eventId: String, sheetId: String, contributorId: String):
-            ResponseEntity<BaseResponse<SignUpSheetItem>>?{
+            ResponseEntity<BaseResponse<EventSignUpSheet>>?{
         datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventId,
             EventSignUpSheet::class.java)?.let { eventSignUpSheet ->
             val updatedEventSignUpSheet = eventSignUpSheet.copy()
@@ -663,7 +663,7 @@ class EventService {
                         return ResponseEntity
                             .status(HttpStatus.OK)
                             .body(BaseResponse(Status.SUCCESS,
-                                selectedSignUpSheet,
+                                updatedEventSignUpSheet,
                                 null))
                     } else {
                         return ResponseEntity
