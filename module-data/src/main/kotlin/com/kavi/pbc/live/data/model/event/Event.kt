@@ -1,7 +1,7 @@
 package com.kavi.pbc.live.data.model.event
 
 import com.kavi.pbc.live.data.model.BaseModel
-import com.kavi.pbc.live.data.model.event.potluck.ContributionItem
+import com.kavi.pbc.live.data.model.event.potluck.PotluckItem
 import com.kavi.pbc.live.data.model.event.signup.sheet.SignUpSheet
 import com.kavi.pbc.live.data.util.DataUtil
 
@@ -24,7 +24,7 @@ data class Event(
     val registrationRequired: Boolean = false,
     val openSeatCount: Int? = null,
     val potluckAvailable: Boolean = false,
-    val potluckItemList: MutableList<ContributionItem>? = mutableListOf(),
+    val potluckItemList: MutableList<PotluckItem>? = mutableListOf(),
     val signUpSheetAvailable: Boolean = false,
     val signUpSheetList: MutableList<SignUpSheet>? = mutableListOf()
 ): BaseModel {

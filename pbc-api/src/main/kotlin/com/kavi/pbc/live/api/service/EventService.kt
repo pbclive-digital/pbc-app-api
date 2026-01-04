@@ -17,16 +17,15 @@ import com.kavi.pbc.live.data.model.event.potluck.EventPotluckContributor
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluckItem
 import com.kavi.pbc.live.data.model.event.register.EventRegistration
 import com.kavi.pbc.live.data.model.event.register.EventRegistrationItem
+import com.kavi.pbc.live.data.model.event.signup.sheet.EventSignUpSheetList
+import com.kavi.pbc.live.data.model.event.signup.sheet.EventSignUpSheetContributor
 import com.kavi.pbc.live.data.model.event.signup.sheet.EventSignUpSheet
-import com.kavi.pbc.live.data.model.event.signup.sheet.SheetContributor
-import com.kavi.pbc.live.data.model.event.signup.sheet.SignUpSheetItem
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.util.Date
-import java.util.UUID
 
 @Service
 class EventService {
@@ -63,13 +62,13 @@ class EventService {
 
         if (event.signUpSheetAvailable) {
             if (!event.signUpSheetList.isNullOrEmpty()) {
-                val signUpSheetItemList = mutableListOf<SignUpSheetItem>()
+                val signUpSheetItemList = mutableListOf<EventSignUpSheet>()
                 event.signUpSheetList?.forEach { sheetItem ->
-                    signUpSheetItemList.add(SignUpSheetItem(sheetItem.sheetId, sheetItem.sheetName, sheetItem.sheetDescription, sheetItem.availableCount))
+                    signUpSheetItemList.add(EventSignUpSheet(sheetItem.sheetId, sheetItem.sheetName, sheetItem.sheetDescription, sheetItem.availableCount))
                 }
 
-                val eventSignUpSheet = EventSignUpSheet(event.id, signUpSheetItemList)
-                datastoreRepositoryContract.createEntity(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventSignUpSheet.id, eventSignUpSheet)
+                val eventSignUpSheetList = EventSignUpSheetList(event.id, signUpSheetItemList)
+                datastoreRepositoryContract.createEntity(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventSignUpSheetList.id, eventSignUpSheetList)
             }
         }
 
@@ -282,7 +281,7 @@ class EventService {
         if (event.signUpSheetAvailable) {
             datastoreRepositoryContract.getEntityFromId(
                 DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, entityId = eventId,
-                EventSignUpSheet::class.java
+                EventSignUpSheetList::class.java
             )?.let { selectedEventSignUpSheets ->
 
                 val updatedEventSignUpSheets = selectedEventSignUpSheets.copy()
@@ -292,7 +291,7 @@ class EventService {
                         givenSignUpSheets.forEach { signUpSheetItem ->
                             if (selectedEventSignUpSheets.signUpSheetItemList.none { it.sheetId == signUpSheetItem.sheetId}) {
                                 updatedEventSignUpSheets.signUpSheetItemList.add(
-                                    SignUpSheetItem(signUpSheetItem.sheetId,
+                                    EventSignUpSheet(signUpSheetItem.sheetId,
                                         signUpSheetItem.sheetName, signUpSheetItem.sheetDescription, signUpSheetItem.availableCount)
                                 )
                             }
@@ -309,16 +308,16 @@ class EventService {
                 datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, updatedEventSignUpSheets.id, updatedEventSignUpSheets)
             }?: run {
                 if (!event.signUpSheetList.isNullOrEmpty()) {
-                    val signUpSheetItemList = mutableListOf<SignUpSheetItem>()
+                    val signUpSheetItemList = mutableListOf<EventSignUpSheet>()
                     event.signUpSheetList?.forEach { signUpSheetItem ->
                         signUpSheetItemList.add(
-                            SignUpSheetItem(signUpSheetItem.sheetId,
+                            EventSignUpSheet(signUpSheetItem.sheetId,
                                 signUpSheetItem.sheetName, signUpSheetItem.sheetDescription, signUpSheetItem.availableCount)
                         )
                     }
 
-                    val eventSignUpSheet = EventSignUpSheet(event.id, signUpSheetItemList)
-                    datastoreRepositoryContract.createEntity(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventSignUpSheet.id, eventSignUpSheet)
+                    val eventSignUpSheetList = EventSignUpSheetList(event.id, signUpSheetItemList)
+                    datastoreRepositoryContract.createEntity(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventSignUpSheetList.id, eventSignUpSheetList)
                 }
             }
         }
@@ -567,9 +566,9 @@ class EventService {
         }
     }
 
-    fun getEventSignUpSheetList(eventId: String): ResponseEntity<BaseResponse<EventSignUpSheet>>? {
+    fun getEventSignUpSheetList(eventId: String): ResponseEntity<BaseResponse<EventSignUpSheetList>>? {
         datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventId,
-            EventSignUpSheet::class.java)?.let {
+            EventSignUpSheetList::class.java)?.let {
             return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(BaseResponse(Status.SUCCESS,
@@ -584,9 +583,9 @@ class EventService {
         }
     }
 
-    fun getEventSignUpSheetRecord(eventId: String, sheetId: String): ResponseEntity<BaseResponse<SignUpSheetItem>>? {
+    fun getEventSignUpSheetRecord(eventId: String, sheetId: String): ResponseEntity<BaseResponse<EventSignUpSheet>>? {
         datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventId,
-            EventSignUpSheet::class.java)?.let { eventSighUpSheet ->
+            EventSignUpSheetList::class.java)?.let { eventSighUpSheet ->
 
             val filteredListFromSheetId = eventSighUpSheet.signUpSheetItemList.filter { it.sheetId == sheetId }
             if (filteredListFromSheetId.isNotEmpty()) {
@@ -611,10 +610,10 @@ class EventService {
         }
     }
 
-    fun signUpGivenContributorToSignUpSheet(eventId: String, sheetId: String, contributor: SheetContributor):
-            ResponseEntity<BaseResponse<EventSignUpSheet>>? {
+    fun signUpGivenContributorToSignUpSheet(eventId: String, sheetId: String, contributor: EventSignUpSheetContributor):
+            ResponseEntity<BaseResponse<EventSignUpSheetList>>? {
         datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventId,
-            EventSignUpSheet::class.java)?.let { eventSighUpSheet ->
+            EventSignUpSheetList::class.java)?.let { eventSighUpSheet ->
             val updatedEventSighUpSheet = eventSighUpSheet.copy()
 
             val filteredSignUpSheet = eventSighUpSheet.signUpSheetItemList.filter { it.sheetId == sheetId }
@@ -669,9 +668,9 @@ class EventService {
     }
 
     fun signOutGivenContributorFromSignUpSheet(eventId: String, sheetId: String, contributorId: String):
-            ResponseEntity<BaseResponse<EventSignUpSheet>>?{
+            ResponseEntity<BaseResponse<EventSignUpSheetList>>?{
         datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventId,
-            EventSignUpSheet::class.java)?.let { eventSignUpSheet ->
+            EventSignUpSheetList::class.java)?.let { eventSignUpSheet ->
             val updatedEventSignUpSheet = eventSignUpSheet.copy()
             val filteredSignUpSheet = eventSignUpSheet.signUpSheetItemList.filter { it.sheetId == sheetId }
 

@@ -2,7 +2,7 @@ package com.kavi.pbc.live.data.model.event.signup.sheet
 
 import com.kavi.pbc.live.data.model.BaseModel
 
-data class SheetContributor(
+data class EventSignUpSheetContributor(
     val contributorId: String,
     val contributorName: String,
     val contributorContactNumber: String

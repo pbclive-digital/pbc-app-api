@@ -3,13 +3,20 @@ package com.kavi.pbc.live.data.model.event.signup.sheet
 import com.kavi.pbc.live.data.model.BaseModel
 
 data class EventSignUpSheet (
-    val id: String,
-    val signUpSheetItemList: MutableList<SignUpSheetItem> = mutableListOf()
+    val sheetId: String,
+    val sheetName: String,
+    val sheetDescription: String,
+    val availableCount: Int,
+    val contributorList: MutableList<EventSignUpSheetContributor> = mutableListOf()
 ): BaseModel {
-    constructor(): this("", mutableListOf())
+
+    constructor(): this("","", "",0, mutableListOf())
 
     override fun toMap(): Map<String, Any?> = mapOf(
-        "id" to id,
-        "signUpSheetItemList" to signUpSheetItemList
+        "sheetId" to sheetId,
+        "sheetName" to sheetName,
+        "sheetDescription" to sheetDescription,
+        "availableCount" to availableCount,
+        "contributorList" to contributorList
     )
 }
