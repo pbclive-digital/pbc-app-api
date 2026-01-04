@@ -52,7 +52,7 @@ class EventService {
             if (!event.potluckItemList.isNullOrEmpty()) {
                 val potluckItemList = mutableListOf<EventPotluckItem>()
                 event.potluckItemList?.forEach { potluckItem ->
-                    potluckItemList.add(EventPotluckItem(UUID.randomUUID().toString(),
+                    potluckItemList.add(EventPotluckItem(potluckItem.itemId,
                         potluckItem.itemName, potluckItem.itemCount))
                 }
 
@@ -65,7 +65,7 @@ class EventService {
             if (!event.signUpSheetList.isNullOrEmpty()) {
                 val signUpSheetItemList = mutableListOf<SignUpSheetItem>()
                 event.signUpSheetList?.forEach { sheetItem ->
-                    signUpSheetItemList.add(SignUpSheetItem(UUID.randomUUID().toString(), sheetItem.sheetName, sheetItem.sheetDescription, sheetItem.availableCount))
+                    signUpSheetItemList.add(SignUpSheetItem(sheetItem.sheetId, sheetItem.sheetName, sheetItem.sheetDescription, sheetItem.availableCount))
                 }
 
                 val eventSignUpSheet = EventSignUpSheet(event.id, signUpSheetItemList)
@@ -241,14 +241,35 @@ class EventService {
             datastoreRepositoryContract.getEntityFromId(
                 DatastoreConstant.EVENT_POTLUCK_COLLECTION, entityId = eventId,
                 EventPotluck::class.java
-            )?.let {
-                logger.printInfo("Record already available to the " +
-                        "event:$eventId in ${DatastoreConstant.EVENT_POTLUCK_COLLECTION} collection.", EventService::class.java)
+            )?.let { selectedEventPotluck ->
+
+                val updatedEventPotluck = selectedEventPotluck.copy()
+
+                event.potluckItemList?.let { givenPotluckItemList ->
+                    if (givenPotluckItemList.size > selectedEventPotluck.potluckItemList.size) {
+                        givenPotluckItemList.forEach { potluckItem ->
+                            if (selectedEventPotluck.potluckItemList.none { it.itemId == potluckItem.itemId}) {
+                                updatedEventPotluck.potluckItemList.add(
+                                    EventPotluckItem(potluckItem.itemId,
+                                        potluckItem.itemName, potluckItem.itemCount)
+                                )
+                            }
+                        }
+                    } else if (givenPotluckItemList.size < selectedEventPotluck.potluckItemList.size) {
+                        selectedEventPotluck.potluckItemList.forEach { selectedEventPotluckItem ->
+                            if (givenPotluckItemList.none { it.itemId == selectedEventPotluckItem.itemId}) {
+                                updatedEventPotluck.potluckItemList.remove(selectedEventPotluckItem)
+                            }
+                        }
+                    }
+                }
+
+                datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_POTLUCK_COLLECTION, updatedEventPotluck.id, updatedEventPotluck)
             }?: run {
                 if (!event.potluckItemList.isNullOrEmpty()) {
                     val potluckItemList = mutableListOf<EventPotluckItem>()
                     event.potluckItemList?.forEach { potluckItem ->
-                        potluckItemList.add(EventPotluckItem(UUID.randomUUID().toString(),
+                        potluckItemList.add(EventPotluckItem(potluckItem.itemId,
                             potluckItem.itemName, potluckItem.itemCount))
                     }
 
@@ -262,15 +283,36 @@ class EventService {
             datastoreRepositoryContract.getEntityFromId(
                 DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, entityId = eventId,
                 EventSignUpSheet::class.java
-            )?.let {
-                logger.printInfo("Record already available to the " +
-                        "event:$eventId in ${DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION} collection.", EventService::class.java)
+            )?.let { selectedEventSignUpSheets ->
+
+                val updatedEventSignUpSheets = selectedEventSignUpSheets.copy()
+
+                event.signUpSheetList?.let { givenSignUpSheets ->
+                    if (givenSignUpSheets.size > selectedEventSignUpSheets.signUpSheetItemList.size) {
+                        givenSignUpSheets.forEach { signUpSheetItem ->
+                            if (selectedEventSignUpSheets.signUpSheetItemList.none { it.sheetId == signUpSheetItem.sheetId}) {
+                                updatedEventSignUpSheets.signUpSheetItemList.add(
+                                    SignUpSheetItem(signUpSheetItem.sheetId,
+                                        signUpSheetItem.sheetName, signUpSheetItem.sheetDescription, signUpSheetItem.availableCount)
+                                )
+                            }
+                        }
+                    } else if (givenSignUpSheets.size < selectedEventSignUpSheets.signUpSheetItemList.size) {
+                        selectedEventSignUpSheets.signUpSheetItemList.forEach { selectedSignUpSheetItem ->
+                            if (givenSignUpSheets.none { it.sheetId == selectedSignUpSheetItem.sheetId}) {
+                                updatedEventSignUpSheets.signUpSheetItemList.remove(selectedSignUpSheetItem)
+                            }
+                        }
+                    }
+                }
+
+                datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, updatedEventSignUpSheets.id, updatedEventSignUpSheets)
             }?: run {
                 if (!event.signUpSheetList.isNullOrEmpty()) {
                     val signUpSheetItemList = mutableListOf<SignUpSheetItem>()
                     event.signUpSheetList?.forEach { signUpSheetItem ->
                         signUpSheetItemList.add(
-                            SignUpSheetItem(UUID.randomUUID().toString(),
+                            SignUpSheetItem(signUpSheetItem.sheetId,
                                 signUpSheetItem.sheetName, signUpSheetItem.sheetDescription, signUpSheetItem.availableCount)
                         )
                     }

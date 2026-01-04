@@ -1,6 +1,7 @@
 package com.kavi.pbc.live.data.model.event
 
 import com.kavi.pbc.live.data.model.BaseModel
+import com.kavi.pbc.live.data.model.event.potluck.ContributionItem
 import com.kavi.pbc.live.data.model.event.signup.sheet.SignUpSheet
 import com.kavi.pbc.live.data.util.DataUtil
 
