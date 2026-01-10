@@ -12,7 +12,7 @@ class CorsConfig: WebMvcConfigurer {
     @Autowired
     lateinit var appProperties: AppProperties
 
-    override fun addCorsMappings(registry: CorsRegistry) {
+    /*override fun addCorsMappings(registry: CorsRegistry) {
         val allowedOrigins = when(appProperties.appEnv) {
             "dev", "staging" -> listOf("http://localhost:8080", "https://firebasestorage.googleapis.com")
             else -> listOf("https://firebasestorage.googleapis.com")
@@ -24,5 +24,15 @@ class CorsConfig: WebMvcConfigurer {
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*")
         }
+    }*/
+
+     */
+    override fun addCorsMappings(registry: CorsRegistry) {
+        registry.addMapping("/**")
+            .allowedOrigins("http://localhost:8080")
+            .allowedOrigins("https://firebasestorage.googleapis.com")
+            .allowedMethods("GET", "POST", "PUT", "DELETE")
+            .allowedHeaders("*")
     }
+
 }
