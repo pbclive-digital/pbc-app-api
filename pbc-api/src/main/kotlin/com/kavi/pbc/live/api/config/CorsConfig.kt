@@ -14,8 +14,8 @@ class CorsConfig: WebMvcConfigurer {
 
     override fun addCorsMappings(registry: CorsRegistry) {
         val allowedOrigins = when(appProperties.appEnv) {
-            "dev", "staging" -> "http://localhost:8080,https://firebasestorage.googleapis.com"
-            else -> "https://firebasestorage.googleapis.com"
+            "dev", "staging" -> "http://localhost:8080,https://pbclive-digital.github.io/"
+            else -> ""
         }
 
         registry.addMapping("/**")
