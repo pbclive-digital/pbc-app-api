@@ -87,6 +87,17 @@ class EventController(private val eventService: EventService) {
         return response
     }
 
+    @GetMapping("/get/past/{limit}")
+    fun getAllPassEventsWithLimit(@PathVariable(value = "limit") limit: Int): ResponseEntity<BaseResponse<List<Event>>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET: [/event/get/past/$limit]", EventController::class.java)
+
+        val response = eventService.getPastEvents(limit = limit)
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
     @GetMapping("/get/{event-id}")
     fun getEventById(@PathVariable(value = "event-id") eventId: String): ResponseEntity<BaseResponse<Event>>? {
         logger.printSeparator()

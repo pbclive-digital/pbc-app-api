@@ -146,7 +146,7 @@ class EventService {
         }
     }
 
-    fun getPastEvents(): ResponseEntity<BaseResponse<List<Event>>>? {
+    fun getPastEvents(limit: Int? = null): ResponseEntity<BaseResponse<List<Event>>>? {
         val properties = mapOf(
             "eventStatus" to EventStatus.PASSED
         )
@@ -159,6 +159,7 @@ class EventService {
             entityCollection = DatastoreConstant.EVENT_COLLECTION,
             propertiesMap = properties,
             orderByMap = orderBy,
+            limit = limit,
             className = Event::class.java
         )
 
