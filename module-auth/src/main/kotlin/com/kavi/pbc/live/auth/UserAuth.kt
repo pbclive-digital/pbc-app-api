@@ -75,11 +75,9 @@ class UserAuth {
     }
 
     fun generateAuthToken(authToken: AuthToken): AuthToken {
-        //authToken.id = DataUtil.idGenerator("tkn")
+        authToken.id = DataUtil.idGenerator("tkn")
         authToken.token = TokenGenerator().generateToken(authToken)
         authToken.lastUsedAt = DataUtil.getCurrentTimestamp()
-
-        println(">>>>>>>>>>>> AuthToken : $authToken")
 
         datastoreRepositoryContract.createEntity(DatastoreConstant.TOKEN_COLLECTION, authToken.id!!, authToken)
         return authToken
