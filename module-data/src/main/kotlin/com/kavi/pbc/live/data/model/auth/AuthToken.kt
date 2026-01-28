@@ -4,7 +4,7 @@ import com.kavi.pbc.live.data.model.BaseModel
 import com.kavi.pbc.live.data.util.DataUtil
 
 data class AuthToken(
-    var id: String,
+    var id: String?,
     val email: String,
     val userId: String,
     var token: String?,

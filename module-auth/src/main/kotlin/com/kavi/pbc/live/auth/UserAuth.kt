@@ -66,7 +66,7 @@ class UserAuth {
         authToken?.let {
             // Update using token lastUsedAt entity.
             it.lastUsedAt = DataUtil.getCurrentTimestamp()
-            datastoreRepositoryContract.updateEntity(DatastoreConstant.TOKEN_COLLECTION, it.id, it)
+            datastoreRepositoryContract.updateEntity(DatastoreConstant.TOKEN_COLLECTION, it.id!!, it)
 
             return it
         }?: run {
@@ -81,7 +81,7 @@ class UserAuth {
 
         println(">>>>>>>>>>>> AuthToken : $authToken")
 
-        datastoreRepositoryContract.createEntity(DatastoreConstant.TOKEN_COLLECTION, authToken.id, authToken)
+        datastoreRepositoryContract.createEntity(DatastoreConstant.TOKEN_COLLECTION, authToken.id!!, authToken)
         return authToken
     }
 
@@ -120,7 +120,7 @@ class UserAuth {
         authTokenList.forEach {
             datastoreRepositoryContract.deleteEntity(
                 entityCollection = DatastoreConstant.TOKEN_COLLECTION,
-                entityId = it.id
+                entityId = it.id!!
             )
         }
     }
@@ -137,7 +137,7 @@ class UserAuth {
             className = AuthToken::class.java)
 
         responseList.forEach { token ->
-            datastoreRepositoryContract.deleteEntity(DatastoreConstant.TOKEN_COLLECTION, token.id)
+            datastoreRepositoryContract.deleteEntity(DatastoreConstant.TOKEN_COLLECTION, token.id!!)
             deletedTokenOwnerList.add(token.email)
         }
 
