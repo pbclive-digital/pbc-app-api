@@ -7,16 +7,18 @@ data class EventSignUpSheet (
     val sheetName: String,
     val sheetDescription: String,
     val availableCount: Int,
+    val allowMultiSignUps: Boolean,
     val contributorList: MutableList<EventSignUpSheetContributor> = mutableListOf()
 ): BaseModel {
 
-    constructor(): this("","", "",0, mutableListOf())
+    constructor(): this("","", "",0, false,mutableListOf())
 
     override fun toMap(): Map<String, Any?> = mapOf(
         "sheetId" to sheetId,
         "sheetName" to sheetName,
         "sheetDescription" to sheetDescription,
         "availableCount" to availableCount,
+        "allowMultiSignUps" to allowMultiSignUps,
         "contributorList" to contributorList
     )
 }

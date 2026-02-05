@@ -64,7 +64,7 @@ class EventService {
             if (!event.signUpSheetList.isNullOrEmpty()) {
                 val signUpSheetItemList = mutableListOf<EventSignUpSheet>()
                 event.signUpSheetList?.forEach { sheetItem ->
-                    signUpSheetItemList.add(EventSignUpSheet(sheetItem.sheetId, sheetItem.sheetName, sheetItem.sheetDescription, sheetItem.availableCount))
+                    signUpSheetItemList.add(EventSignUpSheet(sheetItem.sheetId, sheetItem.sheetName, sheetItem.sheetDescription, sheetItem.availableCount, sheetItem.allowMultiSignUps))
                 }
 
                 val eventSignUpSheetList = EventSignUpSheetList(event.id, signUpSheetItemList)
@@ -293,7 +293,7 @@ class EventService {
                             if (selectedEventSignUpSheets.signUpSheetItemList.none { it.sheetId == signUpSheetItem.sheetId}) {
                                 updatedEventSignUpSheets.signUpSheetItemList.add(
                                     EventSignUpSheet(signUpSheetItem.sheetId,
-                                        signUpSheetItem.sheetName, signUpSheetItem.sheetDescription, signUpSheetItem.availableCount)
+                                        signUpSheetItem.sheetName, signUpSheetItem.sheetDescription, signUpSheetItem.availableCount, signUpSheetItem.allowMultiSignUps)
                                 )
                             }
                         }
@@ -313,7 +313,7 @@ class EventService {
                     event.signUpSheetList?.forEach { signUpSheetItem ->
                         signUpSheetItemList.add(
                             EventSignUpSheet(signUpSheetItem.sheetId,
-                                signUpSheetItem.sheetName, signUpSheetItem.sheetDescription, signUpSheetItem.availableCount)
+                                signUpSheetItem.sheetName, signUpSheetItem.sheetDescription, signUpSheetItem.availableCount, signUpSheetItem.allowMultiSignUps)
                         )
                     }
 
