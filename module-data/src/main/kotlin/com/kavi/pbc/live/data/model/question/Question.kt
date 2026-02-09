@@ -11,11 +11,12 @@ data class Question(
     val createdTime: Long,
     val authorId: String,
     val author: User,
+    val privacy: PrivacyStatus,
     val answerList: MutableList<Answer> = mutableListOf()
 ): BaseModel {
 
     constructor(): this(DataUtil.idGenerator("que"), "", "",
-        System.currentTimeMillis(), "", User())
+        System.currentTimeMillis(), "", User(), PrivacyStatus.PUBLIC)
 
     override fun toMap(): Map<String, Any?> = mapOf(
         "id" to id,
@@ -24,6 +25,7 @@ data class Question(
         "createdTime" to createdTime,
         "authorId" to authorId,
         "author" to author,
+        "privacy" to privacy,
         "answerList" to answerList
     )
 }

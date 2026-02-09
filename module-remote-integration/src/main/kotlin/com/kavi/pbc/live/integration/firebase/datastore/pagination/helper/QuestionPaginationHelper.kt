@@ -54,6 +54,7 @@ class QuestionPaginationHelper {
 
     private fun getQuestionListFirstPageQuery(firestore: Firestore): Query =
         firestore.collection(DatastoreConstant.QUESTION_COLLECTION)
+            .whereEqualTo("privacy", "PUBLIC")
             .orderBy("createdTime", Query.Direction.DESCENDING)
             .limit(QUESTION_PAGE_SIZE)
 
