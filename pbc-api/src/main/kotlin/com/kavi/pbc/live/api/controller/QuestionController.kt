@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -50,12 +51,13 @@ class QuestionController(private val questionService: QuestionService) {
     }
 
     @PostMapping("/get/all")
-    fun getAllQuestionList(@Valid @RequestBody paginationRequest: PaginationRequest?):
+    fun getAllQuestionList(@Valid @RequestBody paginationRequest: PaginationRequest?,
+                           @RequestHeader("X-app-user") userString: String?):
             ResponseEntity<BaseResponse<PaginationResponse<Question>>>?{
         logger.printSeparator()
         logger.printInfo("REQUEST MAPPING: POST: [/question/get/all]", QuestionController::class.java)
 
-        val response = questionService.getAllQuestionList(paginationRequest)
+        val response = questionService.getAllQuestionList(paginationRequest, userString)
         logger.printResponseInfo(response, QuestionController::class.java)
 
         return response

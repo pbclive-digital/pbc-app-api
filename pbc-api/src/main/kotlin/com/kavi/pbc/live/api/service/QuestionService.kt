@@ -8,9 +8,12 @@ import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.Datast
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository
 import com.kavi.pbc.live.data.model.question.Answer
 import com.kavi.pbc.live.data.model.question.Question
+import com.kavi.pbc.live.data.model.user.User
+import com.kavi.pbc.live.data.model.user.UserType
 import com.kavi.pbc.live.integration.firebase.datastore.pagination.helper.QuestionPaginationHelper
 import com.kavi.pbc.live.integration.firebase.datastore.pagination.model.PaginationRequest
 import com.kavi.pbc.live.integration.firebase.datastore.pagination.model.PaginationResponse
+import kotlinx.serialization.json.Json
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -56,9 +59,16 @@ class QuestionService {
         }
     }
 
-    fun getAllQuestionList(paginationRequest: PaginationRequest? = null):
+    fun getAllQuestionList(paginationRequest: PaginationRequest? = null, userString: String?):
             ResponseEntity<BaseResponse<PaginationResponse<Question>>>? {
-        val response = questionPaginationHelper.getAllQuestionList(paginationRequest?.previousPageLastDocKey)
+
+        var isMonk = false
+        if (!userString.isNullOrEmpty()){
+            val user = Json.decodeFromString<User>(userString)
+            isMonk = user.userType == UserType.MONK
+        }
+
+        val response = questionPaginationHelper.getAllQuestionList(paginationRequest?.previousPageLastDocKey, isMonk)
 
         return if (response.entityList.isNotEmpty()) {
             ResponseEntity.ok(BaseResponse(Status.SUCCESS, response, null))

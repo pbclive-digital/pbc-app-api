@@ -12,7 +12,7 @@ import com.kavi.pbc.live.integration.firebase.datastore.pagination.model.Paginat
 
 class QuestionPaginationHelper {
 
-    fun getAllQuestionList(previousPageLastDocKey: String?): PaginationResponse<Question> {
+    fun getAllQuestionList(previousPageLastDocKey: String?, isMonk: Boolean): PaginationResponse<Question> {
         val firestore: Firestore = FirestoreClient.getFirestore()
         val entityList = mutableListOf<Question>()
         var key: String? = null
@@ -20,9 +20,9 @@ class QuestionPaginationHelper {
         previousPageLastDocKey?.let {
             var previousPageLastDoc = PaginationHolder.shared.getFromMap(it)
             val nextPage = previousPageLastDoc?.let {
-                getQuestionListNextPageQuery(firestore, previousPageLastDoc)
+                getQuestionListNextPageQuery(firestore, previousPageLastDoc, isMonk)
             }?: run {
-                getQuestionListFirstPageQuery(firestore)
+                getQuestionListFirstPageQuery(firestore, isMonk)
             }
 
             val nextPageDocuments = nextPage.get().get().documents
@@ -35,7 +35,7 @@ class QuestionPaginationHelper {
                 key = PaginationHolder.shared.addToMap(it, previousPageLastDoc)
             }
         }?: run {
-            val firstPage = getQuestionListFirstPageQuery(firestore)
+            val firstPage = getQuestionListFirstPageQuery(firestore, isMonk)
             val firstPageDocuments = firstPage.get().get().documents
 
             if (firstPageDocuments.isNotEmpty()) {
@@ -52,15 +52,33 @@ class QuestionPaginationHelper {
         return PaginationResponse(entityList, key)
     }
 
-    private fun getQuestionListFirstPageQuery(firestore: Firestore): Query =
-        firestore.collection(DatastoreConstant.QUESTION_COLLECTION)
-            .whereEqualTo("privacy", "PUBLIC")
-            .orderBy("createdTime", Query.Direction.DESCENDING)
-            .limit(QUESTION_PAGE_SIZE)
+    private fun getQuestionListFirstPageQuery(firestore: Firestore, isMonk: Boolean): Query {
+        return if (isMonk) {
+            firestore.collection(DatastoreConstant.QUESTION_COLLECTION)
+                .orderBy("createdTime", Query.Direction.DESCENDING)
+                .limit(QUESTION_PAGE_SIZE)
+        } else {
+            firestore.collection(DatastoreConstant.QUESTION_COLLECTION)
+                .whereEqualTo("privacy", "PUBLIC")
+                .orderBy("createdTime", Query.Direction.DESCENDING)
+                .limit(QUESTION_PAGE_SIZE)
+        }
 
-    private fun getQuestionListNextPageQuery(firestore: Firestore, lastDoc: QueryDocumentSnapshot): Query =
-        firestore.collection(DatastoreConstant.QUESTION_COLLECTION)
-            .orderBy("createdTime", Query.Direction.DESCENDING)
-            .startAfter(lastDoc)
-            .limit(QUESTION_PAGE_SIZE)
+    }
+
+    private fun getQuestionListNextPageQuery(firestore: Firestore, lastDoc: QueryDocumentSnapshot, isMonk: Boolean): Query {
+        return if (isMonk) {
+            firestore.collection(DatastoreConstant.QUESTION_COLLECTION)
+                .orderBy("createdTime", Query.Direction.DESCENDING)
+                .startAfter(lastDoc)
+                .limit(QUESTION_PAGE_SIZE)
+        } else {
+            firestore.collection(DatastoreConstant.QUESTION_COLLECTION)
+                .whereEqualTo("privacy", "PUBLIC")
+                .orderBy("createdTime", Query.Direction.DESCENDING)
+                .startAfter(lastDoc)
+                .limit(QUESTION_PAGE_SIZE)
+        }
+
+    }
 }
