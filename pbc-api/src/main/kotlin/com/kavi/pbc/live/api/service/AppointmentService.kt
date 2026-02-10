@@ -130,7 +130,7 @@ class AppointmentService {
 
     fun getUserAppointmentRequestList(userId: String, userString: String?): ResponseEntity<BaseResponse<List<AppointmentRequest>>> {
 
-        val finalAppointmentRequestList = if (userString != null && userString.isNotEmpty()) {
+        val finalAppointmentRequestList = if (!userString.isNullOrEmpty()) {
             val user = Json.decodeFromString<User>(userString)
 
             if (user.userType == UserType.MONK && user.residentMonk) {
