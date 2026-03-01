@@ -1,9 +1,9 @@
 package com.kavi.pbc.live.api.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.kavi.pbc.live.api.dto.BaseResponse
-import com.kavi.pbc.live.api.dto.Error
-import com.kavi.pbc.live.api.dto.Status
+import com.kavi.pbc.live.api.data.dto.BaseResponse
+import com.kavi.pbc.live.api.data.dto.Error
+import com.kavi.pbc.live.api.data.dto.Status
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.DatastoreRepositoryContract
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository

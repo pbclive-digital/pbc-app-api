@@ -1,8 +1,8 @@
 package com.kavi.pbc.live.api.service
 
-import com.kavi.pbc.live.api.dto.BaseResponse
-import com.kavi.pbc.live.api.dto.Error
-import com.kavi.pbc.live.api.dto.Status
+import com.kavi.pbc.live.api.data.dto.BaseResponse
+import com.kavi.pbc.live.api.data.dto.Error
+import com.kavi.pbc.live.api.data.dto.Status
 import com.kavi.pbc.live.api.security.AuthUserDetails
 import com.kavi.pbc.live.auth.UserAuth
 import com.kavi.pbc.live.data.model.auth.AuthToken

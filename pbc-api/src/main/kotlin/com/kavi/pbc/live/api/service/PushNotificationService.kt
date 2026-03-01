@@ -1,17 +1,17 @@
 package com.kavi.pbc.live.api.service
 
-import com.kavi.pbc.live.api.dto.BaseResponse
-import com.kavi.pbc.live.api.dto.Status
+import com.kavi.pbc.live.api.data.dto.BaseResponse
+import com.kavi.pbc.live.api.data.dto.Status
 import com.kavi.pbc.live.api.util.AppLogger
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.notification.FirebasePushNotification
-import com.kavi.pbc.live.data.model.broadcast.BroadcastMessage
+import com.kavi.pbc.live.data.model.broadcast.NotificationMessage
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 
 @Service
-class BroadcastService {
+class PushNotificationService {
 
     @Autowired
     lateinit var logger: AppLogger
@@ -19,7 +19,7 @@ class BroadcastService {
     @Autowired
     lateinit var pushTokenService: PushTokenService
 
-    fun broadcastMessage(broadCastMessage: BroadcastMessage): ResponseEntity<BaseResponse<String>>? {
+    fun broadcastNotification(broadCastMessage: NotificationMessage): ResponseEntity<BaseResponse<String>>? {
         val data = mapOf(
             "CHANNEL" to FirebasePushNotification.BROADCAST_CHANNEL_ID,
         )

@@ -1,8 +1,8 @@
 package com.kavi.pbc.live.api.service
 
-import com.kavi.pbc.live.api.dto.BaseResponse
-import com.kavi.pbc.live.api.dto.Error
-import com.kavi.pbc.live.api.dto.Status
+import com.kavi.pbc.live.api.data.dto.BaseResponse
+import com.kavi.pbc.live.api.data.dto.Error
+import com.kavi.pbc.live.api.data.dto.Status
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.DatastoreRepositoryContract
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository
 import com.kavi.pbc.live.data.model.user.User
@@ -96,6 +96,16 @@ class UserService {
 
     fun updateUserPushNotificationToken(userId: String, pushTokenData: PushTokenData): ResponseEntity<BaseResponse<String>>? {
         return pushTokenService?.updatePushNotificationToken(userId, pushTokenData)
+    }
+
+    fun getAllUserEmails(): List<String>? {
+        val allAvailableUserEmailList = mutableListOf<String>()
+        datastoreRepositoryContract.getAllInEntity(DatastoreConstant.USER_COLLECTION,
+            User::class.java).forEach { user ->
+            allAvailableUserEmailList.add(user.email)
+        }
+
+        return allAvailableUserEmailList
     }
 
     fun getUserById(userId: String): ResponseEntity<BaseResponse<User>>? {

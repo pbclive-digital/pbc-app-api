@@ -25,10 +25,12 @@ dependencies {
 	implementation(libs.spring.boot.starter.validation)
 	implementation(libs.spring.boot.starter.security)
 	implementation(libs.spring.boot.starter.thymeleaf)
+	implementation(libs.spring.boot.starter.mail)
 
     implementation(libs.kotlin.stdlib.jdk8)
 	implementation(libs.kotlin.reflect)
 	implementation(libs.kotlin.serialization)
+    implementation(libs.kotlin.coroutines.core)
 
     implementation(libs.json)
     implementation(libs.kotlin.logging.jvm)

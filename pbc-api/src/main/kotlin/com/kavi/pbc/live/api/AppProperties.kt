@@ -16,4 +16,7 @@ class AppProperties {
 
     @Value("\${android.support.version}")
     lateinit var androidSupportVersion: String
+
+    @Value("\${spring.mail.username}")
+    lateinit var pbcBroadcastEmail: String
 }

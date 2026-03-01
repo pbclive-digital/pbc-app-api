@@ -1,4 +1,4 @@
-package com.kavi.pbc.live.api.dto
+package com.kavi.pbc.live.api.data.dto
 
 enum class Status {
     SUCCESS, ERROR

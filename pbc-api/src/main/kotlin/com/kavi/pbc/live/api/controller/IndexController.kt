@@ -1,8 +1,8 @@
 package com.kavi.pbc.live.api.controller
 
 import com.kavi.pbc.live.api.AppProperties
-import com.kavi.pbc.live.api.dto.BaseResponse
-import com.kavi.pbc.live.api.dto.Status
+import com.kavi.pbc.live.api.data.dto.BaseResponse
+import com.kavi.pbc.live.api.data.dto.Status
 import com.kavi.pbc.live.api.util.AppLogger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus

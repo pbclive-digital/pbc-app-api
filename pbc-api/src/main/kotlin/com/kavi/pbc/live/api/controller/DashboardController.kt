@@ -1,6 +1,6 @@
 package com.kavi.pbc.live.api.controller
 
-import com.kavi.pbc.live.api.dto.BaseResponse
+import com.kavi.pbc.live.api.data.dto.BaseResponse
 import com.kavi.pbc.live.api.service.DashboardService
 import com.kavi.pbc.live.api.util.AppLogger
 import com.kavi.pbc.live.data.model.DailyQuote
