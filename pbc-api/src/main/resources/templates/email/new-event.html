@@ -64,17 +64,25 @@
             text-align: center;
         }
 
+        .sub-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            text-align: start;
+        }
+
         /* Button */
         .button-container {
             text-align: center;
-            padding: 10px 0 20px 0;
+            padding: 10px 0 10px 0;
         }
 
         .button {
-            background-color: #007bff;
+            background-color: #b84910;
             color: #ffffff !important;
             text-decoration: none;
-            padding: 12px 50px;
+            padding: 12px 30px;
             border-radius: 5px;
             font-weight: bold;
             display: inline-block;
@@ -104,12 +112,18 @@
                 <p th:text="${message}">
                     This is where your primary email content will live. You can pass any string from your Spring Boot controller to populate this area.
                 </p>
+
+                <div class="sub-title">Brief about the event</div>
+
+                <p th:text="${description}">
+                   This will contain the same event description that have given when event was created.
+                </p>
             </td>
         </tr>
 
         <tr>
             <td class="button-container">
-                <a th:href="${actionUrl}" class="button">Click Here</a>
+                <a th:href="${eventUrl}" class="button">See more about this event</a>
             </td>
         </tr>
 

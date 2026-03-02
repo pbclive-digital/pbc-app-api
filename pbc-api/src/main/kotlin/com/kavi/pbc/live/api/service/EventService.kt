@@ -12,6 +12,7 @@ import com.kavi.pbc.live.data.model.event.Event
 import com.kavi.pbc.live.data.model.event.EventStatus
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.notification.FirebasePushNotification
+import com.kavi.pbc.live.data.model.broadcast.EmailNewEventMessage
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluck
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluckContributor
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluckItem
@@ -35,6 +36,9 @@ class EventService {
 
     @Autowired
     lateinit var pushTokenService: PushTokenService
+
+    @Autowired
+    lateinit var emailService: EmailService
 
     private var datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
 
@@ -344,6 +348,16 @@ class EventService {
             message = event.description,
             tokens = pushTokenService.getAllPushTokens(),
             data = pushNotificationData
+        )
+
+        emailService.sendNewEventEmail(
+            emailNewEventMessage = EmailNewEventMessage(
+                subject = "PBC Event: Notification",
+                title = "Pittsburgh Buddhist Center is hosting a new event - ${event.name}",
+                message = "To all our friends, we are kindly inform you that we are hosting a new event. Our new event is ${event.name}. We are invite you all to be a part of this event.",
+                eventDescription = event.description,
+                eventUrl = "https://pbclive-digital.github.io/pbc-web-app/#event/event-selected/${event.id}"
+            )
         )
 
         return ResponseEntity

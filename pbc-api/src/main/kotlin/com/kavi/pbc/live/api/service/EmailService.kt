@@ -89,7 +89,7 @@ class EmailService {
 
     fun sendNewEventEmail(
         emailNewEventMessage: EmailNewEventMessage
-    ): ResponseEntity<BaseResponse<String>>? {
+    ) {
         try {
             // Broadcast to all available emails by batches
             userService.getAllUserEmails()?.let { userEmails ->
@@ -101,34 +101,15 @@ class EmailService {
                         emailTemplateContent = mapOf(
                             "title" to emailNewEventMessage.title,
                             "message" to emailNewEventMessage.message,
+                            "description" to emailNewEventMessage.eventDescription,
                             "eventUrl" to emailNewEventMessage.eventUrl,
                         )
                     )
                 }
             }
-
-            return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(
-                    BaseResponse(
-                        Status.SUCCESS,
-                        "Broadcast Email Initiated. This is not an confirmation of email broadcasted.",
-                        null
-                    )
-                )
         } catch (ex: MessagingException) {
             // Handle error (logging is recommended here)
             ex.printStackTrace()
-
-            return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(
-                    BaseResponse(
-                        Status.ERROR, null, listOf(
-                            Error(message = ex.localizedMessage)
-                        )
-                    )
-                )
         }
     }
 
