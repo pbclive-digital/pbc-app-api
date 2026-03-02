@@ -20,7 +20,7 @@ dependencies {
 }
 
 /**
- * This gradle task to generate google-firebase-credentials .json file
+ * This Gradle task to generate google-firebase-credentials .json file
  * on while application build and deploy to heroku.
  *
  * This refers the credentials from Heroku Env variable `GOOGLE_CREDENTIALS` and write that into
@@ -53,7 +53,7 @@ tasks.register("secret-generate") {
 }
 
 /**
- * Make the `compileKotlin` task dependes on the new gradle task created above.
+ * Make the `compileKotlin` task depends on the new Gradle task created above.
  */
 tasks.named("compileKotlin") {
     dependsOn("secret-generate")

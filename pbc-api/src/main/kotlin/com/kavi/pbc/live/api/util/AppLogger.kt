@@ -21,4 +21,8 @@ class AppLogger {
         kLogger.info { "${javaClass.name}: RESPONSE CODE: ${response?.statusCode}" }
         kLogger.info { "${javaClass.name}: RESPONSE BODY: ${response?.body}" }
     }
+
+    fun <T>printError(message: String, throwable: Throwable, javaClass: Class<T>) {
+        kLogger.error("${javaClass.name}: $message", throwable)
+    }
 }

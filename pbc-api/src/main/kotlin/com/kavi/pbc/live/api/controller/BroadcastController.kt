@@ -44,16 +44,9 @@ class BroadcastController(
         logger.printSeparator()
         logger.printInfo("REQUEST MAPPING: POST: [/broadcast/email]", BroadcastController::class.java)
 
-        //val response = emailService.sendBroadcastEmail(broadCastMessage)
-        emailService.sendBroadcastEmail(broadCastMessage)
-        //logger.printResponseInfo(response, BroadcastController::class.java)
+        val response = emailService.sendBroadcastEmail(broadCastMessage)
+        logger.printResponseInfo(response, BroadcastController::class.java)
 
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(BaseResponse(Status.SUCCESS,
-                "Broadcast Email",
-                null))
-
-        //return response
+        return response
     }
 }

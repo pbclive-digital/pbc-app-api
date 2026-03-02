@@ -5,6 +5,7 @@ import com.kavi.pbc.live.api.data.dto.BaseResponse
 import com.kavi.pbc.live.api.data.dto.Error
 import com.kavi.pbc.live.api.data.dto.Status
 import com.kavi.pbc.live.api.data.model.EmailTemplateType
+import com.kavi.pbc.live.api.util.AppLogger
 import com.kavi.pbc.live.data.model.broadcast.EmailBroadcastMessage
 import com.kavi.pbc.live.data.model.broadcast.EmailNewEventMessage
 import jakarta.mail.MessagingException
@@ -39,6 +40,9 @@ class EmailService {
     @Autowired
     lateinit var userService: UserService
 
+    @Autowired
+    lateinit var logger: AppLogger
+
     fun sendBroadcastEmail(
         emailBroadcastMessage: EmailBroadcastMessage
     ): ResponseEntity<BaseResponse<String>>? {
@@ -63,7 +67,7 @@ class EmailService {
                 .body(
                     BaseResponse(
                         Status.SUCCESS,
-                        "Broadcast Email",
+                        "Broadcast Email Initiated. This is not an confirmation of email broadcasted.",
                         null
                     )
                 )
@@ -108,7 +112,7 @@ class EmailService {
                 .body(
                     BaseResponse(
                         Status.SUCCESS,
-                        "Broadcast Email",
+                        "Broadcast Email Initiated. This is not an confirmation of email broadcasted.",
                         null
                     )
                 )
@@ -201,8 +205,8 @@ class EmailService {
             helper.addInline("logo", res)
 
             mailSender.send(mimeMessage)
-        } catch (ex: MessagingException) {
-            ex.printStackTrace()
+        } catch (ex: Exception) {
+            logger.printError(message = ex.localizedMessage, throwable = ex, EmailService::class.java)
         }
     }
 }

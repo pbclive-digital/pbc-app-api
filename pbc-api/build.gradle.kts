@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
 	alias(libs.plugins.kotlin.jvm)
 	alias(libs.plugins.kotlin.spring)
@@ -62,8 +64,25 @@ springBoot {
     mainClass.set("com.kavi.pbc.live.api.PbcApiApplicationKt")
 }
 
+/**
+ * This is for set default environment
+ */
 tasks.bootRun {
     systemProperties["spring.profiles.active"] = "staging"
+}
+
+/**
+ * This is for set environmental variables from local.properties when app runs in local
+ */
+tasks.withType<org.springframework.boot.gradle.tasks.run.BootRun> {
+    val localProps = Properties()
+    val localPropsFile = project.rootProject.file("local.properties")
+    if (localPropsFile.exists()) {
+        localProps.load(localPropsFile.inputStream())
+        localProps.forEach { (key, value) ->
+            environment(key.toString(), value.toString())
+        }
+    }
 }
 
 kotlin {
