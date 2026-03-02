@@ -180,14 +180,14 @@ class EmailService {
                         context.setVariable(key, value)
                     }
 
-                    templateEngine.process("/email/broadcast-message", context)
+                    templateEngine.process("email/broadcast-message", context)
                 }
                 EmailTemplateType.NEW_EVENT -> {
                     emailTemplateContent.forEach { (key, value) ->
                         context.setVariable(key, value)
                     }
 
-                    templateEngine.process("/email/new-event", context)
+                    templateEngine.process("email/new-event", context)
                 }
             }
 
