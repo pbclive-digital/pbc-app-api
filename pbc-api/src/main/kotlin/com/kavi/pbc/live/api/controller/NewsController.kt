@@ -37,7 +37,7 @@ class NewsController(private val newsService: NewsService) {
     }
 
     @PostMapping("/add/image/{news-title}")
-    fun addEventImage(@PathVariable(value = "news-title") newsTitle: String, @RequestParam("newsImage") newsImage: MultipartFile): ResponseEntity<BaseResponse<String>>? {
+    fun addNewsImage(@PathVariable(value = "news-title") newsTitle: String, @RequestParam("newsImage") newsImage: MultipartFile): ResponseEntity<BaseResponse<String>>? {
         logger.printSeparator()
         logger.printInfo("REQUEST MAPPING: POST: [/news/add/image/$newsTitle]", NewsController::class.java)
 
