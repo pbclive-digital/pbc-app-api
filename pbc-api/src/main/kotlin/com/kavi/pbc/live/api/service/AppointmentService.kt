@@ -252,7 +252,7 @@ class AppointmentService {
 
     private fun retrieveAppointmentForMonk(monkId: String): List<Appointment> {
         val properties = mapOf(
-            "selectedMonkId" to listOf(monkId, "none")
+            "selectedMonkId" to listOf(monkId, "any")
         )
 
         val orderBy = mapOf(
@@ -282,7 +282,7 @@ class AppointmentService {
 
     private fun retrieveAppointmentRequestsForMonk(monkId: String): List<AppointmentRequest> {
         val properties = mapOf(
-            "selectedMonkId" to listOf(monkId, "none")
+            "selectedMonkId" to listOf(monkId, "any")
         )
 
         return datastoreRepositoryContract.getEntityListFromProperties(

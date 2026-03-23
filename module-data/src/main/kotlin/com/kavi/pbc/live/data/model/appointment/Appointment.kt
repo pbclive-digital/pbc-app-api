@@ -17,7 +17,7 @@ data class Appointment(
     var appointmentStatus: AppointmentStatus = AppointmentStatus.PENDING
 ): BaseModel {
 
-    constructor(): this(DataUtil.idGenerator("apt"), "", "", User(), "none", null,
+    constructor(): this(DataUtil.idGenerator("apt"), "", "", User(), "any", null,
         0, "", "", AppointmentStatus.PENDING)
 
     override fun toMap(): Map<String, Any?> = mapOf(

@@ -16,7 +16,7 @@ data class AppointmentRequest(
 ): BaseModel {
 
     constructor(): this(DataUtil.idGenerator("aptr"), "", "", User(),
-        "none", null, "", AppointmentRequestType.REMOTE
+        "any", null, "", AppointmentRequestType.REMOTE
     )
 
     override fun toMap(): Map<String, Any?> = mapOf(
