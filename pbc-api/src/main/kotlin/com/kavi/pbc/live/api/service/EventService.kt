@@ -368,6 +368,16 @@ class EventService {
     }
 
     fun deleteGivenEvent(eventId: String): ResponseEntity<BaseResponse<String>>? {
+
+        // Remove data from event registration collection
+        datastoreRepositoryContract.deleteEntity(DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventId)
+
+        // Remove data from event potluck collection
+        datastoreRepositoryContract.deleteEntity(DatastoreConstant.EVENT_POTLUCK_COLLECTION, eventId)
+
+        // Remove data from event sign-up sheet collection
+        datastoreRepositoryContract.deleteEntity(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventId)
+
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(BaseResponse(Status.SUCCESS,
