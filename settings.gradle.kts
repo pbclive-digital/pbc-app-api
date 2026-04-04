@@ -9,6 +9,7 @@ dependencyResolutionManagement {
 listOf(
     "module-auth",
     "module-remote-integration",
+    "module-csv",
     "module-data",
     "pbc-api"
 ).onEach {

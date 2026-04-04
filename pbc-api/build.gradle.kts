@@ -40,6 +40,7 @@ dependencies {
     implementation(project(":module-auth"))
     implementation(project(":module-remote-integration"))
     implementation(project(":module-data"))
+    implementation(project(":module-csv"))
 
 	testImplementation(libs.spring.boot.starter.test)
 	testImplementation(libs.kotlin.test.junit5)

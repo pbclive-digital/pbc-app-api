@@ -16,6 +16,8 @@ object DataConstant {
     const val PAGINATION_SCHEDULER_RUN_INTERVAL = 5 // From seconds
     const val QUESTION_PAGE_SIZE = 10
 
+    const val EXPORT_FILE_CLEAN = 5 // From minutes
+
     const val AUTH_TOKEN_CLEAN = 1 // From days
     const val AUTH_TOKEN_LIFETIME = 30 // From days
 }

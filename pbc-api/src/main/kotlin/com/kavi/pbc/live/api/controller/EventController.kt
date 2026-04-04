@@ -6,13 +6,17 @@ import com.kavi.pbc.live.api.util.AppLogger
 import com.kavi.pbc.live.data.model.event.Event
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluck
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluckContributor
+import com.kavi.pbc.live.data.model.event.potluck.PotluckDownloadLink
 import com.kavi.pbc.live.data.model.event.register.EventRegistration
 import com.kavi.pbc.live.data.model.event.register.EventRegistrationItem
+import com.kavi.pbc.live.data.model.event.register.RegistrationDownloadLink
 import com.kavi.pbc.live.data.model.event.signup.sheet.EventSignUpSheetList
 import com.kavi.pbc.live.data.model.event.signup.sheet.EventSignUpSheetContributor
 import com.kavi.pbc.live.data.model.event.signup.sheet.EventSignUpSheet
+import com.kavi.pbc.live.data.model.event.signup.sheet.SignUpSheetDownloadLink
 import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.Resource
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -266,6 +270,85 @@ class EventController(private val eventService: EventService) {
         logger.printInfo("REQUEST MAPPING: DELETE:[/event/sign-up-sheet/sign-out/$eventId/$sheetId/$contributorId]", EventController::class.java)
 
         val response = eventService.signOutGivenContributorFromSignUpSheet(eventId, sheetId, contributorId)
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
+    @GetMapping("/get/registration/download-link/{event-id}")
+    fun getEventRegistrationDownloadLink(
+        @PathVariable(value = "event-id") eventId: String
+    ): ResponseEntity<BaseResponse<RegistrationDownloadLink>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET:[/event/get/registration/download-link/$eventId]", EventController::class.java)
+
+        val response = eventService.getRegistrationDownloadLink(eventId)
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
+    @GetMapping("/download/registration/{file-name}")
+    fun downloadEventRegistrationCsv(
+        @PathVariable(value = "file-name") fileName: String
+    ): ResponseEntity<Resource>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET:[/event/download/registration/$fileName]", EventController::class.java)
+
+        val response = eventService.downloadGeneratedDocument(fileName)
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
+    @GetMapping("/get/potluck/download-link/{event-id}")
+    fun getPotluckContributionDownloadLink(
+        @PathVariable(value = "event-id") eventId: String
+    ): ResponseEntity<BaseResponse<PotluckDownloadLink>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET:[/event/get/potluck/download-link/$eventId]", EventController::class.java)
+
+        val response = eventService.getPotluckDownloadLink(eventId)
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
+    @GetMapping("/download/potluck/{file-name}")
+    fun downloadPotluckContributionCsv(
+        @PathVariable(value = "file-name") fileName: String
+    ): ResponseEntity<Resource>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET:[/event/download/potluck/$fileName]", EventController::class.java)
+
+        val response = eventService.downloadGeneratedDocument(fileName)
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
+    @GetMapping("/get/sign-up-sheet/download-link/{event-id}/{sheet-id}")
+    fun getSignUpSheetContributionDownloadLink(
+        @PathVariable(value = "event-id") eventId: String,
+        @PathVariable(value = "sheet-id") sheetId: String
+    ): ResponseEntity<BaseResponse<SignUpSheetDownloadLink>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET:[/event/get/sign-up-sheet/download-link/$eventId/$sheetId]", EventController::class.java)
+
+        val response = eventService.getSignUpSheetDownloadLink(eventId, sheetId)
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
+    @GetMapping("/download/sign-up-sheet/{file-name}")
+    fun downloadEventSignUpSheetCsv(
+        @PathVariable(value = "file-name") fileName: String
+    ): ResponseEntity<Resource>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET:[/event/download/sign-up-sheet/$fileName]", EventController::class.java)
+
+        val response = eventService.downloadGeneratedDocument(fileName)
         logger.printResponseInfo(response, EventController::class.java)
 
         return response

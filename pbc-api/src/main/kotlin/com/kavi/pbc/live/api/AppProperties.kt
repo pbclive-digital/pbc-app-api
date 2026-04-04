@@ -11,6 +11,9 @@ class AppProperties {
     @Value("\${app.env}")
     lateinit var appEnv: String
 
+    @Value("\${file.file-dir}")
+    lateinit var fileDir: String
+
     @Value("\${ios.support.version}")
     lateinit var iOSSupportVersion: String
 

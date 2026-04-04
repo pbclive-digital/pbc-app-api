@@ -1,5 +1,6 @@
 package com.kavi.pbc.live.api.service
 
+import com.kavi.pbc.live.api.AppProperties
 import com.kavi.pbc.live.api.data.dto.BaseResponse
 import com.kavi.pbc.live.api.data.dto.Error
 import com.kavi.pbc.live.api.data.dto.Status
@@ -12,24 +13,35 @@ import com.kavi.pbc.live.data.model.event.Event
 import com.kavi.pbc.live.data.model.event.EventStatus
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.notification.FirebasePushNotification
+import com.kavi.pbc.live.csv.CsvExporter
+import com.kavi.pbc.live.csv.config.ExportConfig
 import com.kavi.pbc.live.data.model.broadcast.EmailNewEventMessage
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluck
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluckContributor
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluckItem
+import com.kavi.pbc.live.data.model.event.potluck.PotluckDownloadLink
 import com.kavi.pbc.live.data.model.event.register.EventRegistration
 import com.kavi.pbc.live.data.model.event.register.EventRegistrationItem
+import com.kavi.pbc.live.data.model.event.register.RegistrationDownloadLink
 import com.kavi.pbc.live.data.model.event.signup.sheet.EventSignUpSheetList
 import com.kavi.pbc.live.data.model.event.signup.sheet.EventSignUpSheetContributor
 import com.kavi.pbc.live.data.model.event.signup.sheet.EventSignUpSheet
+import com.kavi.pbc.live.data.model.event.signup.sheet.SignUpSheetDownloadLink
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.Resource
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.Date
 
 @Service
-class EventService {
+class EventService @Autowired constructor(appProperties: AppProperties) {
 
     @Autowired
     lateinit var logger: AppLogger
@@ -40,7 +52,26 @@ class EventService {
     @Autowired
     lateinit var emailService: EmailService
 
+    @Autowired
+    lateinit var fileService: FileService
+
+    private var fileStorageLocation: Path
     private var datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
+
+    init {
+        appProperties.fileDir.let { fileDir ->
+            CsvExporter.shared.initiate(ExportConfig(exportFilePath = fileDir))
+            fileStorageLocation = Paths.get(fileDir).toAbsolutePath().normalize()
+
+            try {
+                Files.createDirectories(fileStorageLocation)
+            } catch (ex: Exception) {
+                throw Exception("Could not create the directory where the uploaded files will be stored.", ex)
+            }
+        }?: run {
+            throw Exception("Could not create the directory where the uploaded files will be stored.")
+        }
+    }
 
     fun createEvent(event: Event): ResponseEntity<BaseResponse<String>>? {
 
@@ -764,6 +795,91 @@ class EventService {
                 .body(BaseResponse(Status.ERROR, null, listOf(
                     Error("${HttpStatus.NOT_FOUND} due to sign-up sheet not found"))
                 ))
+        }
+    }
+
+    fun getRegistrationDownloadLink(eventId: String): ResponseEntity<BaseResponse<RegistrationDownloadLink>>? {
+        datastoreRepositoryContract.getEntityFromId(
+            DatastoreConstant.EVENT_REGISTRATION_COLLECTION,
+            eventId,
+            EventRegistration::class.java)?.let { eventRegistration ->
+
+            val file = CsvExporter.shared.exportEventRegistrationAsCsv(eventName = eventId, eventRegistration = eventRegistration)
+            val linkPath = "event/download/registration/${file.name}"
+            val registrationLink = RegistrationDownloadLink(eventId = eventId, downloadLink = linkPath)
+
+            return ResponseEntity.ok()
+                .body(BaseResponse(Status.SUCCESS, registrationLink, null))
+        }
+
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(BaseResponse(Status.ERROR, null, listOf(
+                Error("${HttpStatus.NOT_FOUND} due to no registration for this event."))
+            ))
+    }
+
+    fun getPotluckDownloadLink(eventId: String): ResponseEntity<BaseResponse<PotluckDownloadLink>>? {
+        datastoreRepositoryContract.getEntityFromId(
+            DatastoreConstant.EVENT_POTLUCK_COLLECTION,
+            eventId,
+            EventPotluck::class.java)?.let { eventPotluck ->
+
+            val file = CsvExporter.shared.exportPotluckContributionAsCsv(eventName = eventId, eventPotluck = eventPotluck)
+            val linkPath = "event/download/potluck-contribution/${file.name}"
+            val registrationLink = PotluckDownloadLink(eventId = eventId, downloadLink = linkPath)
+
+            return ResponseEntity.ok()
+                .body(BaseResponse(Status.SUCCESS, registrationLink, null))
+        }
+
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(BaseResponse(Status.ERROR, null, listOf(
+                Error("${HttpStatus.NOT_FOUND} due to no registration for this event."))
+            ))
+    }
+
+    fun getSignUpSheetDownloadLink(eventId: String, sheetId: String): ResponseEntity<BaseResponse<SignUpSheetDownloadLink>>? {
+        datastoreRepositoryContract.getEntityFromId(
+            DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION,
+            eventId,
+            EventSignUpSheetList::class.java)?.let { eventSignUpSheetList ->
+
+            val filteredList = eventSignUpSheetList.signUpSheetItemList.filter { it.sheetId == sheetId }
+            if (filteredList.isNotEmpty()) {
+                val signUpSheet = filteredList[0]
+                val file = CsvExporter.shared.exportEventSignUpSheetAsCsv(eventName = eventId, signUpSheet = signUpSheet)
+                val linkPath = "event/download/sign-up-sheet/${file.name}"
+                val signUpSheetLink = SignUpSheetDownloadLink(eventId = eventId, sheetId = sheetId, downloadLink = linkPath)
+
+                return ResponseEntity.ok()
+                    .body(BaseResponse(Status.SUCCESS, signUpSheetLink, null))
+            }
+        }
+
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(BaseResponse(Status.ERROR, null, listOf(
+                Error("${HttpStatus.NOT_FOUND} due to no sign-up sheet available.."))
+            ))
+    }
+
+    fun downloadGeneratedDocument(fileName: String): ResponseEntity<Resource>? {
+        return try {
+            val fileResource = fileService.loadFileAsResource(fileName)
+
+            val header = HttpHeaders()
+            header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=${fileName}");
+
+            ResponseEntity.ok()
+                .headers(header)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(fileResource)
+        } catch (ex: Exception) {
+            ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(null)
         }
     }
 }
