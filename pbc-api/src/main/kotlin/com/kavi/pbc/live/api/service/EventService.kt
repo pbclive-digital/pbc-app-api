@@ -826,7 +826,7 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
             EventPotluck::class.java)?.let { eventPotluck ->
 
             val nameFilePair = CsvExporter.shared.exportPotluckContributionAsCsv(eventName = eventId, eventPotluck = eventPotluck)
-            val linkPath = "/event/download/potluck-contribution/${nameFilePair.first}/${nameFilePair.second.name}"
+            val linkPath = "/event/download/potluck/${nameFilePair.first}/${nameFilePair.second.name}"
             val registrationLink = PotluckDownloadLink(eventId = eventId, downloadLink = linkPath)
 
             return ResponseEntity.ok()
