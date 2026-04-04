@@ -315,13 +315,13 @@ class EventController(private val eventService: EventService) {
         return response
     }
 
-    @GetMapping("/download/potluck/{dir-name}/{file-name}")
+    @GetMapping("/download/potluck-contribution/{dir-name}/{file-name}")
     fun downloadPotluckContributionCsv(
         @PathVariable(value = "dir-name") dirName: String,
         @PathVariable(value = "file-name") fileName: String
     ): ResponseEntity<Resource>? {
         logger.printSeparator()
-        logger.printInfo("REQUEST MAPPING: GET:[/event/download/potluck/$dirName/$fileName]", EventController::class.java)
+        logger.printInfo("REQUEST MAPPING: GET:[/event/download/potluck-contribution/$dirName/$fileName]", EventController::class.java)
 
         val response = eventService.downloadGeneratedDocument(dirName, fileName)
         logger.printResponseInfo(response, EventController::class.java)
