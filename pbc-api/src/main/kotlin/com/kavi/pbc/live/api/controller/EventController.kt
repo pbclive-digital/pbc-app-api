@@ -288,14 +288,15 @@ class EventController(private val eventService: EventService) {
         return response
     }
 
-    @GetMapping("/download/registration/{file-name}")
+    @GetMapping("/download/registration/{dir-name}/{file-name}")
     fun downloadEventRegistrationCsv(
+        @PathVariable(value = "dir-name") dirName: String,
         @PathVariable(value = "file-name") fileName: String
     ): ResponseEntity<Resource>? {
         logger.printSeparator()
-        logger.printInfo("REQUEST MAPPING: GET:[/event/download/registration/$fileName]", EventController::class.java)
+        logger.printInfo("REQUEST MAPPING: GET:[/event/download/registration/$dirName/$fileName]", EventController::class.java)
 
-        val response = eventService.downloadGeneratedDocument(fileName)
+        val response = eventService.downloadGeneratedDocument(dirName, fileName)
         logger.printResponseInfo(response, EventController::class.java)
 
         return response
@@ -314,14 +315,15 @@ class EventController(private val eventService: EventService) {
         return response
     }
 
-    @GetMapping("/download/potluck/{file-name}")
+    @GetMapping("/download/potluck/{dir-name}/{file-name}")
     fun downloadPotluckContributionCsv(
+        @PathVariable(value = "dir-name") dirName: String,
         @PathVariable(value = "file-name") fileName: String
     ): ResponseEntity<Resource>? {
         logger.printSeparator()
-        logger.printInfo("REQUEST MAPPING: GET:[/event/download/potluck/$fileName]", EventController::class.java)
+        logger.printInfo("REQUEST MAPPING: GET:[/event/download/potluck/$dirName/$fileName]", EventController::class.java)
 
-        val response = eventService.downloadGeneratedDocument(fileName)
+        val response = eventService.downloadGeneratedDocument(dirName, fileName)
         logger.printResponseInfo(response, EventController::class.java)
 
         return response
@@ -341,14 +343,15 @@ class EventController(private val eventService: EventService) {
         return response
     }
 
-    @GetMapping("/download/sign-up-sheet/{file-name}")
+    @GetMapping("/download/sign-up-sheet/{dir-name}/{file-name}")
     fun downloadEventSignUpSheetCsv(
+        @PathVariable(value = "dir-name") dirName: String,
         @PathVariable(value = "file-name") fileName: String
     ): ResponseEntity<Resource>? {
         logger.printSeparator()
-        logger.printInfo("REQUEST MAPPING: GET:[/event/download/sign-up-sheet/$fileName]", EventController::class.java)
+        logger.printInfo("REQUEST MAPPING: GET:[/event/download/sign-up-sheet/$dirName/$fileName]", EventController::class.java)
 
-        val response = eventService.downloadGeneratedDocument(fileName)
+        val response = eventService.downloadGeneratedDocument(dirName, fileName)
         logger.printResponseInfo(response, EventController::class.java)
 
         return response

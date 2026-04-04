@@ -37,28 +37,34 @@ object Util {
     /**
      * Generate registration csv document
      */
-    fun generateRegistrationCsv(exportPath: String, name: String, singleOutputList: List<List<String>>) {
+    fun generateRegistrationCsv(exportPath: String, name: String, singleOutputList: List<List<String>>): File {
         csvWriter().open("${exportPath}/${name}/$REGISTRATION_FILE") {
             writeRows(singleOutputList)
         }
+
+        return File("$exportPath/$name/$REGISTRATION_FILE")
     }
 
     /**
      * Generate potluck contribution csv document
      */
-    fun generatePotluckCsv(exportPath: String, name: String, singleOutputList: List<List<String>>) {
+    fun generatePotluckCsv(exportPath: String, name: String, singleOutputList: List<List<String>>): File {
         csvWriter().open("${exportPath}/${name}/$POTLUCK_CONTRIBUTION_FILE") {
             writeRows(singleOutputList)
         }
+
+        return File("$exportPath/$name/$POTLUCK_CONTRIBUTION_FILE")
     }
 
     /**
      * Generate potluck contribution csv document
      */
-    fun generateSignUpSheetCsv(exportPath: String, name: String, singleOutputList: List<List<String>>) {
+    fun generateSignUpSheetCsv(exportPath: String, name: String, singleOutputList: List<List<String>>): File {
         csvWriter().open("${exportPath}/${name}/$SIGN_UP_SHEET_CONTRIBUTION_FILE") {
             writeRows(singleOutputList)
         }
+
+        return File("$exportPath/$name/$SIGN_UP_SHEET_CONTRIBUTION_FILE")
     }
 
     private fun getCurrentTimestamp(): Long {

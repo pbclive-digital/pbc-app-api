@@ -804,8 +804,8 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
             eventId,
             EventRegistration::class.java)?.let { eventRegistration ->
 
-            val file = CsvExporter.shared.exportEventRegistrationAsCsv(eventName = eventId, eventRegistration = eventRegistration)
-            val linkPath = "event/download/registration/${file.name}"
+            val nameFilePair = CsvExporter.shared.exportEventRegistrationAsCsv(eventName = eventId, eventRegistration = eventRegistration)
+            val linkPath = "/event/download/registration/${nameFilePair.first}/${nameFilePair.second.name}"
             val registrationLink = RegistrationDownloadLink(eventId = eventId, downloadLink = linkPath)
 
             return ResponseEntity.ok()
@@ -825,8 +825,8 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
             eventId,
             EventPotluck::class.java)?.let { eventPotluck ->
 
-            val file = CsvExporter.shared.exportPotluckContributionAsCsv(eventName = eventId, eventPotluck = eventPotluck)
-            val linkPath = "event/download/potluck-contribution/${file.name}"
+            val nameFilePair = CsvExporter.shared.exportPotluckContributionAsCsv(eventName = eventId, eventPotluck = eventPotluck)
+            val linkPath = "/event/download/potluck-contribution/${nameFilePair.first}/${nameFilePair.second.name}"
             val registrationLink = PotluckDownloadLink(eventId = eventId, downloadLink = linkPath)
 
             return ResponseEntity.ok()
@@ -849,8 +849,8 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
             val filteredList = eventSignUpSheetList.signUpSheetItemList.filter { it.sheetId == sheetId }
             if (filteredList.isNotEmpty()) {
                 val signUpSheet = filteredList[0]
-                val file = CsvExporter.shared.exportEventSignUpSheetAsCsv(eventName = eventId, signUpSheet = signUpSheet)
-                val linkPath = "event/download/sign-up-sheet/${file.name}"
+                val nameFilePair = CsvExporter.shared.exportEventSignUpSheetAsCsv(eventName = eventId, signUpSheet = signUpSheet)
+                val linkPath = "/event/download/sign-up-sheet/${nameFilePair.first}/${nameFilePair.second.name}"
                 val signUpSheetLink = SignUpSheetDownloadLink(eventId = eventId, sheetId = sheetId, downloadLink = linkPath)
 
                 return ResponseEntity.ok()
@@ -865,9 +865,9 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
             ))
     }
 
-    fun downloadGeneratedDocument(fileName: String): ResponseEntity<Resource>? {
+    fun downloadGeneratedDocument(dirName: String, fileName: String): ResponseEntity<Resource>? {
         return try {
-            val fileResource = fileService.loadFileAsResource(fileName)
+            val fileResource = fileService.loadFileAsResource("$dirName/$fileName")
 
             val header = HttpHeaders()
             header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=${fileName}");

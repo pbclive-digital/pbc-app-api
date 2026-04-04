@@ -18,7 +18,7 @@ class CsvExporter {
         exportConfig = config
     }
 
-    fun exportEventRegistrationAsCsv(eventName: String, eventRegistration: EventRegistration): File {
+    fun exportEventRegistrationAsCsv(eventName: String, eventRegistration: EventRegistration): Pair<String, File> {
         // Registration output - list
         val fileOutput = mutableListOf<List<String>>()
 
@@ -38,12 +38,12 @@ class CsvExporter {
 
         val name = Util.generateNameForEventExport(eventName)
         Util.generateExportDir(exportConfig?.exportFilePath!!, name)
-        Util.generateRegistrationCsv(exportConfig?.exportFilePath!!, name, fileOutput)
+        val registrationSheet = Util.generateRegistrationCsv(exportConfig?.exportFilePath!!, name, fileOutput)
 
-        return File("${exportConfig?.exportFilePath}/$name")
+        return Pair(name, registrationSheet)
     }
 
-    fun exportPotluckContributionAsCsv(eventName: String, eventPotluck: EventPotluck): File {
+    fun exportPotluckContributionAsCsv(eventName: String, eventPotluck: EventPotluck): Pair<String, File> {
         // Potluck contribution output - list
         val fileOutput = mutableListOf<List<String>>()
 
@@ -62,12 +62,12 @@ class CsvExporter {
 
         val name = Util.generateNameForEventExport(eventName)
         Util.generateExportDir(exportConfig?.exportFilePath!!, name)
-        Util.generatePotluckCsv(exportConfig?.exportFilePath!!, name, fileOutput)
+        val potluckContributionSheet = Util.generatePotluckCsv(exportConfig?.exportFilePath!!, name, fileOutput)
 
-        return File("${exportConfig?.exportFilePath}/$name")
+        return Pair(name, potluckContributionSheet)
     }
 
-    fun exportEventSignUpSheetAsCsv(eventName: String, signUpSheet: EventSignUpSheet): File {
+    fun exportEventSignUpSheetAsCsv(eventName: String, signUpSheet: EventSignUpSheet): Pair<String, File> {
         // Sign-up sheet output - list
         val fileOutput = mutableListOf<List<String>>()
 
@@ -86,8 +86,8 @@ class CsvExporter {
 
         val name = Util.generateNameForEventExport("$eventName-${signUpSheet.sheetName}")
         Util.generateExportDir(exportConfig?.exportFilePath!!, name)
-        Util.generateSignUpSheetCsv(exportConfig?.exportFilePath!!, name, fileOutput)
+        val signUpSheet = Util.generateSignUpSheetCsv(exportConfig?.exportFilePath!!, name, fileOutput)
 
-        return File("${exportConfig?.exportFilePath}/$name")
+        return Pair(name, signUpSheet)
     }
 }
