@@ -254,6 +254,9 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
         val properties = mapOf(
             "eventStatus" to EventStatus.PUBLISHED
         )
+        val notInProperties = mapOf(
+            "eventType" to EventType.RECURRING
+        )
         val lessThanMap = mapOf(
             "eventDate" to System.currentTimeMillis()
         )
@@ -261,6 +264,7 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
         val dueEventList = datastoreRepositoryContract.getEntityListFromProperties(
             entityCollection = DatastoreConstant.EVENT_COLLECTION,
             propertiesMap = properties,
+            notInPropertiesMap = notInProperties,
             lessThanMap = lessThanMap,
             className = Event::class.java
         )
