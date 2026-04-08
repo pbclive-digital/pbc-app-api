@@ -16,6 +16,7 @@ import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.notification.Fir
 import com.kavi.pbc.live.csv.CsvExporter
 import com.kavi.pbc.live.csv.config.ExportConfig
 import com.kavi.pbc.live.data.model.broadcast.EmailNewEventMessage
+import com.kavi.pbc.live.data.model.event.EventType
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluck
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluckContributor
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluckItem
@@ -158,6 +159,9 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
         val properties = mapOf(
             "eventStatus" to EventStatus.PUBLISHED
         )
+        val notInProperties = mapOf(
+            "eventType" to EventType.RECURRING
+        )
         val orderBy = mapOf(
             "property" to "eventDate",
             "direction" to "ASC"
@@ -166,12 +170,36 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
         val finalUpcomingEventList = datastoreRepositoryContract.getEntityListFromProperties(
             entityCollection = DatastoreConstant.EVENT_COLLECTION,
             propertiesMap = properties,
+            notInPropertiesMap = notInProperties,
             orderByMap = orderBy,
             className = Event::class.java
         )
 
         return if (finalUpcomingEventList.isNotEmpty()) {
             ResponseEntity.ok(BaseResponse(Status.SUCCESS, finalUpcomingEventList, null))
+        } else {
+            ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error(HttpStatus.NOT_FOUND.toString()))
+                ))
+        }
+    }
+
+    fun getRecurringEvents(): ResponseEntity<BaseResponse<List<Event>>>? {
+        val properties = mapOf(
+            "eventType" to EventType.RECURRING,
+            "eventStatus" to EventStatus.PUBLISHED,
+        )
+
+        val finalRecurringEventList = datastoreRepositoryContract.getEntityListFromProperties(
+            entityCollection = DatastoreConstant.EVENT_COLLECTION,
+            propertiesMap = properties,
+            className = Event::class.java
+        )
+
+        return if (finalRecurringEventList.isNotEmpty()) {
+            ResponseEntity.ok(BaseResponse(Status.SUCCESS, finalRecurringEventList, null))
         } else {
             ResponseEntity
                 .status(HttpStatus.NOT_FOUND)

@@ -80,6 +80,17 @@ class EventController(private val eventService: EventService) {
         return response
     }
 
+    @GetMapping("/get/recurring")
+    fun getAllRecurringEvents(): ResponseEntity<BaseResponse<List<Event>>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET: [/event/get/recurring]", EventController::class.java)
+
+        val response = eventService.getRecurringEvents()
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
     @GetMapping("/get/past")
     fun getAllPassEvents(): ResponseEntity<BaseResponse<List<Event>>>? {
         logger.printSeparator()

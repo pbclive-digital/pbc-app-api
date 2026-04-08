@@ -13,6 +13,7 @@ interface DatastoreRepositoryContract {
                                      className: Class<T>): List<T>
     fun <T>getEntityListFromProperties(entityCollection: String,
                                        propertiesMap: Map<String, Any>? = null,
+                                       notInPropertiesMap: Map<String, Any>? = null,
                                        lessThanMap: Map<String, Any>? = null,
                                        greaterThanMap: Map<String, Any>? = null,
                                        orderByMap: Map<String, String>? = null,

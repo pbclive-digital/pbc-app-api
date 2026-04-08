@@ -103,6 +103,7 @@ class FirebaseDatastoreRepository: DatastoreRepositoryContract {
     override fun <T> getEntityListFromProperties(
         entityCollection: String,
         propertiesMap: Map<String, Any>?,
+        notInPropertiesMap: Map<String, Any>?,
         lessThanMap: Map<String, Any>?,
         greaterThanMap: Map<String, Any>?,
         orderByMap: Map<String, String>?,
@@ -121,6 +122,14 @@ class FirebaseDatastoreRepository: DatastoreRepositoryContract {
                 collectionQuery.whereIn(it, propertyItem)
             } else {
                 collectionQuery.whereEqualTo(it, propertyItem)
+            }
+        }
+        notInPropertiesMap?.keys?.forEach {
+            val propertyItem = notInPropertiesMap[it]
+            collectionQuery = if (propertyItem is List<*>) {
+                collectionQuery.whereNotIn(it, propertyItem)
+            } else {
+                collectionQuery.whereNotEqualTo(it, propertyItem)
             }
         }
         lessThanMap?.keys?.forEach {

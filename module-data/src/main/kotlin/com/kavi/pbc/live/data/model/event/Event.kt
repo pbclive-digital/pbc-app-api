@@ -13,14 +13,15 @@ data class Event(
     val eventDate: Long,
     val startTime: String,
     val endTime: String,
+    val recurringDay: EventRecurringDay = EventRecurringDay.NONE,
     val createdTime: Long = System.currentTimeMillis(),
-    val venueType: VenueType = VenueType.DRAFT,
+    val venueType: VenueType = VenueType.DEFAULT,
     val venue: String?,
     val venueAddress: String?,
     val meetingUrl: String?,
     val creator: String,
     val eventImage: String? = null,
-    val eventType: EventType = EventType.DRAFT,
+    val eventType: EventType = EventType.DEFAULT,
     val registrationRequired: Boolean = false,
     val openSeatCount: Int? = null,
     val potluckAvailable: Boolean = false,
@@ -29,8 +30,8 @@ data class Event(
     val signUpSheetList: MutableList<SignUpSheet>? = mutableListOf()
 ): BaseModel {
 
-    constructor(): this (DataUtil.idGenerator("evt"), "", "", EventStatus.DRAFT, 0, "", "",
-        System.currentTimeMillis(), VenueType.DRAFT, null, null, null,"", null, EventType.DRAFT, false,
+    constructor(): this (DataUtil.idGenerator("evt"), "", "", EventStatus.DRAFT, 0, "", "", EventRecurringDay.NONE,
+        System.currentTimeMillis(), VenueType.DEFAULT, null, null, null,"", null, EventType.DEFAULT, false,
         0, false, mutableListOf(), false, mutableListOf()
     )
 
@@ -42,6 +43,7 @@ data class Event(
         "eventDate" to eventDate,
         "startTime" to startTime,
         "endTime" to endTime,
+        "recurringDay" to recurringDay,
         "createdTime" to createdTime,
         "venueType" to venueType,
         "venue" to venue,
