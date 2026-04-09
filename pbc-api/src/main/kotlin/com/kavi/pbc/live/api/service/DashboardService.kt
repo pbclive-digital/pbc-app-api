@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import com.fasterxml.jackson.core.type.TypeReference
 import com.kavi.pbc.live.data.DataConstant
+import com.kavi.pbc.live.data.model.event.EventType
 import com.kavi.pbc.live.data.model.news.News
 import com.kavi.pbc.live.data.model.news.NewsStatus
 
@@ -81,6 +82,9 @@ class DashboardService (
         val properties = mapOf(
             "eventStatus" to EventStatus.PUBLISHED
         )
+        val notInProperties = mapOf(
+            "eventType" to EventType.RECURRING
+        )
         val orderBy = mapOf(
             "property" to "eventDate",
             "direction" to "ASC"
@@ -89,6 +93,7 @@ class DashboardService (
         return datastoreRepositoryContract.getEntityListFromProperties(
             entityCollection = DatastoreConstant.EVENT_COLLECTION,
             propertiesMap = properties,
+            notInPropertiesMap = notInProperties,
             orderByMap = orderBy,
             className = Event::class.java
         )
