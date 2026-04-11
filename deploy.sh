@@ -109,7 +109,7 @@ function heroku_prod_deploy() {
     else
       heroku login
     fi
-    #git push heroku-prod main
+    git push heroku-prod main
 }
 
 function deploy_execution() {
