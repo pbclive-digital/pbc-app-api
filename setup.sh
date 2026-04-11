@@ -10,7 +10,10 @@ function setup_git_remotes() {
   # Add prod remote
   git remote add heroku-prod $PROD_REMOTE
 
-  printf "Successfully added remotes for staging and production deployments. For use them developer needs to be a contributor of relevant heroku accounts."
+  printf "\n=====================================================================\n"
+  printf "Successfully added remotes for staging and production deployments.\n
+          For use them developer needs to be a contributor of relevant heroku accounts."
+  printf "\n=====================================================================\n"
 }
 
 function is_required_properties_available() {
@@ -37,7 +40,10 @@ function setup_local_properties() {
       echo "PBC_MAIL_PASSWORD=<add email passcode>" >> local.properties
     fi
 
-    printf "For local debugging and running purpose, local.properties file was created with required config parameters. Assign relevant values to them."
+    printf "\n=====================================================================\n"
+    printf "For local debugging and running purpose, local.properties file was created with required config parameters.\n
+            Assign relevant values to them."
+    printf "\n=====================================================================\n"
 }
 
 setup_git_remotes
