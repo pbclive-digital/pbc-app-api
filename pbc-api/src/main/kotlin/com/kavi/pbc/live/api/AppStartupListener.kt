@@ -23,6 +23,9 @@ class AppStartupListener: ApplicationListener<ContextRefreshedEvent> {
             "staging" -> {
                 FirebaseIntegration.shared.init(IntegrationEnv.STAGING)
             }
+            "prod" -> {
+                FirebaseIntegration.shared.init(IntegrationEnv.PROD)
+            }
         }
     }
 }

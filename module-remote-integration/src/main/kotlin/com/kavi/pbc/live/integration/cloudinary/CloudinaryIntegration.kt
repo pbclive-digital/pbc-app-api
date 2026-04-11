@@ -7,6 +7,7 @@ import com.kavi.pbc.live.data.property.IntegrationEnv
 class CloudinaryIntegration: IntegrationContract {
 
     private var cloudinary: Cloudinary? = null
+    private var appEnv: IntegrationEnv = IntegrationEnv.UNDEFINED
 
     companion object {
         private var cloudinaryIntegration: CloudinaryIntegration? = null
@@ -21,6 +22,8 @@ class CloudinaryIntegration: IntegrationContract {
     fun getCloudinary(): Cloudinary? = cloudinary
 
     override fun init(env: IntegrationEnv) {
+        // Assign env
+        appEnv = env
         cloudinary = Cloudinary(getEnvFilePath(env = env))
     }
 
@@ -29,6 +32,7 @@ class CloudinaryIntegration: IntegrationContract {
         val API_SECRET = "uk8-27k0O8iLvDYiY99BeU9YBl8"
         val CLOUD_NAME = "kv-staging"
         return when(env) {
+            IntegrationEnv.UNDEFINED -> ""
             IntegrationEnv.STAGING -> "cloudinary://$API_KEY:$API_SECRET@$CLOUD_NAME"
             IntegrationEnv.PROD -> ""
         }
