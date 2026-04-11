@@ -11,8 +11,7 @@ function setup_git_remotes() {
   git remote add heroku-prod $PROD_REMOTE
 
   printf "\n=====================================================================\n"
-  printf "Successfully added remotes for staging and production deployments.\n
-          For use them developer needs to be a contributor of relevant heroku accounts."
+  printf "Successfully added remotes for staging and production deployments.\nFor use them developer needs to be a contributor of relevant heroku accounts."
   printf "\n=====================================================================\n"
 }
 
@@ -41,8 +40,7 @@ function setup_local_properties() {
     fi
 
     printf "\n=====================================================================\n"
-    printf "For local debugging and running purpose, local.properties file was created with required config parameters.\n
-            Assign relevant values to them."
+    printf "For local debugging and running purpose, local.properties file was created with required config parameters.\nAssign relevant values to them."
     printf "\n=====================================================================\n"
 }
 
