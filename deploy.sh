@@ -121,9 +121,12 @@ function deploy_execution() {
         create_procfile_for_staging
         heroku_staging_deploy
         ;;
-      *)
+      "prod")
         create_procfile_for_prod
         heroku_prod_deploy
+        ;;
+      *)
+        echo "Invalid environment selection"
         ;;
     esac
 }
