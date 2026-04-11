@@ -12,6 +12,17 @@ and web app to deliver few of functionalities to devotes.
  * Sprint-Boot -- 4.0.0-M1
  * Firebase - FireStore
 
+## Setup
+After any developer close the code from Github. They can run setup.sh script for setting up the local environment.
+This will configure followings
+ * Configure STAGING & PROD heroku remotes into the project. 
+ * Add `local.properties` file for local debugging with required fields. (Developer need to configure relevant values)
+
+### Execute setup.sh
+````
+$ ./setup.sh
+````
+
 ## Build
 Build the code by running following command.
 <br />
@@ -25,7 +36,9 @@ available, our development branch will be `main` branch.
 
 ## Deploy
 Primary deployment is in Heroku dyno. For this application has two environments. One is for staging and other one is for
-production. Both environments are in Heroku.
+production. Both environments are in Heroku. To do the deployments, developer need to be a contributor of heroku accounts
+related with staging / production. Once developer get the access to heroku environments, they can use deploy.sh script to 
+do the deployments.
 
 ### Set Heroku ENVIRONMENTAL VARIABLES
 For the application functionality with firebase integration, Before we deploy, make sure in the heroku application, set the following environmental variables
