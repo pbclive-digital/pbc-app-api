@@ -57,6 +57,15 @@ tasks.jar {
     }
 }
 
+/**
+ * Refer application version from gradle.properties file to use in spring-boot application
+ */
+tasks.processResources {
+    val props = mapOf("versionName" to project.property("versionName"))
+    inputs.properties(props)
+    expand(props)
+}
+
 tasks.register("stage") {
     dependsOn("bootJar")
 }

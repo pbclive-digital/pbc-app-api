@@ -104,6 +104,7 @@ function heroku_staging_deploy() {
 function heroku_prod_deploy() {
     git add -f Procfile
     git commit -m "Add and commit the Procfile for heroku production deployment - v$APP_VERSION"
+    git tag -a "v$APP_VERSION" -m "Created a git tag for the production release of v$APP_VERSION"
     if check_heroku_session; then
       echo "Heroku Session available for user: [$HEROKU_SESSION]"
     else
