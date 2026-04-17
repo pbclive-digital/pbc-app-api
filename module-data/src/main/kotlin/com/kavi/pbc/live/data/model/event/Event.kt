@@ -22,6 +22,8 @@ data class Event(
     val creator: String,
     val eventImage: String? = null,
     val eventType: EventType = EventType.DEFAULT,
+    val agendaAvailable: Boolean = false,
+    val agendaItemList: MutableList<String>? = mutableListOf(),
     val registrationRequired: Boolean = false,
     val openSeatCount: Int? = null,
     val potluckAvailable: Boolean = false,
@@ -32,7 +34,7 @@ data class Event(
 
     constructor(): this (DataUtil.idGenerator("evt"), "", "", EventStatus.DRAFT, 0, "", "", EventRecurringDay.NONE,
         System.currentTimeMillis(), VenueType.DEFAULT, null, null, null,"", null, EventType.DEFAULT, false,
-        0, false, mutableListOf(), false, mutableListOf()
+        mutableListOf(), false,0, false, mutableListOf(), false, mutableListOf()
     )
 
     override fun toMap(): Map<String, Any?> = mapOf(
@@ -52,6 +54,8 @@ data class Event(
         "creator" to creator,
         "eventImage" to eventImage,
         "eventType" to eventType,
+        "agendaAvailable" to agendaAvailable,
+        "agendaItemList" to agendaItemList,
         "registrationRequired" to registrationRequired,
         "openSeatCount" to openSeatCount,
         "potluckAvailable" to potluckAvailable,
