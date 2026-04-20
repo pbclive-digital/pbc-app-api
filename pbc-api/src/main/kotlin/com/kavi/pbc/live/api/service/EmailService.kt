@@ -18,6 +18,7 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.mail.javamail.JavaMailSender
+import org.springframework.mail.javamail.JavaMailSenderImpl
 import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.stereotype.Service
 import org.thymeleaf.TemplateEngine
@@ -26,10 +27,9 @@ import java.nio.charset.StandardCharsets
 
 
 @Service
-class EmailService {
-
-    @Autowired
-    lateinit var mailSender: JavaMailSender
+class EmailService(
+    private val allBroadcasters: List<JavaMailSender>
+) {
 
     @Autowired
     lateinit var templateEngine: TemplateEngine
@@ -126,9 +126,22 @@ class EmailService {
         val chunks = recipients.chunked(batchSize)
 
         CoroutineScope(Dispatchers.IO).launch {
+            var broadcasterIndex: Int
+            var broadcasterIterationCount: Int
             chunks.forEachIndexed { index, batch ->
+                /**
+                 * This logic is to iterate the email senders via braches
+                 */
+                broadcasterIterationCount = index / appProperties.mailBroadcasterCount.toInt()
+                broadcasterIndex = index - appProperties.mailBroadcasterCount.toInt() * broadcasterIterationCount
                 batch.forEach { email ->
-                    sendHtmlEmail(email, emailSubject, emailTemplateContent, emailTemplateType)
+                    sendHtmlEmail(
+                        allBroadcasters[broadcasterIndex],
+                        email,
+                        emailSubject,
+                        emailTemplateContent,
+                        emailTemplateType
+                    )
                 }
 
                 // Non-blocking delay between batches
@@ -140,13 +153,14 @@ class EmailService {
     }
 
     private fun sendHtmlEmail(
+        broadcaster: JavaMailSender,
         recipientEmail: String,
         emailSubject: String,
         emailTemplateContent: Map<String, String>,
         emailTemplateType: EmailTemplateType
     ) {
         try {
-            val mimeMessage = mailSender.createMimeMessage()
+            val mimeMessage = broadcaster.createMimeMessage()
             val helper = MimeMessageHelper(
                 mimeMessage,
                 MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
@@ -173,7 +187,7 @@ class EmailService {
             }
 
             // 2. Set Email Metadata
-            helper.setFrom(appProperties.pbcBroadcastEmail)
+            helper.setFrom(getSenderUserName(broadcaster)?: "pbclive.digital@gmail.com")
             helper.setTo(recipientEmail)
             helper.setSubject(emailSubject)
 
@@ -185,9 +199,13 @@ class EmailService {
             val res = ClassPathResource("static/images/image_pbc.png")
             helper.addInline("logo", res)
 
-            mailSender.send(mimeMessage)
+            broadcaster.send(mimeMessage)
         } catch (ex: Exception) {
             logger.printError(message = ex.localizedMessage, throwable = ex, EmailService::class.java)
         }
+    }
+
+    private fun getSenderUserName(emailSender: JavaMailSender): String? {
+        return (emailSender as? JavaMailSenderImpl)?.username
     }
 }

@@ -5,21 +5,21 @@ import org.springframework.stereotype.Component
 
 @Component
 class AppProperties {
-    @Value("\${app.version}")
+    @Value($$"${app.version}")
     lateinit var appVersion: String
 
-    @Value("\${app.env}")
+    @Value($$"${app.env}")
     lateinit var appEnv: String
 
-    @Value("\${file.file-dir}")
+    @Value($$"${file.file-dir}")
     lateinit var fileDir: String
 
-    @Value("\${ios.support.version}")
+    @Value($$"${ios.support.version}")
     lateinit var iOSSupportVersion: String
 
-    @Value("\${android.support.version}")
+    @Value($$"${android.support.version}")
     lateinit var androidSupportVersion: String
 
-    @Value("\${spring.mail.username}")
-    lateinit var pbcBroadcastEmail: String
+    @Value($$"${mail.broadcaster.count}")
+    lateinit var mailBroadcasterCount: String
 }
