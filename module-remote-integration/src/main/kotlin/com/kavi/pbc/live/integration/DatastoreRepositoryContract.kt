@@ -7,6 +7,7 @@ interface DatastoreRepositoryContract {
     fun <T>createAndGetEntity(entityCollection: String, entityId: String, entity: BaseModel): T?
     fun updateEntity(entityCollection: String, entityId: String, entity: BaseModel): String?
     fun <T>getAllInEntity(entityCollection: String, className: Class<T>): List<T>
+    fun <T>getAllInEntitySelectedAttributes(entityCollection: String, attributes: List<String>, className: Class<T>): List<T>
     fun <T>getEntityFromId(entityCollection: String, entityId: String, className: Class<T>): T?
     fun <T>getEntityListFromProperty(entityCollection: String,
                                      propertyKey: String, propertyValue: Any,
