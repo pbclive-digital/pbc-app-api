@@ -6,8 +6,14 @@ import com.kavi.pbc.live.api.data.dto.Error
 import com.kavi.pbc.live.api.data.dto.Status
 import com.kavi.pbc.live.api.data.model.EmailTemplateType
 import com.kavi.pbc.live.api.util.AppLogger
+import com.kavi.pbc.live.com.kavi.pbc.live.integration.DatastoreRepositoryContract
+import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
+import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository
 import com.kavi.pbc.live.data.model.broadcast.EmailBroadcastMessage
 import com.kavi.pbc.live.data.model.broadcast.EmailNewEventMessage
+import com.kavi.pbc.live.data.model.email.EmailGroup
+import com.kavi.pbc.live.data.model.email.EmailGroupHeading
+import com.kavi.pbc.live.data.model.email.EmailItem
 import jakarta.mail.MessagingException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +48,105 @@ class EmailService(
 
     @Autowired
     lateinit var logger: AppLogger
+
+    private var datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
+
+    fun createEmailGroup(emailGroup: EmailGroup): ResponseEntity<BaseResponse<String>>? {
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(BaseResponse(Status.SUCCESS,
+                datastoreRepositoryContract.createEntity(DatastoreConstant.EMAIL_GROUP_COLLECTION,
+                    emailGroup.id, emailGroup), null))
+    }
+
+    fun getAllEmailGroups(): ResponseEntity<BaseResponse<List<EmailGroupHeading>>>? {
+        val attributes = listOf(
+            "id", "name"
+        )
+
+        val emailGroupHeadingList = datastoreRepositoryContract.getAllInEntitySelectedAttributes(DatastoreConstant.EMAIL_GROUP_COLLECTION,
+            attributes, EmailGroupHeading::class.java)
+
+        return if (emailGroupHeadingList.isNotEmpty()) {
+            ResponseEntity.ok(BaseResponse(Status.SUCCESS, emailGroupHeadingList, null))
+        } else {
+            ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error(HttpStatus.NOT_FOUND.toString()))
+                ))
+        }
+    }
+
+    fun getEmailGroupById(groupId: String): ResponseEntity<BaseResponse<EmailGroup>>? {
+        emailGroupById(groupId = groupId)?.let { emailGroup ->
+            return ResponseEntity.ok(BaseResponse(Status.SUCCESS, emailGroup, null))
+        }?: run {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error(HttpStatus.NOT_FOUND.toString()))
+                ))
+        }
+    }
+
+    fun addEmailsToGroup(groupId: String, emailList: List<EmailItem>): ResponseEntity<BaseResponse<EmailGroup>>? {
+        emailGroupById(groupId = groupId)?.let { emailGroup ->
+            val mergeResultSet = LinkedHashSet<EmailItem>(emailGroup.emails)
+            mergeResultSet.addAll(emailList)
+
+            emailGroup.emails = ArrayList(mergeResultSet)
+            datastoreRepositoryContract.updateEntity(DatastoreConstant.EMAIL_GROUP_COLLECTION,
+                groupId, emailGroup)
+            return ResponseEntity.ok(BaseResponse(Status.SUCCESS,
+                emailGroup, null))
+        }?: run {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error("Email group not found with given ID `$groupId`"))
+                ))
+        }
+    }
+
+    fun removeEmailsToGroup(groupId: String, emailList: List<EmailItem>): ResponseEntity<BaseResponse<EmailGroup>>? {
+        emailGroupById(groupId = groupId)?.let { emailGroup ->
+            emailGroup.emails.removeAll(emailList.toSet())
+            datastoreRepositoryContract.updateEntity(DatastoreConstant.EMAIL_GROUP_COLLECTION,
+                groupId, emailGroup)
+            return ResponseEntity.ok(BaseResponse(Status.SUCCESS,
+                emailGroup, null))
+        }?: run {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error("Email group not found with given ID `$groupId`"))
+                ))
+        }
+    }
+
+    fun getEmailListOfGroup(groupId: String):
+            ResponseEntity<BaseResponse<List<EmailItem>>>? {
+
+        emailGroupById(groupId = groupId)?.let { emailGroup ->
+            return ResponseEntity.ok(
+                BaseResponse(
+                    Status.SUCCESS,
+                    emailGroup.emails, null
+                )
+            )
+        }
+
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(
+                BaseResponse(
+                    Status.ERROR, null, listOf(
+                        Error("Email group not found with given ID `$groupId`")
+                    )
+                )
+            )
+    }
 
     fun sendBroadcastEmail(
         emailBroadcastMessage: EmailBroadcastMessage
@@ -111,6 +216,15 @@ class EmailService(
             // Handle error (logging is recommended here)
             ex.printStackTrace()
         }
+    }
+
+    private fun emailGroupById(groupId: String): EmailGroup? {
+        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EMAIL_GROUP_COLLECTION,
+            groupId, EmailGroup::class.java)?.let { emailGroup ->
+                return emailGroup
+        }
+
+        return null
     }
 
     private fun sendInBatches(

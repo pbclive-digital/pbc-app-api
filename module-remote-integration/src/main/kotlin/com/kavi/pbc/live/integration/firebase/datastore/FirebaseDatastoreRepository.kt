@@ -67,6 +67,23 @@ class FirebaseDatastoreRepository: DatastoreRepositoryContract {
         return entityList
     }
 
+    override fun <T> getAllInEntitySelectedAttributes(
+        entityCollection: String,
+        attributes: List<String>,
+        className: Class<T>
+    ): List<T> {
+        val entityList: MutableList<T> = ArrayList()
+        val future: ApiFuture<QuerySnapshot> = FirestoreClient.getFirestore()
+            .collection(entityCollection)
+            .select(*attributes.toTypedArray())
+            .get()
+        val documents = future.get().documents
+        documents.forEach {
+            it.toObject(className).let { entityItem -> entityList.add(entityItem) }
+        }
+        return entityList
+    }
+
     override fun <T> getEntityFromId(
         entityCollection: String,
         entityId: String,
