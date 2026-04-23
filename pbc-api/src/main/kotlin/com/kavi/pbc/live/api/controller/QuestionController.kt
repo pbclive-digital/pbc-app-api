@@ -87,7 +87,7 @@ class QuestionController(private val questionService: QuestionService) {
     }
 
     @DeleteMapping("/delete/{question-id}")
-    fun deleteNews(@PathVariable(value = "question-id") questionId: String):
+    fun deleteQuestion(@PathVariable(value = "question-id") questionId: String):
             ResponseEntity<BaseResponse<String>>? {
         logger.printSeparator()
         logger.printInfo("REQUEST MAPPING: DELETE:[/question/delete/$questionId]", QuestionController::class.java)

@@ -13,6 +13,7 @@ import com.kavi.pbc.live.data.model.broadcast.EmailBroadcastMessage
 import com.kavi.pbc.live.data.model.broadcast.EmailNewEventMessage
 import com.kavi.pbc.live.data.model.email.EmailGroup
 import com.kavi.pbc.live.data.model.email.EmailGroupHeading
+import com.kavi.pbc.live.data.model.email.EmailItem
 import jakarta.mail.MessagingException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -89,9 +90,9 @@ class EmailService(
         }
     }
 
-    fun addEmailsToGroup(groupId: String, emailList: List<String>): ResponseEntity<BaseResponse<EmailGroup>>? {
+    fun addEmailsToGroup(groupId: String, emailList: List<EmailItem>): ResponseEntity<BaseResponse<EmailGroup>>? {
         emailGroupById(groupId = groupId)?.let { emailGroup ->
-            val mergeResultSet = LinkedHashSet<String>(emailGroup.emails)
+            val mergeResultSet = LinkedHashSet<EmailItem>(emailGroup.emails)
             mergeResultSet.addAll(emailList)
 
             emailGroup.emails = ArrayList(mergeResultSet)
@@ -108,7 +109,7 @@ class EmailService(
         }
     }
 
-    fun removeEmailsToGroup(groupId: String, emailList: List<String>): ResponseEntity<BaseResponse<EmailGroup>>? {
+    fun removeEmailsToGroup(groupId: String, emailList: List<EmailItem>): ResponseEntity<BaseResponse<EmailGroup>>? {
         emailGroupById(groupId = groupId)?.let { emailGroup ->
             emailGroup.emails.removeAll(emailList.toSet())
             datastoreRepositoryContract.updateEntity(DatastoreConstant.EMAIL_GROUP_COLLECTION,
@@ -122,6 +123,29 @@ class EmailService(
                     Error("Email group not found with given ID `$groupId`"))
                 ))
         }
+    }
+
+    fun getEmailListOfGroup(groupId: String):
+            ResponseEntity<BaseResponse<List<EmailItem>>>? {
+
+        emailGroupById(groupId = groupId)?.let { emailGroup ->
+            return ResponseEntity.ok(
+                BaseResponse(
+                    Status.SUCCESS,
+                    emailGroup.emails, null
+                )
+            )
+        }
+
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(
+                BaseResponse(
+                    Status.ERROR, null, listOf(
+                        Error("Email group not found with given ID `$groupId`")
+                    )
+                )
+            )
     }
 
     fun sendBroadcastEmail(

@@ -6,7 +6,7 @@ import com.kavi.pbc.live.data.util.DataUtil
 data class EmailGroup(
     val id: String,
     val name: String,
-    var emails: MutableList<String> = mutableListOf(),
+    var emails: MutableList<EmailItem> = mutableListOf(),
 ): BaseModel {
 
     constructor() : this(DataUtil.idGenerator("eml"), "", mutableListOf())

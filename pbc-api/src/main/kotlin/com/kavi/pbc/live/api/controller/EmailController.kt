@@ -5,6 +5,7 @@ import com.kavi.pbc.live.api.service.EmailService
 import com.kavi.pbc.live.api.util.AppLogger
 import com.kavi.pbc.live.data.model.email.EmailGroup
 import com.kavi.pbc.live.data.model.email.EmailGroupHeading
+import com.kavi.pbc.live.data.model.email.EmailItem
 import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -56,8 +57,21 @@ class EmailController(private val emailService: EmailService) {
         return response
     }
 
+    @GetMapping("/get/email-list/{group-id}")
+    fun getEmailListOfGroup(@PathVariable(value = "group-id") groupId: String):
+            ResponseEntity<BaseResponse<List<EmailItem>>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: POST: [/email-group/get/email-list/$groupId]",
+            EmailController::class.java)
+
+        val response = emailService.getEmailListOfGroup(groupId)
+        logger.printResponseInfo(response, EmailController::class.java)
+
+        return response
+    }
+
     @PutMapping("/add/emails/{group-id}")
-    fun addEmailsToEmailGroup(@PathVariable(value = "group-id") groupId: String, @Valid @RequestBody emailList: List<String>): ResponseEntity<BaseResponse<EmailGroup>>? {
+    fun addEmailsToEmailGroup(@PathVariable(value = "group-id") groupId: String, @Valid @RequestBody emailList: List<EmailItem>): ResponseEntity<BaseResponse<EmailGroup>>? {
         logger.printSeparator()
         logger.printInfo("REQUEST MAPPING: PUT: [/email-group/add/emails/$groupId]", EmailController::class.java)
 
@@ -68,7 +82,7 @@ class EmailController(private val emailService: EmailService) {
     }
 
     @PutMapping("/remove/emails/{group-id}")
-    fun removeEmailsFromEmailGroup(@PathVariable(value = "group-id") groupId: String, @Valid @RequestBody emailList: List<String>): ResponseEntity<BaseResponse<EmailGroup>>? {
+    fun removeEmailsFromEmailGroup(@PathVariable(value = "group-id") groupId: String, @Valid @RequestBody emailList: List<EmailItem>): ResponseEntity<BaseResponse<EmailGroup>>? {
         logger.printSeparator()
         logger.printInfo("REQUEST MAPPING: PUT: [/email-group/add/emails/$groupId]", EmailController::class.java)
 
