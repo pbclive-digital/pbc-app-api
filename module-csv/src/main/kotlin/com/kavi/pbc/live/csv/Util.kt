@@ -1,5 +1,6 @@
 package com.kavi.pbc.live.csv
 
+import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import java.io.File
 import java.io.IOException
@@ -66,6 +67,11 @@ object Util {
 
         return File("$exportPath/$name/$SIGN_UP_SHEET_CONTRIBUTION_FILE")
     }
+
+    /**
+     * Read lines of given csv document.
+     */
+    fun readLinesFromGivenCsv(file: File): List<List<String>> = csvReader().readAll(file)
 
     private fun getCurrentTimestamp(): Long {
         return System.currentTimeMillis()

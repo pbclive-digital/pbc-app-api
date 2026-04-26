@@ -9,6 +9,7 @@ import com.kavi.pbc.live.api.util.AppLogger
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.DatastoreRepositoryContract
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository
+import com.kavi.pbc.live.csv.CsvEmailItemGenerator
 import com.kavi.pbc.live.data.model.broadcast.EmailBroadcastMessage
 import com.kavi.pbc.live.data.model.broadcast.EmailNewEventMessage
 import com.kavi.pbc.live.data.model.email.EmailGroup
@@ -27,8 +28,13 @@ import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.JavaMailSenderImpl
 import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 import org.thymeleaf.TemplateEngine
 import org.thymeleaf.context.Context
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.IOException
 import java.nio.charset.StandardCharsets
 
 
@@ -57,6 +63,33 @@ class EmailService(
             .body(BaseResponse(Status.SUCCESS,
                 datastoreRepositoryContract.createEntity(DatastoreConstant.EMAIL_GROUP_COLLECTION,
                     emailGroup.id, emailGroup), null))
+    }
+
+    fun createEmailGroupFromFile(groupName: String, file: MultipartFile): ResponseEntity<BaseResponse<String>> {
+        fileFromMultipartFile(file)?.let {
+            val emailItemList = CsvEmailItemGenerator.shared.readCsvFile(it)
+
+            // Delete generated file
+            it.delete()
+
+            // Create EmailGroup
+            val emailGroup = EmailGroup(
+                name = groupName,
+                emails = emailItemList
+            )
+
+            return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(BaseResponse(Status.SUCCESS,
+                    datastoreRepositoryContract.createEntity(DatastoreConstant.EMAIL_GROUP_COLLECTION,
+                        emailGroup.id, emailGroup), null))
+        }?: run {
+            val errorList = listOf(Error("File conversion error. Please follow the given format and upload a new questions file."))
+
+            return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(BaseResponse(Status.ERROR, null, errorList))
+        }
     }
 
     fun getAllEmailGroups(): ResponseEntity<BaseResponse<List<EmailGroupHeading>>>? {
@@ -146,6 +179,14 @@ class EmailService(
                     )
                 )
             )
+    }
+
+    fun deleteEmailGroup(groupId: String): ResponseEntity<BaseResponse<String>>? {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(BaseResponse(Status.SUCCESS,
+                datastoreRepositoryContract.deleteEntity(DatastoreConstant.EMAIL_GROUP_COLLECTION, groupId),
+                null))
     }
 
     fun sendBroadcastEmail(
@@ -316,6 +357,32 @@ class EmailService(
             broadcaster.send(mimeMessage)
         } catch (ex: Exception) {
             logger.printError(message = ex.localizedMessage, throwable = ex, EmailService::class.java)
+        }
+    }
+
+    /**
+     * Convert Multipart file to File
+     */
+    private fun fileFromMultipartFile(multipartFile: MultipartFile): File? {
+        try {
+            val tempFilePath = "./build/tmp"
+
+            multipartFile.originalFilename?.let {
+                val convFile = File("$tempFilePath/$it")
+
+                convFile.createNewFile()
+                val fos = FileOutputStream(convFile)
+                fos.write(multipartFile.bytes)
+                fos.close()
+
+                return convFile
+            } ?: run {
+                return null
+            }
+        } catch (ex: FileNotFoundException) {
+            return null
+        } catch (ex: IOException) {
+            return null
         }
     }
 
