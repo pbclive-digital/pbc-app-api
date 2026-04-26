@@ -21,8 +21,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.ClassPathResource
+import org.springframework.core.io.Resource
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.JavaMailSenderImpl
@@ -57,12 +61,25 @@ class EmailService(
 
     private var datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
 
+    @Value("classpath:email-group-template/email-group-csv-file-template.csv")
+    var emailGroupCSVTemplateResource: Resource? = null
+
     fun createEmailGroup(emailGroup: EmailGroup): ResponseEntity<BaseResponse<String>>? {
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(BaseResponse(Status.SUCCESS,
                 datastoreRepositoryContract.createEntity(DatastoreConstant.EMAIL_GROUP_COLLECTION,
                     emailGroup.id, emailGroup), null))
+    }
+
+    fun downloadEmailGroupTemplate(fileName: String): ResponseEntity<Resource>? {
+        val header = HttpHeaders()
+        header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=${fileName}");
+
+        return ResponseEntity.ok()
+            .headers(header)
+            .contentType(MediaType.APPLICATION_OCTET_STREAM)
+            .body(emailGroupCSVTemplateResource)
     }
 
     fun createEmailGroupFromFile(groupName: String, file: MultipartFile): ResponseEntity<BaseResponse<String>> {

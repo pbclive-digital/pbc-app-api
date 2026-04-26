@@ -8,6 +8,7 @@ import com.kavi.pbc.live.data.model.email.EmailGroupHeading
 import com.kavi.pbc.live.data.model.email.EmailItem
 import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.Resource
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -46,6 +47,18 @@ class EmailController(private val emailService: EmailService) {
         logger.printInfo("REQUEST MAPPING: POST: [/email-group/create/from-file/$groupName]", EmailController::class.java)
 
         val response = emailService.createEmailGroupFromFile(groupName, file)
+        logger.printResponseInfo(response, EmailController::class.java)
+
+        return response
+    }
+
+    @GetMapping("/download/template/{file-name}")
+    fun downloadEmailGroupCSVTemplate(@PathVariable(value = "file-name") fileName: String):
+            ResponseEntity<Resource>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET: [/email-group/download/template/$fileName]", EmailController::class.java)
+
+        val response = emailService.downloadEmailGroupTemplate(fileName)
         logger.printResponseInfo(response, EmailController::class.java)
 
         return response
