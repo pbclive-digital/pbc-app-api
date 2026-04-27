@@ -1,6 +1,7 @@
 package com.kavi.pbc.live.api.controller
 
 import com.kavi.pbc.live.api.data.dto.BaseResponse
+import com.kavi.pbc.live.api.data.dto.request.PublishEventRequest
 import com.kavi.pbc.live.api.service.EventService
 import com.kavi.pbc.live.api.util.AppLogger
 import com.kavi.pbc.live.data.model.event.Event
@@ -137,11 +138,24 @@ class EventController(private val eventService: EventService) {
     }
 
     @PutMapping("/put/publish/{event-id}")
-    fun publishDraftEvent(@PathVariable(value = "event-id") eventId: String, @Valid @RequestBody event: Event): ResponseEntity<BaseResponse<Event>>?? {
+    fun publishDraftEvent(@PathVariable(value = "event-id") eventId: String,
+                          @Valid @RequestBody event: Event): ResponseEntity<BaseResponse<Event>>? {
         logger.printSeparator()
         logger.printInfo("REQUEST MAPPING: PUT: [/event/put/publish/$eventId]", EventController::class.java)
 
         val response = eventService.publishDraftEvent(eventId, event)
+        logger.printResponseInfo(response, EventController::class.java)
+
+        return response
+    }
+
+    @PutMapping("/v2/put/publish/{event-id}")
+    fun publishDraftEventV2(@PathVariable(value = "event-id") eventId: String,
+                          @Valid @RequestBody publishEventReq: PublishEventRequest): ResponseEntity<BaseResponse<Event>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: PUT: [/event/v2/put/publish/$eventId]", EventController::class.java)
+
+        val response = eventService.publishDraftEvent(eventId, publishEventReq.event, publishEventReq.emailGroupHeadings)
         logger.printResponseInfo(response, EventController::class.java)
 
         return response

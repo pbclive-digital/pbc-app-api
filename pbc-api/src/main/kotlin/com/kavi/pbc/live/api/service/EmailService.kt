@@ -198,6 +198,39 @@ class EmailService(
             )
     }
 
+    fun getEmailGroupsFromEmail(email: String):
+            ResponseEntity<BaseResponse<List<EmailGroupHeading>>>? {
+        val emailGroupHeadings = mutableListOf<EmailGroupHeading>()
+
+        val allEmailGroups = datastoreRepositoryContract.getAllInEntity(DatastoreConstant.EMAIL_GROUP_COLLECTION,
+            EmailGroup::class.java)
+
+        allEmailGroups.forEach { emailGroup ->
+            if (emailGroup.emails.any { it.email == email }) {
+                emailGroupHeadings.add(EmailGroupHeading(emailGroup.id, emailGroup.name))
+            }
+        }
+
+        if (emailGroupHeadings.isNotEmpty()) {
+            return ResponseEntity.ok(
+                BaseResponse(
+                    Status.SUCCESS,
+                    emailGroupHeadings, null
+                )
+            )
+        } else {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(
+                    BaseResponse(
+                        Status.ERROR, null, listOf(
+                            Error("This email: `$email` is not containing in any email group.")
+                        )
+                    )
+                )
+        }
+    }
+
     fun deleteEmailGroup(groupId: String): ResponseEntity<BaseResponse<String>>? {
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -247,6 +280,43 @@ class EmailService(
                         )
                     )
                 )
+        }
+    }
+
+    fun sendEmailToSelectedGroups(emailNewEventMessage: EmailNewEventMessage,
+                                  emailGroups: List<EmailGroupHeading>) {
+        val mergeResultSet = LinkedHashSet<String>()
+
+        emailGroups.forEach { group ->
+            datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EMAIL_GROUP_COLLECTION,
+                group.id, EmailGroup::class.java)?.let { emailGroup ->
+                    val emailList = mutableListOf<String>()
+                    emailGroup.emails.forEach { emailItem ->
+                        emailList.add(emailItem.email)
+                    }
+                mergeResultSet.addAll(emailList)
+            }
+        }
+
+        val emailList = mergeResultSet.toList()
+
+        try {
+            if (emailList.isNotEmpty()) {
+                sendInBatches(
+                    recipients = emailList,
+                    emailSubject = emailNewEventMessage.subject,
+                    emailTemplateType = EmailTemplateType.NEW_EVENT,
+                    emailTemplateContent = mapOf(
+                        "title" to emailNewEventMessage.title,
+                        "message" to emailNewEventMessage.message,
+                        "description" to emailNewEventMessage.eventDescription,
+                        "eventUrl" to emailNewEventMessage.eventUrl,
+                    )
+                )
+            }
+        } catch (ex: MessagingException) {
+            // Handle error (logging is recommended here)
+            ex.printStackTrace()
         }
     }
 

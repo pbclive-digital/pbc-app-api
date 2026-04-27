@@ -16,6 +16,7 @@ import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.notification.Fir
 import com.kavi.pbc.live.csv.CsvExporter
 import com.kavi.pbc.live.csv.config.ExportConfig
 import com.kavi.pbc.live.data.model.broadcast.EmailNewEventMessage
+import com.kavi.pbc.live.data.model.email.EmailGroupHeading
 import com.kavi.pbc.live.data.model.event.EventType
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluck
 import com.kavi.pbc.live.data.model.event.potluck.EventPotluckContributor
@@ -396,7 +397,8 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
                 event, null))
     }
 
-    fun publishDraftEvent(eventId: String, event: Event): ResponseEntity<BaseResponse<Event>>? {
+    fun publishDraftEvent(eventId: String, event: Event,
+                          emailGroupHeadings: List<EmailGroupHeading>? = null): ResponseEntity<BaseResponse<Event>>? {
         event.eventStatus = EventStatus.PUBLISHED
 
         datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_COLLECTION, eventId, event)
@@ -413,15 +415,22 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
             data = pushNotificationData
         )
 
-        emailService.sendNewEventEmail(
-            emailNewEventMessage = EmailNewEventMessage(
-                subject = "PBC Event: Notification",
-                title = "Pittsburgh Buddhist Center is hosting a new event - ${event.name}",
-                message = "To all our friends, we are kindly inform you that we are hosting a new event. Our new event is ${event.name}. We are invite you all to be a part of this event.",
-                eventDescription = event.description,
-                eventUrl = "https://pbclive-digital.github.io/pbc-web-app/#event/event-selected/${event.id}"
-            )
+        val newEventEmail = EmailNewEventMessage(
+            subject = "PBC Event: Notification",
+            title = "Pittsburgh Buddhist Center is hosting a new event - ${event.name}",
+            message = "To all our friends, we are kindly inform you that we are hosting a new event. Our new event is ${event.name}. We are invite you all to be a part of this event.",
+            eventDescription = event.description,
+            eventUrl = "https://pbclive-digital.github.io/pbc-web-app/#event/event-selected/${event.id}"
         )
+
+        if (emailGroupHeadings?.isNotEmpty() == true) {
+            emailService.sendEmailToSelectedGroups(
+                emailNewEventMessage = newEventEmail, emailGroupHeadings)
+        } else {
+            emailService.sendNewEventEmail(
+                emailNewEventMessage = newEventEmail
+            )
+        }
 
         return ResponseEntity
             .status(HttpStatus.OK)

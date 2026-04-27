@@ -99,6 +99,19 @@ class EmailController(private val emailService: EmailService) {
         return response
     }
 
+    @GetMapping("/get/email-groups/{email}")
+    fun getEmailGroupsFromEmail(@PathVariable(value = "email") email: String):
+            ResponseEntity<BaseResponse<List<EmailGroupHeading>>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: POST: [/email-group/get/email-groups/$email]",
+            EmailController::class.java)
+
+        val response = emailService.getEmailGroupsFromEmail(email)
+        logger.printResponseInfo(response, EmailController::class.java)
+
+        return response
+    }
+
     @PutMapping("/add/emails/{group-id}")
     fun addEmailsToEmailGroup(@PathVariable(value = "group-id") groupId: String, @Valid @RequestBody emailList: List<EmailItem>): ResponseEntity<BaseResponse<EmailGroup>>? {
         logger.printSeparator()
