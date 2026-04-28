@@ -10,7 +10,10 @@ import com.kavi.pbc.live.data.model.config.Config
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository
 import com.kavi.pbc.live.data.DataConstant
+import com.kavi.pbc.live.data.constant.GENERAL_EMAIL_GROUP_ID
+import com.kavi.pbc.live.data.constant.GENERAL_EMAIL_GROUP_NAME
 import com.kavi.pbc.live.data.model.config.DeviceFactor
+import com.kavi.pbc.live.data.model.email.EmailGroupHeading
 import com.kavi.pbc.live.data.model.user.User
 import com.kavi.pbc.live.data.model.user.UserType
 import org.springframework.beans.factory.annotation.Autowired
@@ -45,6 +48,9 @@ class ConfigService {
                 DeviceFactor.INCH10TAB -> it.dashboardEventCount = DataConstant.DASHBOARD_EVENT_COUNT_10INCH_TAB
             }
             it.residentMonkList = residentMonkList
+            it.generalEmailGroup = EmailGroupHeading(
+                id = GENERAL_EMAIL_GROUP_ID, name = GENERAL_EMAIL_GROUP_NAME,
+            )
             return ResponseEntity.ok(BaseResponse(Status.SUCCESS, it, null))
         }?: run {
             return ResponseEntity

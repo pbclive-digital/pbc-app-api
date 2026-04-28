@@ -1,5 +1,6 @@
 package com.kavi.pbc.live.api
 
+import com.kavi.pbc.live.api.service.EmailService
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.FirebaseIntegration
 import com.kavi.pbc.live.data.property.IntegrationEnv
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,9 +14,15 @@ class AppStartupListener: ApplicationListener<ContextRefreshedEvent> {
     @Autowired
     lateinit var appProperties: AppProperties
 
+    @Autowired
+    lateinit var emailService: EmailService
+
     override fun onApplicationEvent(event: ContextRefreshedEvent) {
         // Initialize firebase fire-store with environment
         initializeFirebase()
+
+        // Setup general-email-group
+        emailService.setupGeneralEmailGroup()
     }
 
     private fun initializeFirebase() {

@@ -10,6 +10,8 @@ import com.kavi.pbc.live.com.kavi.pbc.live.integration.DatastoreRepositoryContra
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository
 import com.kavi.pbc.live.csv.CsvEmailItemGenerator
+import com.kavi.pbc.live.data.constant.GENERAL_EMAIL_GROUP_ID
+import com.kavi.pbc.live.data.constant.GENERAL_EMAIL_GROUP_NAME
 import com.kavi.pbc.live.data.model.broadcast.EmailBroadcastMessage
 import com.kavi.pbc.live.data.model.broadcast.EmailNewEventMessage
 import com.kavi.pbc.live.data.model.email.EmailGroup
@@ -63,6 +65,16 @@ class EmailService(
 
     @Value("classpath:email-group-template/email-group-csv-file-template.csv")
     var emailGroupCSVTemplateResource: Resource? = null
+
+    fun setupGeneralEmailGroup() {
+        emailGroupById(GENERAL_EMAIL_GROUP_ID)?.let { group ->
+            logger.printInfo("General Email Group already exists!",
+                EmailService::class.java)
+        }?: run {
+            datastoreRepositoryContract.createEntity(DatastoreConstant.EMAIL_GROUP_COLLECTION,
+                GENERAL_EMAIL_GROUP_ID, EmailGroup(GENERAL_EMAIL_GROUP_ID, GENERAL_EMAIL_GROUP_NAME))
+        }
+    }
 
     fun createEmailGroup(emailGroup: EmailGroup): ResponseEntity<BaseResponse<String>>? {
         return ResponseEntity

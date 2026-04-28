@@ -2,22 +2,26 @@ package com.kavi.pbc.live.data.model.config
 
 import com.kavi.pbc.live.data.DataConstant
 import com.kavi.pbc.live.data.model.BaseModel
+import com.kavi.pbc.live.data.model.email.EmailGroupHeading
 import com.kavi.pbc.live.data.model.user.User
 
 data class Config(
     var dashboardEventCount: Int,
     var dailyQuotesCount: Int,
-    var residentMonkList: List<User> = emptyList()
+    var residentMonkList: List<User> = emptyList(),
+    var generalEmailGroup: EmailGroupHeading
 ): BaseModel {
     constructor(): this(
         DataConstant.DASHBOARD_EVENT_COUNT,
         DataConstant.DAILY_QUOTE_COUNT,
-        emptyList()
+        emptyList(),
+        EmailGroupHeading()
     )
 
     override fun toMap(): Map<String, Any?> = mapOf(
         "dashboardEventCount" to dashboardEventCount,
         "dailyQuotesCount" to dailyQuotesCount,
-        "residentMonkList" to residentMonkList
+        "residentMonkList" to residentMonkList,
+        "generalEmailGroup" to generalEmailGroup
     )
 }
