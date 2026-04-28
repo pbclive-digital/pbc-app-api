@@ -7,6 +7,9 @@ import com.kavi.pbc.live.com.kavi.pbc.live.integration.DatastoreRepositoryContra
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository
 import com.kavi.pbc.live.data.model.user.User
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
+import com.kavi.pbc.live.data.constant.GENERAL_EMAIL_GROUP_ID
+import com.kavi.pbc.live.data.model.email.EmailGroup
+import com.kavi.pbc.live.data.model.email.EmailItem
 import com.kavi.pbc.live.data.model.notification.PushTokenData
 import com.kavi.pbc.live.data.model.user.UserRoleUpdateReq
 import com.kavi.pbc.live.data.model.user.UserType
@@ -37,10 +40,16 @@ class UserService {
             user.uppercaseFirstName = user.firstName?.uppercase()
             user.uppercaseLastName = user.lastName?.uppercase()
 
+            // Create a new user
+            val createUserResult = datastoreRepositoryContract.createEntity(DatastoreConstant.USER_COLLECTION, user.id, user)
+
+            // Add user email to general email group
+            addUserToGeneralEmailGroup(user)
+
             return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(BaseResponse(Status.SUCCESS,
-                    datastoreRepositoryContract.createEntity(DatastoreConstant.USER_COLLECTION, user.id, user), null))
+                    createUserResult, null))
         }
     }
 
@@ -196,5 +205,24 @@ class UserService {
             propertiesMap = properties,
             className = User::class.java
         )
+    }
+
+    /**
+     * Create this as a internal method, because when it user EmailService in UserService, that create
+     * circular dependency injection in Spring-boot
+     */
+    private fun addUserToGeneralEmailGroup(newUser: User) {
+        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EMAIL_GROUP_COLLECTION,
+            GENERAL_EMAIL_GROUP_ID, EmailGroup::class.java)?.let { emailGroup ->
+
+            val mergeResultSet = LinkedHashSet<EmailItem>(emailGroup.emails)
+            mergeResultSet.addAll(listOf(
+                EmailItem(email = newUser.email, ownerName = "${newUser.firstName} ${newUser.lastName}"),
+            ))
+
+            emailGroup.emails = ArrayList(mergeResultSet)
+            datastoreRepositoryContract.updateEntity(DatastoreConstant.EMAIL_GROUP_COLLECTION,
+                GENERAL_EMAIL_GROUP_ID, emailGroup)
+        }
     }
 }
