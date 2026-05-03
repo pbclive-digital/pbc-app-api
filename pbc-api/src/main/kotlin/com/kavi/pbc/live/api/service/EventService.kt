@@ -409,7 +409,7 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
         )
 
         FirebasePushNotification.shared.sendNotificationToMultipleTokens(
-            title = "EVENT: ${event.name}",
+            title = "PBC Event: ${event.name}",
             message = event.description,
             tokens = pushTokenService.getAllPushTokens(),
             data = pushNotificationData
@@ -417,19 +417,16 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
 
         val newEventEmail = EmailNewEventMessage(
             subject = "PBC Event: Notification",
-            title = "Pittsburgh Buddhist Center is hosting a new event - ${event.name}",
+            title = event.name,
             message = "To all our friends, we are kindly inform you that we are hosting a new event. Our new event is ${event.name}. We are invite you all to be a part of this event.",
             eventDescription = event.description,
+            eventAgenda = event.agendaItemList ?: emptyList(),
             eventUrl = "https://pbclive-digital.github.io/pbc-web-app/#event/event-selected/${event.id}"
         )
 
         if (emailGroupHeadings?.isNotEmpty() == true) {
-            emailService.sendEmailToSelectedGroups(
+            emailService.sendNewEventEmailToSelectedGroups(
                 emailNewEventMessage = newEventEmail, emailGroupHeadings)
-        } else {
-            emailService.sendNewEventEmail(
-                emailNewEventMessage = newEventEmail
-            )
         }
 
         return ResponseEntity

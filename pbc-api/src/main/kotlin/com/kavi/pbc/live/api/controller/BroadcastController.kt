@@ -1,14 +1,13 @@
 package com.kavi.pbc.live.api.controller
 
 import com.kavi.pbc.live.api.data.dto.BaseResponse
-import com.kavi.pbc.live.api.data.dto.Status
+import com.kavi.pbc.live.api.data.dto.request.EmailBroadcastRequest
 import com.kavi.pbc.live.api.service.PushNotificationService
 import com.kavi.pbc.live.api.service.EmailService
 import com.kavi.pbc.live.api.util.AppLogger
 import com.kavi.pbc.live.data.model.broadcast.EmailBroadcastMessage
 import com.kavi.pbc.live.data.model.broadcast.NotificationMessage
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PostMapping
@@ -45,6 +44,18 @@ class BroadcastController(
         logger.printInfo("REQUEST MAPPING: POST: [/broadcast/email]", BroadcastController::class.java)
 
         val response = emailService.sendBroadcastEmail(broadCastMessage)
+        logger.printResponseInfo(response, BroadcastController::class.java)
+
+        return response
+    }
+
+    @PostMapping("/v2/email")
+    fun broadcastEmailV2(@Validated @RequestBody broadCastMessageReq: EmailBroadcastRequest):
+            ResponseEntity<BaseResponse<String>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: POST: [/broadcast/v2/email]", BroadcastController::class.java)
+
+        val response = emailService.sendBroadcastEmail(broadCastMessageReq.emailBroadcastMessage, broadCastMessageReq.emailGroupHeadings)
         logger.printResponseInfo(response, BroadcastController::class.java)
 
         return response

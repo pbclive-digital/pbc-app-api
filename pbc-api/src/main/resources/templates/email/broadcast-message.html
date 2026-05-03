@@ -12,12 +12,15 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f4f4f4;
         }
+
         table {
             border-spacing: 0;
         }
+
         td {
             padding: 0;
         }
+
         img {
             border: 0;
         }
@@ -51,7 +54,7 @@
         }
 
         .content {
-            padding: 0 30px 10px 30px;
+            padding: 0 10px 10px 30px;
             text-align: left;
             line-height: 1.6;
         }
@@ -64,6 +67,30 @@
             text-align: center;
         }
 
+        .sub-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            text-align: start;
+        }
+
+        /* Button */
+        .button-container {
+            text-align: center;
+            padding: 10px 0 10px 0;
+        }
+
+        .button {
+            background-color: #b84910;
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
         .footer {
             padding: 20px;
             text-align: center;
@@ -73,31 +100,31 @@
     </style>
 </head>
 <body>
-<div class="wrapper" style="text-align: center;">
-    <table class="main" width="100%">
-        <tr>
-            <td class="header">
-                <img src="cid:logo" alt="PBC Logo" width="100" style="display: block; margin: 0 auto;">
-            </td>
-        </tr>
+<p class="wrapper" style="text-align: center;">
+<table class="main" width="100%">
+    <tr>
+        <td class="header">
+            <img src="cid:logo" alt="PBC Logo" width="100" style="display: block; margin: 0 auto;">
+        </td>
+    </tr>
 
-        <tr>
-            <td class="content">
-                <div class="title" th:text="${title}">Email Title Goes Here</div>
+    <tr>
+        <td class="content">
+            <div class="title" th:text="${title}">Email Title Goes Here</div>
 
-                <p th:text="${message}">
-                    This is where your primary email content will live. You can pass any string from your Spring Boot controller to populate this area.
-                </p>
-            </td>
-        </tr>
+            <p th:text="${message}">
+                This is where your primary email content will live. You can pass any string from your Spring Boot
+                controller to populate this area.
+            </p>
+        </td>
+    </tr>
 
-        <tr>
-            <td class="footer">
-                <p>Thank you for being with us!</p>
-                <p>&copy; 2026 Pittsburgh Buddhist Center</p>
-            </td>
-        </tr>
-    </table>
-</div>
+    <tr>
+        <td class="footer">
+            <p>Thank you for being with us!</p>
+            <p>&copy; 2026 Pittsburgh Buddhist Center</p>
+        </td>
+    </tr>
+</table>
 </body>
 </html>

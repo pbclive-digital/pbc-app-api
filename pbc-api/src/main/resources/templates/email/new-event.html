@@ -12,12 +12,15 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f4f4f4;
         }
+
         table {
             border-spacing: 0;
         }
+
         td {
             padding: 0;
         }
+
         img {
             border: 0;
         }
@@ -97,43 +100,57 @@
     </style>
 </head>
 <body>
-<div class="wrapper" style="text-align: center;">
-    <table class="main" width="100%">
-        <tr>
-            <td class="header">
-                <img src="cid:logo" alt="PBC Logo" width="100" style="display: block; margin: 0 auto;">
-            </td>
-        </tr>
+<p class="wrapper" style="text-align: center;">
+<table class="main" width="100%">
+    <tr>
+        <td class="header">
+            <img src="cid:logo" alt="PBC Logo" width="100" style="display: block; margin: 0 auto;">
+        </td>
+    </tr>
 
-        <tr>
-            <td class="content">
-                <div class="title" th:text="${title}">Email Title Goes Here</div>
+    <tr>
+        <td class="content">
+            <p style="text-align: center;">Pittsburgh Buddhist Center is hosting a new event</p>
 
-                <p th:text="${message}">
-                    This is where your primary email content will live. You can pass any string from your Spring Boot controller to populate this area.
-                </p>
+            <div class="title" th:text="${title}">Email Title Goes Here</div>
 
-                <div class="sub-title">Brief about the event</div>
+            <p th:text="${message}">
+                This is where your primary email content will live. You can pass any string from your Spring Boot
+                controller to populate this area.
+            </p>
 
-                <p th:text="${description}">
-                   This will contain the same event description that have given when event was created.
-                </p>
-            </td>
-        </tr>
+            <div class="sub-title">Brief about the event</div>
 
-        <tr>
-            <td class="button-container">
-                <a th:href="${eventUrl}" class="button">See more about this event</a>
-            </td>
-        </tr>
+            <p th:text="${description}">
+                This will contain the same event description that have given when event was created.
+            </p>
 
-        <tr>
-            <td class="footer">
-                <p>Thank you for being with us!</p>
-                <p>&copy; 2026 Pittsburgh Buddhist Center</p>
-            </td>
-        </tr>
-    </table>
-</div>
+            <div th:if="${not #lists.isEmpty(eventAgenda)}">
+                <div class="sub-title">Event Agenda:</div>
+
+                <ul style="padding-left: 30px; color: #2c3e50;">
+                    <li th:each="agendaItem : ${eventAgenda}"
+                        th:text="${agendaItem}"
+                        style="margin-bottom: 10px;">
+                        This is a placeholder that will be replaced by the list item
+                    </li>
+                </ul>
+            </div>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="button-container">
+            <a th:href="${eventUrl}" class="button">See more about this event</a>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="footer">
+            <p>Thank you for being with us!</p>
+            <p>&copy; 2026 Pittsburgh Buddhist Center</p>
+        </td>
+    </tr>
+</table>
 </body>
 </html>
