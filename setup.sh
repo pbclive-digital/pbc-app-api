@@ -23,20 +23,32 @@ function is_required_properties_available() {
     fi
 }
 
+function write_content_to_local_properties() {
+  echo "# Mail server - one config" >> local.properties
+  echo "PBC_MAIL_BROADCASTER_ONE_USERNAME=<add email address>" >> local.properties
+  echo "PBC_MAIL_BROADCASTER_ONE_PASSWORD=<add email passcode>" >> local.properties
+  echo "# Mail server - two config" >> local.properties
+  echo "PBC_MAIL_BROADCASTER_TWO_USERNAME=<add email address>" >> local.properties
+  echo "PBC_MAIL_BROADCASTER_TWO_PASSWORD=<add email passcode>" >> local.properties
+  echo "# Mail server - three config" >> local.properties
+  echo "PBC_MAIL_BROADCASTER_THREE_USERNAME=<add email address>" >> local.properties
+  echo "PBC_MAIL_BROADCASTER_THREE_PASSWORD=<add email passcode>" >> local.properties
+  echo "# Mail server - four config" >> local.properties
+  echo "PBC_MAIL_BROADCASTER_FOUR_USERNAME=<add email address>" >> local.properties
+  echo "PBC_MAIL_BROADCASTER_FOUR_PASSWORD=<add email passcode>" >> local.properties
+  echo "# Mail server - five config" >> local.properties
+  echo "PBC_MAIL_BROADCASTER_FIVE_USERNAME=<add email address>" >> local.properties
+  echo "PBC_MAIL_BROADCASTER_FIVE_PASSWORD=<add email passcode>" >> local.properties
+}
+
 function setup_local_properties() {
     if [ -f "./local.properties" ]; then
       if ! is_required_properties_available; then
-          echo "# Mail server username config" >> local.properties
-          echo "PBC_MAIL_USERNAME=<add email address>" >> local.properties
-          echo "# Mail server passcode config" >> local.properties
-          echo "PBC_MAIL_PASSWORD=<add email passcode>" >> local.properties
+        write_content_to_local_properties
       fi
     else
       touch local.properties
-      echo "# Mail server username config" > local.properties
-      echo "PBC_MAIL_USERNAME=<add email address>" >> local.properties
-      echo "# Mail server passcode config" >> local.properties
-      echo "PBC_MAIL_PASSWORD=<add email passcode>" >> local.properties
+      write_content_to_local_properties
     fi
 
     printf "\n=====================================================================\n"
