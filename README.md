@@ -20,7 +20,7 @@ This will configure followings
 
 ### Execute setup.sh
 ````
-$ ./setup.sh
+$ ./script/setup.sh
 ````
 
 ## Build
@@ -39,6 +39,18 @@ Primary deployment is in Heroku dyno. For this application has two environments.
 production. Both environments are in Heroku. To do the deployments, developer need to be a contributor of heroku accounts
 related with staging / production. Once developer get the access to heroku environments, they can use deploy.sh script to 
 do the deployments.
+
+### Use deploy.sh
+Developer can use this script to run the application in local for development, deploy application to staging-environment and
+deploy application to production environment. 
+````
+$ ./script/deploy <deployment-environment>
+
+Available deployment env options:
+    - local:    Run the application in local for development / testing. Deploy on [localhost:8082]
+    - staging:  Deploy application in staging environment.
+    - prod:     Deploy application in producation environment.
+````
 
 ### Set Heroku ENVIRONMENTAL VARIABLES
 For the application functionality with firebase integration, Before we deploy, make sure in the heroku application, set the following environmental variables
