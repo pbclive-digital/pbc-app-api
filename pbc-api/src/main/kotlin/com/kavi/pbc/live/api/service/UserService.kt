@@ -22,10 +22,13 @@ import org.springframework.stereotype.Service
 class UserService {
 
     @Autowired
-    private val authService: AuthService? = null
+    lateinit var authService: AuthService
 
     @Autowired
-    private val pushTokenService: PushTokenService? = null
+    lateinit var emailService: EmailService
+
+    @Autowired
+    lateinit var pushTokenService: PushTokenService
 
     private var datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
 
@@ -44,7 +47,9 @@ class UserService {
             val createUserResult = datastoreRepositoryContract.createEntity(DatastoreConstant.USER_COLLECTION, user.id, user)
 
             // Add user email to general email group
-            addUserToGeneralEmailGroup(user)
+            emailService.addEmailsToGroup(GENERAL_EMAIL_GROUP_ID, listOf(
+                EmailItem(email = user.email, ownerName = "${user.firstName} ${user.lastName}"),
+            ))
 
             return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -104,7 +109,7 @@ class UserService {
     }
 
     fun updateUserPushNotificationToken(userId: String, pushTokenData: PushTokenData): ResponseEntity<BaseResponse<String>>? {
-        return pushTokenService?.updatePushNotificationToken(userId, pushTokenData)
+        return pushTokenService.updatePushNotificationToken(userId, pushTokenData)
     }
 
     fun getAllUserEmails(): List<String>? {
@@ -143,10 +148,10 @@ class UserService {
 
     fun searchUserByName(name: String): ResponseEntity<BaseResponse<List<User>>>? {
         searchUserFromName(name)?.let {
-            if (it.isNotEmpty())
-                return ResponseEntity.ok(BaseResponse(Status.SUCCESS, it, null))
+            return if (it.isNotEmpty())
+                ResponseEntity.ok(BaseResponse(Status.SUCCESS, it, null))
             else
-                return ResponseEntity
+                ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .body(BaseResponse(Status.ERROR, null, listOf(
                         Error(HttpStatus.NOT_FOUND.toString()))
@@ -163,7 +168,7 @@ class UserService {
     fun deleteUserFromId(userId: String): ResponseEntity<BaseResponse<String>>? {
         val updateTime = datastoreRepositoryContract.deleteEntity(DatastoreConstant.USER_COLLECTION, userId)
         updateTime?.let {
-            authService?.deleteTokenFromUser(userId)
+            authService.deleteTokenFromUser(userId)
         }
         return ResponseEntity.ok(BaseResponse(Status.SUCCESS, updateTime, null))
     }
@@ -205,24 +210,5 @@ class UserService {
             propertiesMap = properties,
             className = User::class.java
         )
-    }
-
-    /**
-     * Create this as a internal method, because when it user EmailService in UserService, that create
-     * circular dependency injection in Spring-boot
-     */
-    private fun addUserToGeneralEmailGroup(newUser: User) {
-        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EMAIL_GROUP_COLLECTION,
-            GENERAL_EMAIL_GROUP_ID, EmailGroup::class.java)?.let { emailGroup ->
-
-            val mergeResultSet = LinkedHashSet<EmailItem>(emailGroup.emails)
-            mergeResultSet.addAll(listOf(
-                EmailItem(email = newUser.email, ownerName = "${newUser.firstName} ${newUser.lastName}"),
-            ))
-
-            emailGroup.emails = ArrayList(mergeResultSet)
-            datastoreRepositoryContract.updateEntity(DatastoreConstant.EMAIL_GROUP_COLLECTION,
-                GENERAL_EMAIL_GROUP_ID, emailGroup)
-        }
     }
 }

@@ -42,6 +42,7 @@ class SecurityConfiguration {
                     .requestMatchers("/news/delete/**").authenticated()
                     .requestMatchers("/news/add/image/**").authenticated()
                     .requestMatchers("/broadcast/message/**").authenticated()
+                    .requestMatchers("/email-group/**").authenticated()
                     .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                     .anyRequest().permitAll()
             }
