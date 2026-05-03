@@ -295,8 +295,8 @@ class EmailService(
         }
     }
 
-    fun sendEmailToSelectedGroups(emailNewEventMessage: EmailNewEventMessage,
-                                  emailGroups: List<EmailGroupHeading>) {
+    fun sendNewEventEmailToSelectedGroups(emailNewEventMessage: EmailNewEventMessage,
+                                          emailGroups: List<EmailGroupHeading>) {
         val mergeResultSet = LinkedHashSet<String>()
 
         emailGroups.forEach { group ->
@@ -322,35 +322,10 @@ class EmailService(
                         "title" to emailNewEventMessage.title,
                         "message" to emailNewEventMessage.message,
                         "description" to emailNewEventMessage.eventDescription,
+                        "eventAgenda" to emailNewEventMessage.eventAgenda,
                         "eventUrl" to emailNewEventMessage.eventUrl,
                     )
                 )
-            }
-        } catch (ex: MessagingException) {
-            // Handle error (logging is recommended here)
-            ex.printStackTrace()
-        }
-    }
-
-    fun sendNewEventEmail(
-        emailNewEventMessage: EmailNewEventMessage
-    ) {
-        try {
-            // Broadcast to all available emails by batches
-            userService.getAllUserEmails()?.let { userEmails ->
-                if (userEmails.isNotEmpty()) {
-                    sendInBatches(
-                        recipients = userEmails,
-                        emailSubject = emailNewEventMessage.subject,
-                        emailTemplateType = EmailTemplateType.NEW_EVENT,
-                        emailTemplateContent = mapOf(
-                            "title" to emailNewEventMessage.title,
-                            "message" to emailNewEventMessage.message,
-                            "description" to emailNewEventMessage.eventDescription,
-                            "eventUrl" to emailNewEventMessage.eventUrl,
-                        )
-                    )
-                }
             }
         } catch (ex: MessagingException) {
             // Handle error (logging is recommended here)
@@ -371,7 +346,7 @@ class EmailService(
         recipients: List<String>,
         emailSubject: String,
         emailTemplateType: EmailTemplateType,
-        emailTemplateContent: Map<String, String>,
+        emailTemplateContent: Map<String, Any?>,
     ) {
         val batchSize = 10
         val pauseMillis = 5000L
@@ -410,7 +385,7 @@ class EmailService(
         broadcaster: JavaMailSender,
         recipientEmail: String,
         emailSubject: String,
-        emailTemplateContent: Map<String, String>,
+        emailTemplateContent: Map<String, Any?>,
         emailTemplateType: EmailTemplateType
     ) {
         try {

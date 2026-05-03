@@ -7,15 +7,17 @@ data class EmailNewEventMessage(
     val title: String,
     val message: String,
     val eventDescription: String,
+    val eventAgenda: List<String> = emptyList(),
     val eventUrl: String,
 ): BaseModel {
-    constructor(): this("", "", "", "", "")
+    constructor(): this("", "", "", "", emptyList(),"")
 
     override fun toMap(): Map<String, Any?> = mapOf(
         "subject" to subject,
         "title" to title,
         "message" to message,
         "eventDescription" to eventDescription,
+        "eventAgenda" to eventAgenda,
         "eventUrl" to eventUrl,
     )
 }
