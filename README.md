@@ -55,7 +55,9 @@ Available deployment env options:
 ### Set Heroku ENVIRONMENTAL VARIABLES
 For the application functionality with firebase integration, Before we deploy, make sure in the heroku application, set the following environmental variables
 * `GOOGLE_CREDENTIALS` -> Google Firebase `google-service-account.json` file content
-* `PBC_ENV` -> According to the deployment environment, set the value as `staging` o `prod`.
+* `PBC_ENV` -> According to the deployment environment, set the value as `staging` or `prod`.
+* `PBC_MAIL_BROADCASTER_<ONE-TO-FIVE>_USERNAME` -> All one to five email usernames used to broadcast emails in PBC.
+* `PBC_MAIL_BROADCASTER_<ONE-TO-FIVE>_PASSWORD` -> All one to five email app-passwords used to broadcast emails in PBC.
 
 > [!NOTE]
 > This values already set in the existing heroku application. So no need to worry about that. But in case of new deployment, need to make sure these set-up correctly.
