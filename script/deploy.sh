@@ -12,7 +12,31 @@ PROD_SECRET=pbc-app-secrets/firebase-service-account-secrets/prod/pbc-live-servi
 PROPERTY_FILE=gradle.properties
 PROPERTY_KEY=versionName
 
-function fetchApplicationVersion() {
+#VERSION_UPGRADE_PATTERN="none"
+#
+#function request_parameters() {
+#  printf "Select the application versioning pattern"
+#  printf "\n"
+#  PS3="Select the version pattern:"
+#  local options=("Year" "Major" "Minor" "No-Upgrade")
+#
+#  COLUMNS=1
+#  select opt in "${options[@]}"
+#  do
+#    case $opt in
+#      "Year") VERSION_UPGRADE_PATTERN="year" break ;;
+#      "Major") VERSION_UPGRADE_PATTERN="major" break ;;
+#      "Minor") VERSION_UPGRADE_PATTERN="minor" break ;;
+#      "No-Upgrade") VERSION_UPGRADE_PATTERN="none" break ;;
+#      "*")
+#        echo "Invalid option $REPLY"
+#        break
+#        ;;
+#    esac
+#  done
+#}
+
+function fetch_application_version() {
     APP_VERSION=`cat $PROPERTY_FILE | grep "$PROPERTY_KEY" | cut -d"=" -f2 | tr -d " "`
 }
 
@@ -98,6 +122,9 @@ function heroku_staging_deploy() {
     else
       heroku login
     fi
+    local tag_name="v$APP_VERSION-staging"
+    git tag -a "$tag_name" -m "Create a tag for staging release v$APP_VERSION"
+    git push origin "$tag_name"
     git push heroku-staging main
 }
 
@@ -110,6 +137,9 @@ function heroku_prod_deploy() {
     else
       heroku login
     fi
+    local tag_name="v$APP_VERSION-prod"
+    git tag -a "$tag_name" -m "Create a tag for prod release v$APP_VERSION"
+    git push origin "$tag_name"
     git push heroku-prod main
 }
 
@@ -137,7 +167,7 @@ args=()
 env=$1
 
 ## Fetching the application version defined in gradle.properties
-fetchApplicationVersion
+fetch_application_version
 
 ## Execute the operation according to provided environment
 case $env in
@@ -155,6 +185,7 @@ case $env in
     fi
     ;;
   "staging"|"prod")
+    ## Execute deployments
     deploy_execution
     ;;
   *)
