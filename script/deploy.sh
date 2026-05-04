@@ -122,10 +122,17 @@ function heroku_staging_deploy() {
     else
       heroku login
     fi
+
+    ## push commit to heroku staging for deployment
+    git push heroku-staging main
+
+    ## create a tag for staging release
     local tag_name="v$APP_VERSION-staging"
     git tag -a "$tag_name" -m "Create a tag for staging release v$APP_VERSION"
+    ## push commit to origin main
+    git push origin main
+    ## push tag to origin
     git push origin "$tag_name"
-    git push heroku-staging main
 }
 
 function heroku_prod_deploy() {
@@ -137,10 +144,17 @@ function heroku_prod_deploy() {
     else
       heroku login
     fi
+
+    ## push commit to heroku prod for deployment
+    git push heroku-prod main
+
+    ## create a tag for staging release
     local tag_name="v$APP_VERSION-prod"
     git tag -a "$tag_name" -m "Create a tag for prod release v$APP_VERSION"
+    ## push commit to origin main
+    git push origin main
+    ## push tag to origin
     git push origin "$tag_name"
-    git push heroku-prod main
 }
 
 function deploy_execution() {
