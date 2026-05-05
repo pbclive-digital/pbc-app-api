@@ -56,5 +56,22 @@ function setup_local_properties() {
     printf "\n=====================================================================\n"
 }
 
+function setup_firebase_secrets() {
+    git clone https://github.com/pbclive-digital/pbc-app-secrets.git
+    if [ -d "pbc-app-secrets" ]; then
+      mv pbc-app-secrets/firebase-service-account-secrets/* module-remote-integration/src/resources/firebase/
+      rm -rf pbc-app-secrets
+
+      printf "\n=====================================================================\n"
+      printf "Successfully setup firebase-app-secrets for local testing."
+      printf "\n=====================================================================\n"
+    else
+      printf "\n=====================================================================\n"
+      printf "Firebase app-secrets not setup, because pbc-app-secrets private repo is failed to clone."
+      printf "\n=====================================================================\n"
+    fi
+}
+
 setup_git_remotes
 setup_local_properties
+setup_firebase_secrets

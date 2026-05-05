@@ -13,9 +13,10 @@ and web app to deliver few of functionalities to devotes.
  * Firebase - FireStore
 
 ## Setup
-After any developer close the code from Github. They can run setup.sh script for setting up the local environment.
+After clone the code from Github. Run `setup.sh` script for setting up the local environment.
 This will configure followings
- * Configure STAGING & PROD heroku remotes into the project. 
+ * Configure STAGING & PROD heroku remotes into the project.
+ * Adding firebase-service-account-keys. (For this you need `pbc-app-secrets` private repository access.)
  * Add `local.properties` file for local debugging with required fields. (Developer need to configure relevant values)
 
 ### Execute setup.sh
@@ -49,13 +50,6 @@ For the application functionality with firebase integration, Before we deploy, m
 
 > [!NOTE]
 > This values already set in the existing heroku application. So no need to worry about that. But in case of new deployment, need to make sure these set-up correctly.
-
-### Deploy any custom branch to Staging env to testing.
-If we need to deploy a change to staging server (QA) without merging to develop branch as a release, use following command
-to deploy feature branch to staging server.
-````
-   git push heroku-staging <feature-development>:master
-````
 
 ### Release Naming
 Application is following pattern to name the releases. It built with release year, major or feature drop version, minor or bug-fix.
@@ -95,6 +89,13 @@ Following are the available options developer can pass as environment.
 - Heroku CLI installed in the system
 - Need to add the `heroku-staging` & `heroku-prod` remotes to the local git repository.
 
+### Deploy any custom branch to Staging env to testing.
+If we need to deploy a change to staging server (QA) without merging to develop branch as a release, use following command
+to deploy feature branch to staging server.
+````
+   git push heroku-staging <feature-development>:master
+````
+
 ## Notes
  * All tool version is configured in `pbc-app-api/gradle/version-catalog/libs.versions.toml`.
  * To Change Java version, make sure to change it in `libs.versions.toml` & `settings.properties`. By changing in `libs.versions.toml` will apply changes to 
@@ -112,7 +113,7 @@ Following are the available options developer can pass as environment.
        java.runtime.version=24
      ````
 
-### Debug using IntelliJ
+## Debug using IntelliJ
  * Before attached debugger in IntelliJ, open the `AppProperties.kt` file and hardcode the values to `appEnv="staging"`.
    While debugging, it failed to read the properties. 
 
