@@ -65,12 +65,12 @@ Example : 2025.1.0
 ````
 
 ### Steps to follow in new release
-1. Create a release branch from master branch according to this naming template release/<release-version-name>. Eg: release/2026.1.0.
+1. Create a release branch from master branch according to this naming template `release/<release-version-name>`. Eg: release/2026.1.0.
 2. Merge selected feature branches for specific release to the release branch above created.
 3. Update the application version to new version in gradle.properties file and resources/application.properties in pbc-api spring-boot module.
 4. Create a pull request to master branch from release branch.
 5. Merge pull request to master and fetch master branch change to local.
-6. Use `deploy.sh` script to do deployment to <local/staging/prod>
+6. Use `deploy.sh` script to do deployment to `<local/staging/prod>`
 
 ### Use `deploy.sh` script for different deployment scenarios.
 Developer can use this script to run the application in local for development, deploy application to staging-environment and
