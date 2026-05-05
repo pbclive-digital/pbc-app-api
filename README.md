@@ -40,18 +40,6 @@ production. Both environments are in Heroku. To do the deployments, developer ne
 related with staging / production. Once developer get the access to heroku environments, they can use deploy.sh script to 
 do the deployments.
 
-### Use deploy.sh
-Developer can use this script to run the application in local for development, deploy application to staging-environment and
-deploy application to production environment. 
-````
-$ ./script/deploy <deployment-environment>
-
-Available deployment env options:
-    - local:    Run the application in local for development / testing. Deploy on [localhost:8082]
-    - staging:  Deploy application in staging environment.
-    - prod:     Deploy application in producation environment.
-````
-
 ### Set Heroku ENVIRONMENTAL VARIABLES
 For the application functionality with firebase integration, Before we deploy, make sure in the heroku application, set the following environmental variables
 * `GOOGLE_CREDENTIALS` -> Google Firebase `google-service-account.json` file content
@@ -77,9 +65,11 @@ Example : 2025.1.0
 ````
 
 ### Use `depploy.sh` script for different deployment scenarios.
+Developer can use this script to run the application in local for development, deploy application to staging-environment and
+deploy application to production environment.
 This `deploy.sh` script is created for make the deployment process easy to all developers. Currently, developer can execute the `deploy.sh` script as follows.
 ````
-    ./deploy.sh <env-name-to-deploy>
+    ./script/deploy.sh <env-name-to-deploy>
 ````
 
 This `env-name-to-deploy` is an argument while execute the script. From that script will identify which environment that developer want to deploy the new app.
