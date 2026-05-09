@@ -64,6 +64,7 @@ class SecurityConfiguration {
 
         val allowedOriginList = when(appProperties.appEnv) {
             "dev", "staging" -> listOf("http://localhost:8080", "https://pbclive-digital.github.io")
+            "prod" -> listOf("https://pbc-live-prod.web.app", "https://pbc-live-prod.firebaseapp.com")
             else -> emptyList()
         }
 
