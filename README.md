@@ -52,9 +52,9 @@ For the application functionality with firebase integration, Before we deploy, m
 > This values already set in the existing heroku application. So no need to worry about that. But in case of new deployment, need to make sure these set-up correctly.
 
 ### Release Naming
-Application is following pattern to name the releases. It built with release year, major or feature drop version, minor or bug-fix.
+Application is following pattern to name the releases. It built with release year, release month, release index for the month.
 ````
-Pattern : <release-year>.<major/feature-drop>.<minor/bug-fx> 
+Pattern : <release-year>.<release-month>.<release index for the month> 
 Example : 2025.1.0
 ````
 
