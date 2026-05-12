@@ -54,7 +54,7 @@
         }
 
         .content {
-            padding: 0 10px 10px 30px;
+            padding: 0 10px 10px 10px;
             text-align: left;
             line-height: 1.6;
         }
@@ -71,6 +71,7 @@
             font-size: 16px;
             font-weight: bold;
             color: #2c3e50;
+            margin-left: 30px;
             margin-bottom: 8px;
             text-align: start;
         }
@@ -109,25 +110,25 @@
 
     <tr>
         <td class="content">
-            <p style="text-align: center;">Pittsburgh Buddhist Center is hosting a new event</p>
+            <p style="text-align: center; padding: 0 10px 10px 30px;">Pittsburgh Buddhist Center is hosting a new event</p>
 
             <div class="title" th:text="${title}">Email Title Goes Here</div>
 
-            <p th:text="${message}">
+            <p th:text="${message}" style="padding: 0 10px 10px 30px">
                 This is where your primary email content will live. You can pass any string from your Spring Boot
                 controller to populate this area.
             </p>
 
             <div class="sub-title">Brief about the event</div>
 
-            <p th:text="${description}">
+            <p th:text="${description}" style="padding: 0 10px 10px 30px">
                 This will contain the same event description that have given when event was created.
             </p>
 
             <div th:if="${not #lists.isEmpty(eventAgenda)}">
                 <div class="sub-title">Event Agenda:</div>
 
-                <ul style="padding-left: 30px; color: #2c3e50;">
+                <ul style="padding-left: 50px; color: #2c3e50;">
                     <li th:each="agendaItem : ${eventAgenda}"
                         th:text="${agendaItem}"
                         style="margin-bottom: 10px;">
