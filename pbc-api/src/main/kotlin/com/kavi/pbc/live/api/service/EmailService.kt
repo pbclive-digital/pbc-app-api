@@ -407,6 +407,19 @@ class EmailService(
                 }
             }
 
+            var textContent = when (emailTemplateType) {
+                EmailTemplateType.BROADCAST -> {
+                    "This is a broadcast email from Pittsburgh Buddhist Center"
+                }
+
+                EmailTemplateType.NEW_EVENT -> {
+                    "This is a event notification email from Pittsburgh Buddhist Center"
+                }
+            }
+            emailTemplateContent.keys.forEach { key ->
+                textContent = textContent + "\n" + emailTemplateContent[key].toString()
+            }
+
             // 2. Set Email Metadata
             helper.setFrom(getSenderUserName(broadcaster)?: "pbclive.digital@gmail.com")
             helper.setTo(recipientEmail)
@@ -414,7 +427,7 @@ class EmailService(
 
             // 3. Attach the processed HTML content
             // The 'true' flag indicates this is an HTML email
-            helper.setText(htmlContent, true)
+            helper.setText(textContent, htmlContent)
 
             // 4. Add the inline image
             val res = ClassPathResource("static/images/image_pbc.png")
