@@ -240,6 +240,31 @@ class EmailService(
         }
     }
 
+    fun unsubscribeFromEmailNotification(email: String): ResponseEntity<BaseResponse<String>>? {
+        val allEmailGroups = datastoreRepositoryContract.getAllInEntity(DatastoreConstant.EMAIL_GROUP_COLLECTION, EmailGroup::class.java)
+        allEmailGroups.forEach { emailGroup ->
+            if (emailGroup.id != GENERAL_EMAIL_GROUP_ID) {
+                if (emailGroup.emails.any { it.email == email }) {
+                    val newEmailList = emailGroup.emails.filterNot { it.email == email }
+                    val updatedEmailGroup = EmailGroup(
+                        emailGroup.id, emailGroup.name,
+                        newEmailList as MutableList<EmailItem>
+                    )
+                    datastoreRepositoryContract.updateEntity(
+                        entityCollection = DatastoreConstant.EMAIL_GROUP_COLLECTION,
+                        entityId = emailGroup.id,
+                        updatedEmailGroup
+                    )
+                }
+            }
+        }
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(BaseResponse(Status.SUCCESS,
+                "Initiate the request to unsubscribe given email from the email groups",
+                null))
+    }
+
     fun deleteEmailGroup(groupId: String): ResponseEntity<BaseResponse<String>>? {
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -253,7 +278,6 @@ class EmailService(
         selectedEmailGroups: List<EmailGroupHeading> = emptyList(),
     ): ResponseEntity<BaseResponse<String>>? {
         try {
-
             val mergeResultSet = if (selectedEmailGroups.isNotEmpty()) {
                 fetchEmailsAsRecipients(selectedEmailGroups)
             } else {
@@ -421,7 +445,7 @@ class EmailService(
             }
 
             // 2. Set Email Metadata
-            helper.setFrom(getSenderUserName(broadcaster)?: "pbclive.digital@gmail.com")
+            helper.setFrom(getSenderUserName(broadcaster)?: "info@pittsburghbuddhistcenter.org")
             helper.setTo(recipientEmail)
             helper.setSubject(emailSubject)
 
@@ -432,6 +456,20 @@ class EmailService(
             // 4. Add the inline image
             val res = ClassPathResource("static/images/image_pbc.png")
             helper.addInline("logo", res)
+
+            // 5. Add the critical headers
+            val unsubscribeUrl = when(appProperties.appEnv) {
+                "prod" -> {
+                    "https://pbc-api-prod-c38d60f1a699.herokuapp.com/email-group/unsubscribe/$recipientEmail"
+                }
+                else -> {
+                    "https://pbc-api-staging-1f3fe32cb947.herokuapp.com/email-group/unsubscribe/$recipientEmail"
+                }
+            }
+            val mailtoLink = "mailto:pbclive.digital@gmail.com"
+
+            mimeMessage.setHeader("List-Unsubscribe", "<$unsubscribeUrl>, <$mailtoLink>");
+            mimeMessage.setHeader("List-Unsubscribe-Post", "List-Unsubscribe=One-Click");
 
             broadcaster.send(mimeMessage)
         } catch (ex: Exception) {
