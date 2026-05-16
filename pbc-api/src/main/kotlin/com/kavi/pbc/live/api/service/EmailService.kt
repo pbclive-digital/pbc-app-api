@@ -375,7 +375,7 @@ class EmailService(
             var broadcasterIterationCount: Int
             chunks.forEachIndexed { index, batch ->
                 /**
-                 * This logic is to iterate the email senders via braches
+                 * This logic is to iterate the email senders via batches
                  */
                 broadcasterIterationCount = index / appProperties.mailBroadcasterCount.toInt()
                 broadcasterIndex = index - appProperties.mailBroadcasterCount.toInt() * broadcasterIterationCount
