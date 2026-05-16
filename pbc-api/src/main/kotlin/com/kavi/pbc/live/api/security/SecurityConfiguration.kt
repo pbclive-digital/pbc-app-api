@@ -42,7 +42,11 @@ class SecurityConfiguration {
                     .requestMatchers("/news/delete/**").authenticated()
                     .requestMatchers("/news/add/image/**").authenticated()
                     .requestMatchers("/broadcast/message/**").authenticated()
-                    .requestMatchers("/email-group/**").authenticated()
+                    .requestMatchers("/email-group/create/**").authenticated()
+                    .requestMatchers("/email-group/get/**").authenticated()
+                    .requestMatchers("/email-group/add/**").authenticated()
+                    .requestMatchers("/email-group/remove/**").authenticated()
+                    .requestMatchers("/email-group/delete/**").authenticated()
                     .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                     .anyRequest().permitAll()
             }

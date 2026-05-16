@@ -134,6 +134,18 @@ class EmailController(private val emailService: EmailService) {
         return response
     }
 
+    // This should be a post request to access by email `Unsubscribe` button.
+    @PostMapping("/unsubscribe/{email}")
+    fun unsubscribeFromEmailNotifications(@PathVariable(value = "email") email: String): ResponseEntity<BaseResponse<String>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: PUT: [/email-group/unsubscribe/$email]", EmailController::class.java)
+
+        val response = emailService.unsubscribeFromEmailNotification(email)
+        logger.printResponseInfo(response, EmailController::class.java)
+
+        return response
+    }
+
     @DeleteMapping("/delete/{group-id}")
     fun deleteEmailGroup(@PathVariable(value = "group-id") groupId: String): ResponseEntity<BaseResponse<String>>? {
         logger.printSeparator()
