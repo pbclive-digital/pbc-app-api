@@ -25,33 +25,21 @@ class MailConfig {
         return sender
     }
 
-    @Bean(name = ["broadcastSenderOne"])
-    fun broadcastSenderOne(
-        @Value($$"${mail.broadcast.one.username}") user: String,
-        @Value($$"${mail.broadcast.one.password}") pass: String
+    @Bean(name = ["eventNotifier"])
+    fun eventEmailNotifier(
+        @Value($$"${mail.event.username}") user: String,
+        @Value($$"${mail.event.password}") pass: String
     ): JavaMailSender = createSender(user, pass)
 
-    @Bean(name = ["broadcastSenderTwo"])
-    fun broadcastSenderTwo(
-        @Value($$"${mail.broadcast.two.username}") user: String,
-        @Value($$"${mail.broadcast.two.password}") pass: String
+    @Bean(name = ["infoNotifier"])
+    fun infoEmailNotifier(
+        @Value($$"${mail.info.username}") user: String,
+        @Value($$"${mail.info.password}") pass: String
     ): JavaMailSender = createSender(user, pass)
 
-    @Bean(name = ["broadcastSenderThree"])
-    fun broadcastSenderThree(
-        @Value($$"${mail.broadcast.three.username}") user: String,
-        @Value($$"${mail.broadcast.three.password}") pass: String
-    ): JavaMailSender = createSender(user, pass)
-
-    @Bean(name = ["broadcastSenderFour"])
-    fun broadcastSenderFour(
-        @Value($$"${mail.broadcast.four.username}") user: String,
-        @Value($$"${mail.broadcast.four.password}") pass: String
-    ): JavaMailSender = createSender(user, pass)
-
-    @Bean(name = ["broadcastSenderFive"])
-    fun broadcastSenderFive(
-        @Value($$"${mail.broadcast.five.username}") user: String,
-        @Value($$"${mail.broadcast.five.password}") pass: String
+    @Bean(name = ["broadcastNotifier"])
+    fun broadcastEmailNotifier(
+        @Value($$"${mail.broadcast.username}") user: String,
+        @Value($$"${mail.broadcast.password}") pass: String
     ): JavaMailSender = createSender(user, pass)
 }

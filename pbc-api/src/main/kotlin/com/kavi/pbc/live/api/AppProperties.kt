@@ -19,7 +19,4 @@ class AppProperties {
 
     @Value($$"${android.support.version}")
     lateinit var androidSupportVersion: String
-
-    @Value($$"${mail.broadcaster.count}")
-    lateinit var mailBroadcasterCount: String
 }
