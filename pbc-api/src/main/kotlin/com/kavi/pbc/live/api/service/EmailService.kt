@@ -453,7 +453,8 @@ class EmailService(
             helper.setText(textContent, htmlContent)
 
             // 4. Add the inline image
-            val res = ClassPathResource("static/images/image_pbc.png")
+            //val res = ClassPathResource("static/images/image_pbc.png")
+            val res = ClassPathResource("static/images/image_pbc_with_name.png")
             helper.addInline("logo", res)
 
             // 5. Add the critical headers
