@@ -57,6 +57,9 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
     @Autowired
     lateinit var fileService: FileService
 
+    @Autowired
+    lateinit var appProperties: AppProperties
+
     private var fileStorageLocation: Path
     private var datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
 
@@ -415,13 +418,18 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
             data = pushNotificationData
         )
 
+        val eventUrl = when(appProperties.appEnv) {
+            "prod" -> "https://pbc-live-prod.web.app/#event/event-selected/${event.id}"
+            else -> "https://pbclive-digital.github.io/pbc-web-app/#event/event-selected/${event.id}"
+        }
+
         val newEventEmail = EmailNewEventMessage(
             subject = "PBC Event: Notification",
             title = event.name,
             message = "To all our friends, we are kindly inform you that we are hosting a new event. Our new event is ${event.name}. We are invite you all to be a part of this event.",
             eventDescription = event.description,
             eventAgenda = event.agendaItemList ?: emptyList(),
-            eventUrl = "https://pbclive-digital.github.io/pbc-web-app/#event/event-selected/${event.id}"
+            eventUrl = eventUrl
         )
 
         if (emailGroupHeadings?.isNotEmpty() == true) {

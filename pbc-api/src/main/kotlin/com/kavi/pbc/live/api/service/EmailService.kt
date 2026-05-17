@@ -23,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.Resource
@@ -46,7 +47,9 @@ import java.nio.charset.StandardCharsets
 
 @Service
 class EmailService(
-    private val allBroadcasters: List<JavaMailSender>
+    @Qualifier("eventNotifier") private val eventNotifier: JavaMailSender,
+    @Qualifier("infoNotifier") private val infoNotifier: JavaMailSender,
+    @Qualifier("broadcastNotifier") private val broadcastNotifier: JavaMailSender,
 ) {
 
     @Autowired
@@ -288,6 +291,7 @@ class EmailService(
             val emailList = mergeResultSet.toList()
             if (emailList.isNotEmpty()) {
                 sendInBatches(
+                    emailSender = broadcastNotifier,
                     recipients = emailList,
                     emailSubject = emailBroadcastMessage.subject,
                     emailTemplateType = EmailTemplateType.BROADCAST,
@@ -331,6 +335,7 @@ class EmailService(
         try {
             if (emailList.isNotEmpty()) {
                 sendInBatches(
+                    emailSender = eventNotifier,
                     recipients = emailList,
                     emailSubject = emailNewEventMessage.subject,
                     emailTemplateType = EmailTemplateType.NEW_EVENT,
@@ -359,6 +364,7 @@ class EmailService(
     }
 
     private fun sendInBatches(
+        emailSender: JavaMailSender,
         recipients: List<String>,
         emailSubject: String,
         emailTemplateType: EmailTemplateType,
@@ -371,17 +377,10 @@ class EmailService(
         val chunks = recipients.chunked(batchSize)
 
         CoroutineScope(Dispatchers.IO).launch {
-            var broadcasterIndex: Int
-            var broadcasterIterationCount: Int
             chunks.forEachIndexed { index, batch ->
-                /**
-                 * This logic is to iterate the email senders via batches
-                 */
-                broadcasterIterationCount = index / appProperties.mailBroadcasterCount.toInt()
-                broadcasterIndex = index - appProperties.mailBroadcasterCount.toInt() * broadcasterIterationCount
                 batch.forEach { email ->
                     sendHtmlEmail(
-                        allBroadcasters[broadcasterIndex],
+                        emailSender,
                         email,
                         emailSubject,
                         emailTemplateContent,
@@ -459,14 +458,13 @@ class EmailService(
 
             // 5. Add the critical headers
             val unsubscribeUrl = when(appProperties.appEnv) {
-                "prod" -> {
-                    "https://pbc-api-prod-c38d60f1a699.herokuapp.com/email-group/unsubscribe/$recipientEmail"
-                }
-                else -> {
-                    "https://pbc-api-staging-1f3fe32cb947.herokuapp.com/email-group/unsubscribe/$recipientEmail"
-                }
+                "prod" -> "https://pbc-api-prod-c38d60f1a699.herokuapp.com/email-group/unsubscribe/$recipientEmail"
+                else -> "https://pbc-api-staging-1f3fe32cb947.herokuapp.com/email-group/unsubscribe/$recipientEmail"
             }
-            val mailtoLink = "mailto:pbclive.digital@gmail.com"
+            val mailtoLink = when(appProperties.appEnv) {
+                "prod" -> "mailto:info@pittsburghbuddhistcenter.org"
+                else -> "mailto:pbclive.digital@gmail.com"
+            }
 
             mimeMessage.setHeader("List-Unsubscribe", "<$unsubscribeUrl>, <$mailtoLink>");
             mimeMessage.setHeader("List-Unsubscribe-Post", "List-Unsubscribe=One-Click");
