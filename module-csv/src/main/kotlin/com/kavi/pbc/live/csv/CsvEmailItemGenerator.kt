@@ -17,13 +17,22 @@ class CsvEmailItemGenerator {
             val email = row[0].trim()
             val ownerName = row[1].trim()
 
-            if (email == "EMAIL" && ownerName == "OWNER NAME") {
+            if (email == "EMAIL" && ownerName == "OWNER NAME") { // IF THIS IS COLUMN HEADINGS
+                return@lit
+            } else if (email.isEmpty()) { // IF EMAIL IS EMPTY
                 return@lit
             } else {
-                emailItemList.add(EmailItem(email, ownerName))
+                if (isValidEmail(email)) {
+                    emailItemList.add(EmailItem(email, ownerName))
+                }
             }
         }
 
         return emailItemList
+    }
+
+    fun isValidEmail(email: String): Boolean {
+        val emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$".toRegex()
+        return emailRegex.matches(email)
     }
 }
