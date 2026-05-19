@@ -68,8 +68,7 @@ class SecurityConfiguration {
 
         val allowedOriginList = when(appProperties.appEnv) {
             "dev", "staging" -> listOf("http://localhost:8080", "https://pbclive-digital.github.io")
-            // TODO: IMPORTANT make sure to remove localhost:8080 whitelisting
-            "prod" -> listOf("http://localhost:8080", "https://pbc-live-prod.web.app", "https://pbc-live-prod.firebaseapp.com")
+            "prod" -> listOf("https://pbc-live-prod.web.app", "https://pbc-live-prod.firebaseapp.com", "https://app.pittsburghbuddhistcenter.org")
             else -> emptyList()
         }
 
