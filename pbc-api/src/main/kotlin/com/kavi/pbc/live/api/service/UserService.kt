@@ -8,7 +8,6 @@ import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.Fireba
 import com.kavi.pbc.live.data.model.user.User
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
 import com.kavi.pbc.live.data.constant.GENERAL_EMAIL_GROUP_ID
-import com.kavi.pbc.live.data.model.email.EmailGroup
 import com.kavi.pbc.live.data.model.email.EmailItem
 import com.kavi.pbc.live.data.model.notification.PushTokenData
 import com.kavi.pbc.live.data.model.user.UserRoleUpdateReq
@@ -161,6 +160,28 @@ class UserService {
                 .status(HttpStatus.NOT_FOUND)
                 .body(BaseResponse(Status.ERROR, null, listOf(
                     Error("${HttpStatus.NOT_FOUND.toString()} due to No valid name provided to search"))
+                ))
+        }
+    }
+
+    fun getUserListByType(userType: UserType): ResponseEntity<BaseResponse<List<User>>>? {
+        val properties = mapOf(
+            "userType" to userType
+        )
+
+        val userList = datastoreRepositoryContract.getEntityListFromProperties(
+            entityCollection = DatastoreConstant.USER_COLLECTION,
+            propertiesMap = properties,
+            className = User::class.java
+        )
+
+        return if (userList.isNotEmpty()) {
+            ResponseEntity.ok(BaseResponse(Status.SUCCESS, userList, null))
+        } else {
+            ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error(HttpStatus.NOT_FOUND.toString()))
                 ))
         }
     }
