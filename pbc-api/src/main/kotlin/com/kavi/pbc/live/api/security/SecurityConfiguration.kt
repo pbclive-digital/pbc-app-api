@@ -33,7 +33,6 @@ class SecurityConfiguration {
                     .requestMatchers("/event/put/publish/**").authenticated()
                     .requestMatchers("/event/update/**").authenticated()
                     .requestMatchers("/event/delete/**").authenticated()
-                    .requestMatchers("/user/update/**").authenticated()
                     .requestMatchers("/appointment/**").authenticated()
                     .requestMatchers("/news/create/**").authenticated()
                     .requestMatchers("/news/update/**").authenticated()
@@ -47,6 +46,9 @@ class SecurityConfiguration {
                     .requestMatchers("/email-group/add/**").authenticated()
                     .requestMatchers("/email-group/remove/**").authenticated()
                     .requestMatchers("/email-group/delete/**").authenticated()
+                    .requestMatchers("/user/get/**").authenticated()
+                    .requestMatchers("/user/update/**").authenticated()
+                    .requestMatchers("/user/delete/**").authenticated()
                     .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                     .anyRequest().permitAll()
             }
