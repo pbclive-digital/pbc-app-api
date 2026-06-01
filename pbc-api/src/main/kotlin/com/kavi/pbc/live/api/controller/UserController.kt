@@ -6,6 +6,7 @@ import com.kavi.pbc.live.api.util.AppLogger
 import com.kavi.pbc.live.data.model.notification.PushTokenData
 import com.kavi.pbc.live.data.model.user.User
 import com.kavi.pbc.live.data.model.user.UserRoleUpdateReq
+import com.kavi.pbc.live.data.model.user.UserType
 import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -66,6 +67,39 @@ class UserController(private val userService: UserService) {
         logger.printInfo("REQUEST MAPPING: GET: [/user/get/name/$name]", UserController::class.java)
 
         val response = userService.searchUserByName(name)
+        logger.printResponseInfo(response, UserController::class.java)
+
+        return response
+    }
+
+    @GetMapping("/get/admins")
+    fun getAdminUserList(): ResponseEntity<BaseResponse<List<User>>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET: [/user/get/admins]", UserController::class.java)
+
+        val response = userService.getUserListByType(userType = UserType.ADMIN)
+        logger.printResponseInfo(response, UserController::class.java)
+
+        return response
+    }
+
+    @GetMapping("/get/consumers")
+    fun getConsumerUserList(): ResponseEntity<BaseResponse<List<User>>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET: [/user/get/consumers]", UserController::class.java)
+
+        val response = userService.getUserListByType(userType = UserType.CONSUMER)
+        logger.printResponseInfo(response, UserController::class.java)
+
+        return response
+    }
+
+    @GetMapping("/get/resident-monks")
+    fun getResidentMonksList(): ResponseEntity<BaseResponse<List<User>>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET: [/user/get/resident-monks]", UserController::class.java)
+
+        val response = userService.getUserListByType(userType = UserType.MONK, isResidentMonkStatus = true)
         logger.printResponseInfo(response, UserController::class.java)
 
         return response
