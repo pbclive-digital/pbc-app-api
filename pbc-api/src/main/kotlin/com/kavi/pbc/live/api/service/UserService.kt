@@ -164,10 +164,17 @@ class UserService {
         }
     }
 
-    fun getUserListByType(userType: UserType): ResponseEntity<BaseResponse<List<User>>>? {
-        val properties = mapOf(
-            "userType" to userType
-        )
+    fun getUserListByType(userType: UserType, isResidentMonkStatus: Boolean = false): ResponseEntity<BaseResponse<List<User>>>? {
+        val properties = if (userType == UserType.MONK && isResidentMonkStatus) {
+            mapOf(
+                "userType" to userType,
+                "residentMonk" to true
+            )
+        } else {
+            mapOf(
+                "userType" to userType
+            )
+        }
 
         val userList = datastoreRepositoryContract.getEntityListFromProperties(
             entityCollection = DatastoreConstant.USER_COLLECTION,

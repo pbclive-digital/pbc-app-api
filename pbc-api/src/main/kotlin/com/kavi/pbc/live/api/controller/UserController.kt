@@ -94,6 +94,17 @@ class UserController(private val userService: UserService) {
         return response
     }
 
+    @GetMapping("/get/resident-monks")
+    fun getResidentMonksList(): ResponseEntity<BaseResponse<List<User>>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: GET: [/user/get/resident-monks]", UserController::class.java)
+
+        val response = userService.getUserListByType(userType = UserType.MONK, isResidentMonkStatus = true)
+        logger.printResponseInfo(response, UserController::class.java)
+
+        return response
+    }
+
     @PutMapping("/update/{user-id}")
     fun updateUser(@PathVariable(value = "user-id") userId: String, @Valid @RequestBody user: User):
             ResponseEntity<BaseResponse<User>>? {
