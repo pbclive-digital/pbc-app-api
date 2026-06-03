@@ -46,7 +46,6 @@ class SecurityConfiguration {
                     .requestMatchers("/email-group/add/**").authenticated()
                     .requestMatchers("/email-group/remove/**").authenticated()
                     .requestMatchers("/email-group/delete/**").authenticated()
-                    .requestMatchers("/user/get/**").authenticated()
                     .requestMatchers("/user/update/**").authenticated()
                     .requestMatchers("/user/delete/**").authenticated()
                     .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
