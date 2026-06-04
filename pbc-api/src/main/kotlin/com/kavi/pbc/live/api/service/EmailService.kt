@@ -4,19 +4,24 @@ import com.kavi.pbc.live.api.AppProperties
 import com.kavi.pbc.live.api.data.dto.BaseResponse
 import com.kavi.pbc.live.api.data.dto.Error
 import com.kavi.pbc.live.api.data.dto.Status
-import com.kavi.pbc.live.api.data.model.EmailTemplateType
 import com.kavi.pbc.live.api.util.AppLogger
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.DatastoreRepositoryContract
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.DatastoreConstant
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.FirebaseDatastoreRepository
+import com.kavi.pbc.live.com.kavi.pbc.live.integration.firebase.datastore.pagination.helper.EmailRecordPaginationHelper
 import com.kavi.pbc.live.csv.CsvEmailItemGenerator
 import com.kavi.pbc.live.data.constant.GENERAL_EMAIL_GROUP_ID
 import com.kavi.pbc.live.data.constant.GENERAL_EMAIL_GROUP_NAME
 import com.kavi.pbc.live.data.model.broadcast.EmailBroadcastMessage
 import com.kavi.pbc.live.data.model.broadcast.EmailNewEventMessage
+import com.kavi.pbc.live.data.model.broadcast.EmailTemplateType
+import com.kavi.pbc.live.data.model.broadcast.record.EmailRecord
+import com.kavi.pbc.live.data.model.broadcast.record.EmailRecordContent
 import com.kavi.pbc.live.data.model.email.EmailGroup
 import com.kavi.pbc.live.data.model.email.EmailGroupHeading
 import com.kavi.pbc.live.data.model.email.EmailItem
+import com.kavi.pbc.live.integration.firebase.datastore.pagination.model.PaginationRequest
+import com.kavi.pbc.live.integration.firebase.datastore.pagination.model.PaginationResponse
 import jakarta.mail.MessagingException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -61,7 +66,8 @@ class EmailService(
     @Autowired
     lateinit var logger: AppLogger
 
-    private var datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
+    private val datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
+    private val emailRecordPaginationHelper = EmailRecordPaginationHelper()
 
     @Value("classpath:email-group-template/email-group-csv-file-template.csv")
     var emailGroupCSVTemplateResource: Resource? = null
@@ -276,6 +282,29 @@ class EmailService(
                 null))
     }
 
+    fun getEmailRecords(paginationRequest: PaginationRequest?): ResponseEntity<BaseResponse<PaginationResponse<EmailRecord>>>? {
+
+        val emailRecordResponse = emailRecordPaginationHelper.getAllEmailRecordList(paginationRequest?.previousPageLastDocKey)
+
+        return if (emailRecordResponse.entityList.isNotEmpty()) {
+            ResponseEntity.ok(BaseResponse(Status.SUCCESS, emailRecordResponse, null))
+        } else {
+            if (emailRecordResponse.previousPageLastDocKey == "NO-NEXT-PAGE") {
+                ResponseEntity
+                    .status(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE)
+                    .body(BaseResponse(Status.ERROR, null, listOf(
+                        Error(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE.toString()))
+                    ))
+            } else {
+                ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(BaseResponse(Status.ERROR, null, listOf(
+                        Error(HttpStatus.NOT_FOUND.toString()))
+                    ))
+            }
+        }
+    }
+
     fun sendBroadcastEmail(
         emailBroadcastMessage: EmailBroadcastMessage,
         selectedEmailGroups: List<EmailGroupHeading> = emptyList(),
@@ -301,6 +330,19 @@ class EmailService(
                     )
                 )
             }
+
+            // Store the send email in email records
+            val broadcastRecord = EmailRecord(
+                emailTemplate = EmailTemplateType.BROADCAST,
+                emailGroupHeadings = selectedEmailGroups,
+                emailRecordContent = EmailRecordContent(
+                    subject = emailBroadcastMessage.subject,
+                    title = emailBroadcastMessage.title,
+                    message = emailBroadcastMessage.message,
+                )
+            )
+            datastoreRepositoryContract.createEntity(DatastoreConstant.EMAIL_RECORD_COLLECTION,
+                broadcastRecord.id, broadcastRecord)
 
             return ResponseEntity
                 .status(HttpStatus.OK)
@@ -348,6 +390,22 @@ class EmailService(
                     )
                 )
             }
+
+            // Store the send email in email records
+            val broadcastRecord = EmailRecord(
+                emailTemplate = EmailTemplateType.NEW_EVENT,
+                emailGroupHeadings = emailGroups,
+                emailRecordContent = EmailRecordContent(
+                    subject = emailNewEventMessage.subject,
+                    title = emailNewEventMessage.title,
+                    message = emailNewEventMessage.message,
+                    eventDescription = emailNewEventMessage.eventDescription,
+                    eventAgenda = emailNewEventMessage.eventAgenda,
+                    eventUrl = emailNewEventMessage.eventUrl,
+                )
+            )
+            datastoreRepositoryContract.createEntity(DatastoreConstant.EMAIL_RECORD_COLLECTION,
+                broadcastRecord.id, broadcastRecord)
         } catch (ex: MessagingException) {
             // Handle error (logging is recommended here)
             ex.printStackTrace()

@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service
 @Service
 class QuestionService {
 
-    private var datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
+    private val datastoreRepositoryContract: DatastoreRepositoryContract = FirebaseDatastoreRepository()
     private val questionPaginationHelper = QuestionPaginationHelper()
 
     fun createQuestion(question: Question): ResponseEntity<BaseResponse<String>>? {
@@ -68,12 +68,12 @@ class QuestionService {
             isMonk = user.userType == UserType.MONK
         }
 
-        val response = questionPaginationHelper.getAllQuestionList(paginationRequest?.previousPageLastDocKey, isMonk)
+        val questionsResponse = questionPaginationHelper.getAllQuestionList(paginationRequest?.previousPageLastDocKey, isMonk)
 
-        return if (response.entityList.isNotEmpty()) {
-            ResponseEntity.ok(BaseResponse(Status.SUCCESS, response, null))
+        return if (questionsResponse.entityList.isNotEmpty()) {
+            ResponseEntity.ok(BaseResponse(Status.SUCCESS, questionsResponse, null))
         } else {
-            if (response.previousPageLastDocKey == "NO-NEXT-PAGE") {
+            if (questionsResponse.previousPageLastDocKey == "NO-NEXT-PAGE") {
                 ResponseEntity
                     .status(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE)
                     .body(BaseResponse(Status.ERROR, null, listOf(

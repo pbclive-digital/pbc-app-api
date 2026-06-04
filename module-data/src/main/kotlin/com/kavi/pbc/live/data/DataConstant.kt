@@ -15,7 +15,7 @@ object DataConstant {
     const val PAGINATION_LIFE_TIME = 2 // From minutes
     const val PAGINATION_SCHEDULER_RUN_INTERVAL = 5 // From seconds
     const val QUESTION_PAGE_SIZE = 10
-    const val QUESTION_GROUP_PAGE_SIZE = 50
+    const val EMAIL_RECORD_PAGE_SIZE = 20
 
     const val EXPORT_FILE_CLEAN = 5 // From minutes
 

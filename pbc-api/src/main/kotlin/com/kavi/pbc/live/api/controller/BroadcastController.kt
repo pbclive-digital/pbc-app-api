@@ -7,6 +7,10 @@ import com.kavi.pbc.live.api.service.EmailService
 import com.kavi.pbc.live.api.util.AppLogger
 import com.kavi.pbc.live.data.model.broadcast.EmailBroadcastMessage
 import com.kavi.pbc.live.data.model.broadcast.NotificationMessage
+import com.kavi.pbc.live.data.model.broadcast.record.EmailRecord
+import com.kavi.pbc.live.integration.firebase.datastore.pagination.model.PaginationRequest
+import com.kavi.pbc.live.integration.firebase.datastore.pagination.model.PaginationResponse
+import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -56,6 +60,18 @@ class BroadcastController(
         logger.printInfo("REQUEST MAPPING: POST: [/broadcast/v2/email]", BroadcastController::class.java)
 
         val response = emailService.sendBroadcastEmail(broadCastMessageReq.emailBroadcastMessage, broadCastMessageReq.emailGroupHeadings)
+        logger.printResponseInfo(response, BroadcastController::class.java)
+
+        return response
+    }
+
+    @PostMapping("/get/records")
+    fun getBroadcastRecordList(@Valid @RequestBody paginationRequest: PaginationRequest?):
+            ResponseEntity<BaseResponse<PaginationResponse<EmailRecord>>>? {
+        logger.printSeparator()
+        logger.printInfo("REQUEST MAPPING: POST: [/broadcast/get/records]", BroadcastController::class.java)
+
+        val response = emailService.getEmailRecords(paginationRequest = paginationRequest)
         logger.printResponseInfo(response, BroadcastController::class.java)
 
         return response
