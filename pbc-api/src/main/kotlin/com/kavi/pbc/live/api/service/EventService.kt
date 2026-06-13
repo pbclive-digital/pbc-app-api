@@ -408,7 +408,7 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
 
         val pushNotificationData = mapOf(
             "CHANNEL" to FirebasePushNotification.EVENT_CHANNEL_ID,
-            "NEWS_ID" to eventId
+            "EVENT_ID" to eventId
         )
 
         FirebasePushNotification.shared.sendNotificationToMultipleTokens(
