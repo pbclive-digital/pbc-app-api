@@ -1,4 +1,4 @@
-package com.kavi.pbc.live.api.data.model
+package com.kavi.pbc.live.data.model.broadcast
 
 enum class EmailTemplateType {
     BROADCAST, NEW_EVENT
