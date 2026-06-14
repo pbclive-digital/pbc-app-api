@@ -29,10 +29,12 @@ import com.kavi.pbc.live.data.model.event.signup.sheet.EventSignUpSheetList
 import com.kavi.pbc.live.data.model.event.signup.sheet.EventSignUpSheetContributor
 import com.kavi.pbc.live.data.model.event.signup.sheet.EventSignUpSheet
 import com.kavi.pbc.live.data.model.event.signup.sheet.SignUpSheetDownloadLink
+import jakarta.mail.Part
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -265,21 +267,34 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
             "eventDate" to System.currentTimeMillis()
         )
 
-        val dueEventList = datastoreRepositoryContract.getEntityListFromProperties(
-            entityCollection = DatastoreConstant.EVENT_COLLECTION,
-            propertiesMap = properties,
-            notInPropertiesMap = notInProperties,
-            lessThanMap = lessThanMap,
-            className = Event::class.java
-        )
-
-        dueEventList.forEach { dueEvent ->
-            dueEvent.eventStatus = EventStatus.PASSED
-            datastoreRepositoryContract.updateEntity(
+        val dueEventList: List<Event> = datastoreRepositoryContract.runInTransaction { transaction ->
+            // ==========================================
+            // PHASE 1: EXECUTE ALL READS FIRST
+            // ==========================================
+            val dueEventList = datastoreRepositoryContract.getEntityListFromPropertiesTx(
+                transaction = transaction,
                 entityCollection = DatastoreConstant.EVENT_COLLECTION,
-                entityId = dueEvent.id,
-                entity = dueEvent
+                propertiesMap = properties,
+                notInPropertiesMap = notInProperties,
+                lessThanMap = lessThanMap,
+                className = Event::class.java
             )
+
+            // ==========================================
+            // PHASE 2: BUSINESS LOGIC & WRITES ONLY
+            // ==========================================
+            dueEventList.forEach { dueEvent ->
+                dueEvent.eventStatus = EventStatus.PASSED
+                datastoreRepositoryContract.updateEntityTx(
+                    transaction = transaction,
+                    entityCollection = DatastoreConstant.EVENT_COLLECTION,
+                    entityId = dueEvent.id,
+                    entity = dueEvent
+                )
+            }
+
+            // Explicitly return the fetched list so it escapes the transaction scope
+            dueEventList
         }
 
         return if (dueEventList.isNotEmpty()) {
@@ -291,120 +306,141 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
 
     fun updateEvent(eventId: String, event: Event): ResponseEntity<BaseResponse<Event>>? {
 
-        datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_COLLECTION, eventId, event)
+        datastoreRepositoryContract.runInTransaction { transaction ->
 
-        if (event.registrationRequired) {
-            datastoreRepositoryContract.getEntityFromId(
-                DatastoreConstant.EVENT_REGISTRATION_COLLECTION, entityId = eventId,
-                EventRegistration::class.java
-            )?.let {
-                logger.printInfo("Record already available to the " +
-                        "event:$eventId in ${DatastoreConstant.EVENT_REGISTRATION_COLLECTION} collection.", EventService::class.java)
-            }?: run {
-                val eventRegistration = EventRegistration(event.id, event.openSeatCount!!)
-                datastoreRepositoryContract
-                    .createEntity(DatastoreConstant.EVENT_REGISTRATION_COLLECTION,
-                        eventRegistration.id, eventRegistration)
-            }
-        }
+            // ==========================================
+            // PHASE 1: EXECUTE ALL READS FIRST
+            // ==========================================
+            val existingRegistration = if (event.registrationRequired) {
+                datastoreRepositoryContract.getEntityFromIdTx(
+                    transaction, DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventId, EventRegistration::class.java
+                )
+            } else null
 
-        if (event.potluckAvailable) {
-            datastoreRepositoryContract.getEntityFromId(
-                DatastoreConstant.EVENT_POTLUCK_COLLECTION, entityId = eventId,
-                EventPotluck::class.java
-            )?.let { selectedEventPotluck ->
+            val existingPotluck = if (event.potluckAvailable) {
+                datastoreRepositoryContract.getEntityFromIdTx(
+                    transaction, DatastoreConstant.EVENT_POTLUCK_COLLECTION, eventId, EventPotluck::class.java
+                )
+            } else null
 
-                val updatedEventPotluck = selectedEventPotluck.copy()
+            val existingSignUpSheets = if (event.signUpSheetAvailable) {
+                datastoreRepositoryContract.getEntityFromIdTx(
+                    transaction, DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventId, EventSignUpSheetList::class.java
+                )
+            } else null
 
-                event.potluckItemList?.let { givenPotluckItemList ->
-                    if (givenPotluckItemList.size > selectedEventPotluck.potluckItemList.size) {
-                        givenPotluckItemList.forEach { potluckItem ->
-                            if (selectedEventPotluck.potluckItemList.none { it.itemId == potluckItem.itemId}) {
-                                updatedEventPotluck.potluckItemList.add(
-                                    EventPotluckItem(potluckItem.itemId,
-                                        potluckItem.itemName, potluckItem.itemCount)
-                                )
-                            }
-                        }
-                    } else if (givenPotluckItemList.size < selectedEventPotluck.potluckItemList.size) {
-                        selectedEventPotluck.potluckItemList.forEach { selectedEventPotluckItem ->
-                            if (givenPotluckItemList.none { it.itemId == selectedEventPotluckItem.itemId}) {
-                                updatedEventPotluck.potluckItemList.remove(selectedEventPotluckItem)
-                            }
-                        }
-                    }
-                }
+            // ==========================================
+            // PHASE 2: BUSINESS LOGIC & WRITES ONLY
+            // ==========================================
 
-                datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_POTLUCK_COLLECTION, updatedEventPotluck.id, updatedEventPotluck)
-            }?: run {
-                if (!event.potluckItemList.isNullOrEmpty()) {
-                    val potluckItemList = mutableListOf<EventPotluckItem>()
-                    event.potluckItemList?.forEach { potluckItem ->
-                        potluckItemList.add(EventPotluckItem(potluckItem.itemId,
-                            potluckItem.itemName, potluckItem.itemCount))
-                    }
-
-                    val eventPotluck = EventPotluck(event.id, potluckItemList)
-                    datastoreRepositoryContract.createEntity(DatastoreConstant.EVENT_POTLUCK_COLLECTION, eventPotluck.id, eventPotluck)
+            // --- 1. REGISTRATION WRITE ---
+            if (event.registrationRequired) {
+                if (existingRegistration != null) {
+                    logger.printInfo("Record already available to the " +
+                            "event:$eventId in ${DatastoreConstant.EVENT_REGISTRATION_COLLECTION} collection.", EventService::class.java)
+                } else {
+                    val eventRegistration = EventRegistration(event.id, event.openSeatCount!!)
+                    datastoreRepositoryContract.createEntityTx(
+                        transaction, DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventRegistration.id, eventRegistration
+                    )
                 }
             }
-        }
 
-        if (event.signUpSheetAvailable) {
-            datastoreRepositoryContract.getEntityFromId(
-                DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, entityId = eventId,
-                EventSignUpSheetList::class.java
-            )?.let { selectedEventSignUpSheets ->
+            // --- 2. POTLUCK WRITE ---
+            if (event.potluckAvailable) {
+                if (existingPotluck != null) {
+                    val updatedEventPotluck = existingPotluck.copy()
 
-                val updatedEventSignUpSheets = selectedEventSignUpSheets.copy()
-
-                event.signUpSheetList?.let { givenSignUpSheets ->
-                    if (givenSignUpSheets.size > selectedEventSignUpSheets.signUpSheetItemList.size) {
-                        givenSignUpSheets.forEach { signUpSheetItem ->
-                            if (selectedEventSignUpSheets.signUpSheetItemList.none { it.sheetId == signUpSheetItem.sheetId}) {
-                                updatedEventSignUpSheets.signUpSheetItemList.add(
-                                    EventSignUpSheet(signUpSheetItem.sheetId,
-                                        signUpSheetItem.sheetName, signUpSheetItem.sheetDescription, signUpSheetItem.availableCount, signUpSheetItem.allowMultiSignUps)
-                                )
+                    event.potluckItemList?.let { givenPotluckItemList ->
+                        if (givenPotluckItemList.size > existingPotluck.potluckItemList.size) {
+                            givenPotluckItemList.forEach { potluckItem ->
+                                if (existingPotluck.potluckItemList.none { it.itemId == potluckItem.itemId }) {
+                                    updatedEventPotluck.potluckItemList.add(
+                                        EventPotluckItem(potluckItem.itemId, potluckItem.itemName, potluckItem.itemCount)
+                                    )
+                                }
                             }
-                        }
-                    } else if (givenSignUpSheets.size < selectedEventSignUpSheets.signUpSheetItemList.size) {
-                        selectedEventSignUpSheets.signUpSheetItemList.forEach { selectedSignUpSheetItem ->
-                            if (givenSignUpSheets.none { it.sheetId == selectedSignUpSheetItem.sheetId}) {
-                                updatedEventSignUpSheets.signUpSheetItemList.remove(selectedSignUpSheetItem)
+                        } else if (givenPotluckItemList.size < existingPotluck.potluckItemList.size) {
+                            existingPotluck.potluckItemList.forEach { selectedEventPotluckItem ->
+                                if (givenPotluckItemList.none { it.itemId == selectedEventPotluckItem.itemId }) {
+                                    updatedEventPotluck.potluckItemList.remove(selectedEventPotluckItem)
+                                }
                             }
                         }
                     }
-                }
+                    datastoreRepositoryContract.updateEntityTx(
+                        transaction, DatastoreConstant.EVENT_POTLUCK_COLLECTION, updatedEventPotluck.id, updatedEventPotluck
+                    )
+                } else {
+                    if (!event.potluckItemList.isNullOrEmpty()) {
+                        val potluckItemList = event.potluckItemList!!.map {
+                            EventPotluckItem(it.itemId, it.itemName, it.itemCount)
+                        }.toMutableList()
 
-                datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, updatedEventSignUpSheets.id, updatedEventSignUpSheets)
-            }?: run {
-                if (!event.signUpSheetList.isNullOrEmpty()) {
-                    val signUpSheetItemList = mutableListOf<EventSignUpSheet>()
-                    event.signUpSheetList?.forEach { signUpSheetItem ->
-                        signUpSheetItemList.add(
-                            EventSignUpSheet(signUpSheetItem.sheetId,
-                                signUpSheetItem.sheetName, signUpSheetItem.sheetDescription, signUpSheetItem.availableCount, signUpSheetItem.allowMultiSignUps)
+                        val eventPotluck = EventPotluck(event.id, potluckItemList)
+                        datastoreRepositoryContract.createEntityTx(
+                            transaction, DatastoreConstant.EVENT_POTLUCK_COLLECTION, eventPotluck.id, eventPotluck
                         )
                     }
-
-                    val eventSignUpSheetList = EventSignUpSheetList(event.id, signUpSheetItemList)
-                    datastoreRepositoryContract.createEntity(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventSignUpSheetList.id, eventSignUpSheetList)
                 }
             }
+
+            // --- 3. SIGN UP SHEET WRITE ---
+            if (event.signUpSheetAvailable) {
+                if (existingSignUpSheets != null) {
+                    val updatedEventSignUpSheets = existingSignUpSheets.copy()
+
+                    event.signUpSheetList?.let { givenSignUpSheets ->
+                        if (givenSignUpSheets.size > existingSignUpSheets.signUpSheetItemList.size) {
+                            givenSignUpSheets.forEach { signUpSheetItem ->
+                                if (existingSignUpSheets.signUpSheetItemList.none { it.sheetId == signUpSheetItem.sheetId }) {
+                                    updatedEventSignUpSheets.signUpSheetItemList.add(
+                                        EventSignUpSheet(signUpSheetItem.sheetId, signUpSheetItem.sheetName, signUpSheetItem.sheetDescription, signUpSheetItem.availableCount, signUpSheetItem.allowMultiSignUps)
+                                    )
+                                }
+                            }
+                        } else if (givenSignUpSheets.size < existingSignUpSheets.signUpSheetItemList.size) {
+                            existingSignUpSheets.signUpSheetItemList.forEach { selectedSignUpSheetItem ->
+                                if (givenSignUpSheets.none { it.sheetId == selectedSignUpSheetItem.sheetId }) {
+                                    updatedEventSignUpSheets.signUpSheetItemList.remove(selectedSignUpSheetItem)
+                                }
+                            }
+                        }
+                    }
+                    datastoreRepositoryContract.updateEntityTx(
+                        transaction, DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, updatedEventSignUpSheets.id, updatedEventSignUpSheets
+                    )
+                } else {
+                    if (!event.signUpSheetList.isNullOrEmpty()) {
+                        val signUpSheetItemList = event.signUpSheetList!!.map {
+                            EventSignUpSheet(it.sheetId, it.sheetName, it.sheetDescription, it.availableCount, it.allowMultiSignUps)
+                        }.toMutableList()
+
+                        val eventSignUpSheetList = EventSignUpSheetList(event.id, signUpSheetItemList)
+                        datastoreRepositoryContract.createEntityTx(
+                            transaction, DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventSignUpSheetList.id, eventSignUpSheetList
+                        )
+                    }
+                }
+            }
+
+            // Update the event object
+            datastoreRepositoryContract.updateEntityTx(transaction,DatastoreConstant.EVENT_COLLECTION, eventId, event)
         }
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(BaseResponse(Status.SUCCESS,
-                event, null))
+            .body(BaseResponse(Status.SUCCESS, event, null))
     }
 
     fun publishDraftEvent(eventId: String, event: Event,
                           emailGroupHeadings: List<EmailGroupHeading>? = null): ResponseEntity<BaseResponse<Event>>? {
         event.eventStatus = EventStatus.PUBLISHED
 
-        datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_COLLECTION, eventId, event)
+        // TODO - Following email sending, notification sending also should come inside the transaction
+        datastoreRepositoryContract.runInTransaction { transaction ->
+            datastoreRepositoryContract.updateEntityTx(transaction,DatastoreConstant.EVENT_COLLECTION, eventId, event)
+        }
 
         val pushNotificationData = mapOf(
             "CHANNEL" to FirebasePushNotification.EVENT_CHANNEL_ID,
@@ -462,16 +498,54 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
                 null))
     }
 
-    fun registerToEvent(eventId: String, eventRegistrationItem: EventRegistrationItem): ResponseEntity<BaseResponse<EventRegistration>>? {
+    fun getEventRegistrationRecord(eventId: String): ResponseEntity<BaseResponse<EventRegistration>>? {
         datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventId,
-            EventRegistration::class.java)?.let { eventRegistration ->
-                eventRegistration.registrationList.add(eventRegistrationItem)
-            datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventRegistration.id, eventRegistration)
+            EventRegistration::class.java)?.let {
+            return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse(Status.SUCCESS,
+                    it,
+                    null))
+        }?: run {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse(Status.ERROR, null, listOf(
+                    Error(HttpStatus.NOT_FOUND.toString()))
+                ))
+        }
+    }
 
+    fun registerToEvent(eventId: String, eventRegistrationItem: EventRegistrationItem): ResponseEntity<BaseResponse<EventRegistration>>? {
+        val eventRegistration = datastoreRepositoryContract.runInTransaction { transaction ->
+            // ==========================================
+            // PHASE 1: EXECUTE ALL READS FIRST
+            // ==========================================
+            val eventRegistration = datastoreRepositoryContract.getEntityFromIdTx(transaction,
+                DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventId, EventRegistration::class.java)
+
+            // ==========================================
+            // PHASE 2: BUSINESS LOGIC & WRITES ONLY
+            // ==========================================
+            eventRegistration?.let { registration ->
+                registration.registrationList.add(eventRegistrationItem)
+                datastoreRepositoryContract.updateEntityTx(
+                    transaction,
+                    DatastoreConstant.EVENT_REGISTRATION_COLLECTION,
+                    registration.id,
+                    registration
+                )
+
+                registration
+            }?: run {
+                null
+            }
+        }
+
+        eventRegistration?.let {
             return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(BaseResponse(Status.SUCCESS,
-                    eventRegistration,
+                    it,
                     null))
         }?: run {
             return ResponseEntity
@@ -483,30 +557,34 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
     }
 
     fun unregisterFromEvent(eventId: String, userId: String): ResponseEntity<BaseResponse<EventRegistration>>? {
-        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventId,
-            EventRegistration::class.java)?.let { eventRegistration ->
-            eventRegistration.registrationList.removeIf { it.participantUserId == userId }
-            datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventRegistration.id, eventRegistration)
+        val eventRegistration = datastoreRepositoryContract.runInTransaction { transaction ->
+            // ==========================================
+            // PHASE 1: EXECUTE ALL READS FIRST
+            // ==========================================
+            val eventRegistration = datastoreRepositoryContract.getEntityFromIdTx(transaction,
+                DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventId, EventRegistration::class.java)
 
+            // ==========================================
+            // PHASE 2: BUSINESS LOGIC & WRITES ONLY
+            // ==========================================
+            eventRegistration?.let { registration ->
+                registration.registrationList.removeIf { it.participantUserId == userId }
+                datastoreRepositoryContract.updateEntityTx(
+                    transaction,
+                    DatastoreConstant.EVENT_REGISTRATION_COLLECTION,
+                    registration.id,
+                    registration
+                )
+
+                registration
+            }?: run {
+                null
+            }
+        }
+
+        eventRegistration?.let {
             return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body(BaseResponse(Status.SUCCESS,
-                    eventRegistration,
-                    null))
-        }?: run {
-            return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(BaseResponse(Status.ERROR, null, listOf(
-                    Error(HttpStatus.NOT_FOUND.toString()))
-                ))
-        }
-    }
-
-    fun getEventRegistrationRecord(eventId: String): ResponseEntity<BaseResponse<EventRegistration>>? {
-        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_REGISTRATION_COLLECTION, eventId,
-            EventRegistration::class.java)?.let {
-            return ResponseEntity
-                .status(HttpStatus.OK)
                 .body(BaseResponse(Status.SUCCESS,
                     it,
                     null))
@@ -538,83 +616,20 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
 
     fun signUpGivenContributorToPotluckItem(eventId: String, potluckItemId: String, contributor: EventPotluckContributor):
             ResponseEntity<BaseResponse<EventPotluck>>? {
-        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_POTLUCK_COLLECTION, eventId,
-            EventPotluck::class.java)?.let { potluck ->
-            val updatedPotluck = potluck.copy()
+        val updatedPotluckResult = datastoreRepositoryContract.runInTransaction { transaction ->
+            // Read data
+            val eventPotluck = datastoreRepositoryContract.getEntityFromIdTx(
+                transaction, DatastoreConstant.EVENT_POTLUCK_COLLECTION, eventId, EventPotluck::class.java)
 
-            val filteredPotluckItem = potluck.potluckItemList.filter { it.itemId == potluckItemId }
+            // Write/Modify data
+            eventPotluck?.let { potluck ->
+                val updatedPotluck = potluck.copy()
+                val filteredPotluckItem = potluck.potluckItemList.filter { it.itemId == potluckItemId }
 
-            if (filteredPotluckItem.isNotEmpty()) {
-                val selectedPotluckItem = filteredPotluckItem[0]
+                if (filteredPotluckItem.isNotEmpty()) {
+                    val selectedPotluckItem = filteredPotluckItem[0]
+                    selectedPotluckItem.contributorList.add(contributor)
 
-                selectedPotluckItem.contributorList.add(contributor)
-
-                val itemIndexList = updatedPotluck.potluckItemList.withIndex()
-                    .filter { (_, value) -> value.itemId == potluckItemId }
-                    .map { it.index }
-
-                if (itemIndexList.isNotEmpty()) {
-                    val itemIndex = itemIndexList[0]
-
-                    updatedPotluck.potluckItemList.removeAt(itemIndex)
-                    updatedPotluck.potluckItemList.add(itemIndex, selectedPotluckItem)
-
-                    datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_POTLUCK_COLLECTION, updatedPotluck.id, updatedPotluck)
-
-                    return ResponseEntity
-                        .status(HttpStatus.OK)
-                        .body(BaseResponse(Status.SUCCESS,
-                            updatedPotluck,
-                            null))
-                } else {
-                    return ResponseEntity
-                        .status(HttpStatus.NOT_FOUND)
-                        .body(BaseResponse(
-                            Status.ERROR, null, listOf(
-                                Error("${HttpStatus.NOT_FOUND} due to potluck item not found")
-                            ))
-                        )
-                }
-            } else {
-                return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(BaseResponse(
-                        Status.ERROR, null, listOf(
-                            Error("${HttpStatus.NOT_FOUND} due to potluck item not found")
-                        ))
-                    )
-            }
-        }?: run {
-            return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(BaseResponse(Status.ERROR, null, listOf(
-                    Error("${HttpStatus.NOT_FOUND} due to potluck not found"))
-                ))
-        }
-    }
-
-    fun signOutGivenContributorFromPotluckItem(eventId: String, potluckItemId: String, contributorId: String):
-            ResponseEntity<BaseResponse<EventPotluck>>?{
-        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_POTLUCK_COLLECTION, eventId,
-            EventPotluck::class.java)?.let { potluck ->
-            val updatedPotluck = potluck.copy()
-            val filteredPotluckItem = potluck.potluckItemList.filter { it.itemId == potluckItemId }
-
-            if (filteredPotluckItem.isNotEmpty()) {
-                val selectedPotluckItem = filteredPotluckItem[0]
-
-                val contributorIndexList = selectedPotluckItem
-                    .contributorList.withIndex()
-                    .filter { (_, value) -> value.contributorId == contributorId }
-                    .map { it.index }
-
-                var isRemoved = false
-                if (contributorIndexList.isNotEmpty()) {
-                    val elementToRemove = selectedPotluckItem.contributorList[contributorIndexList[0]]
-                    isRemoved = selectedPotluckItem.contributorList.remove(elementToRemove)
-                }
-
-                if (isRemoved) {
                     val itemIndexList = updatedPotluck.potluckItemList.withIndex()
                         .filter { (_, value) -> value.itemId == potluckItemId }
                         .map { it.index }
@@ -625,32 +640,121 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
                         updatedPotluck.potluckItemList.removeAt(itemIndex)
                         updatedPotluck.potluckItemList.add(itemIndex, selectedPotluckItem)
 
-                        datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_POTLUCK_COLLECTION, updatedPotluck.id, updatedPotluck)
+                        datastoreRepositoryContract.updateEntityTx(
+                            transaction,
+                            DatastoreConstant.EVENT_POTLUCK_COLLECTION,
+                            updatedPotluck.id,
+                            updatedPotluck
+                        )
 
-                        return ResponseEntity
-                            .status(HttpStatus.OK)
-                            .body(BaseResponse(Status.SUCCESS,
-                                updatedPotluck,
-                                null))
+                        Pair(HttpStatus.OK, updatedPotluck)
                     } else {
-                        return ResponseEntity
-                            .status(HttpStatus.NOT_FOUND)
-                            .body(BaseResponse(
-                                Status.ERROR, null, listOf(
-                                    Error("${HttpStatus.NOT_FOUND} due to potluck item not found")
-                                ))
-                            )
+                        Pair(HttpStatus.NOT_FOUND, null)
                     }
                 } else {
-                    return ResponseEntity
-                        .status(HttpStatus.SERVICE_UNAVAILABLE)
-                        .body(BaseResponse(
-                            Status.ERROR, null, listOf(
-                                Error("${HttpStatus.SERVICE_UNAVAILABLE} Failed to remove the contributor")
-                            ))
-                        )
+                    Pair(HttpStatus.NOT_FOUND, null)
                 }
-            } else {
+            }?: run {
+                Pair(HttpStatus.NOT_FOUND, null)
+            }
+        }
+
+        when (updatedPotluckResult.first) {
+            HttpStatus.OK -> {
+                return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(BaseResponse(Status.SUCCESS,
+                        updatedPotluckResult.second as EventPotluck,
+                        null))
+            }
+            else -> {
+                return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(BaseResponse(Status.ERROR, null, listOf(
+                        Error("${HttpStatus.NOT_FOUND} due to potluck not found"))
+                    ))
+            }
+        }
+    }
+
+    fun signOutGivenContributorFromPotluckItem(eventId: String, potluckItemId: String, contributorId: String):
+            ResponseEntity<BaseResponse<EventPotluck>>?{
+
+        val updatedPotluckResult = datastoreRepositoryContract.runInTransaction { transaction ->
+            // Read data
+            val eventPotluck = datastoreRepositoryContract.getEntityFromIdTx(
+                transaction, DatastoreConstant.EVENT_POTLUCK_COLLECTION, eventId, EventPotluck::class.java)
+
+            // Write/Modify data
+            eventPotluck?.let { potluck ->
+                val updatedPotluck = potluck.copy()
+                val filteredPotluckItem = potluck.potluckItemList.filter { it.itemId == potluckItemId }
+
+                if (filteredPotluckItem.isNotEmpty()) {
+                    val selectedPotluckItem = filteredPotluckItem[0]
+
+                    val contributorIndexList = selectedPotluckItem
+                        .contributorList.withIndex()
+                        .filter { (_, value) -> value.contributorId == contributorId }
+                        .map { it.index }
+
+                    var isRemoved = false
+                    if (contributorIndexList.isNotEmpty()) {
+                        val elementToRemove = selectedPotluckItem.contributorList[contributorIndexList[0]]
+                        isRemoved = selectedPotluckItem.contributorList.remove(elementToRemove)
+                    }
+
+                    if (isRemoved) {
+                        val itemIndexList = updatedPotluck.potluckItemList.withIndex()
+                            .filter { (_, value) -> value.itemId == potluckItemId }
+                            .map { it.index }
+
+                        if (itemIndexList.isNotEmpty()) {
+                            val itemIndex = itemIndexList[0]
+
+                            updatedPotluck.potluckItemList.removeAt(itemIndex)
+                            updatedPotluck.potluckItemList.add(itemIndex, selectedPotluckItem)
+
+                            datastoreRepositoryContract.updateEntityTx(
+                                transaction,
+                                DatastoreConstant.EVENT_POTLUCK_COLLECTION,
+                                updatedPotluck.id,
+                                updatedPotluck
+                            )
+
+                            Pair(HttpStatus.OK, updatedPotluck)
+                        } else {
+                            Pair(HttpStatus.NOT_FOUND, "${HttpStatus.NOT_FOUND} due to potluck item not found")
+                        }
+                    } else {
+                        Pair(HttpStatus.SERVICE_UNAVAILABLE, "${HttpStatus.SERVICE_UNAVAILABLE} Failed to remove the contributor")
+                    }
+                } else {
+                    Pair(HttpStatus.NOT_FOUND, "${HttpStatus.NOT_FOUND} due to potluck item not found")
+                }
+            }?: run {
+                Pair(HttpStatus.NOT_FOUND, "${HttpStatus.NOT_FOUND} due to potluck item not found")
+            }
+        }
+
+        when(updatedPotluckResult.first) {
+            HttpStatus.OK -> {
+                return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(BaseResponse(Status.SUCCESS,
+                        updatedPotluckResult.second as EventPotluck,
+                        null))
+            }
+            HttpStatus.SERVICE_UNAVAILABLE -> {
+                return ResponseEntity
+                    .status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body(BaseResponse(
+                        Status.ERROR, null, listOf(
+                            Error("${HttpStatus.SERVICE_UNAVAILABLE} Failed to remove the contributor")
+                        ))
+                    )
+            }
+            else -> {
                 return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .body(BaseResponse(
@@ -659,12 +763,6 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
                         ))
                     )
             }
-        }?: run {
-            return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(BaseResponse(Status.ERROR, null, listOf(
-                    Error("${HttpStatus.NOT_FOUND} due to potluck not found"))
-                ))
         }
     }
 
@@ -714,119 +812,58 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
 
     fun signUpGivenContributorToSignUpSheet(eventId: String, sheetId: String, contributor: EventSignUpSheetContributor):
             ResponseEntity<BaseResponse<EventSignUpSheetList>>? {
-        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventId,
-            EventSignUpSheetList::class.java)?.let { eventSighUpSheet ->
-            val updatedEventSighUpSheet = eventSighUpSheet.copy()
 
-            val filteredSignUpSheet = eventSighUpSheet.signUpSheetItemList.filter { it.sheetId == sheetId }
+        val updateSignUpSheetResult = datastoreRepositoryContract.runInTransaction { transaction ->
+            // Read the data
+            val eventSighUpSheet = datastoreRepositoryContract.getEntityFromIdTx(
+                transaction, DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventId, EventSignUpSheetList::class.java)
 
-            if (filteredSignUpSheet.isNotEmpty()) {
-                val selectedSignUpSheet = filteredSignUpSheet[0]
+            // Write/Modify data
+            eventSighUpSheet?.let { sighUpSheet ->
+                val updatedSighUpSheet = sighUpSheet.copy()
+                val filteredSignUpSheet = sighUpSheet.signUpSheetItemList.filter { it.sheetId == sheetId }
 
-                selectedSignUpSheet.contributorList.add(contributor)
+                if (filteredSignUpSheet.isNotEmpty()) {
+                    val selectedSignUpSheet = filteredSignUpSheet[0]
+                    selectedSignUpSheet.contributorList.add(contributor)
 
-                val sheetIndexList = updatedEventSighUpSheet.signUpSheetItemList.withIndex()
-                    .filter { (_, value) -> value.sheetId == sheetId }
-                    .map { it.index }
-
-                if (sheetIndexList.isNotEmpty()) {
-                    val sheetIndex = sheetIndexList[0]
-
-                    updatedEventSighUpSheet.signUpSheetItemList.removeAt(sheetIndex)
-                    updatedEventSighUpSheet.signUpSheetItemList.add(sheetIndex, selectedSignUpSheet)
-
-                    datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, updatedEventSighUpSheet.id, updatedEventSighUpSheet)
-
-                    return ResponseEntity
-                        .status(HttpStatus.OK)
-                        .body(BaseResponse(Status.SUCCESS,
-                            updatedEventSighUpSheet,
-                            null))
-                } else {
-                    return ResponseEntity
-                        .status(HttpStatus.NOT_FOUND)
-                        .body(BaseResponse(
-                            Status.ERROR, null, listOf(
-                                Error("${HttpStatus.NOT_FOUND} due to sign-up sheet not found")
-                            ))
-                        )
-                }
-            } else {
-                return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(BaseResponse(
-                        Status.ERROR, null, listOf(
-                            Error("${HttpStatus.NOT_FOUND} due to sign-up sheet not found")
-                        ))
-                    )
-            }
-        }?: run {
-            return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(BaseResponse(Status.ERROR, null, listOf(
-                    Error("${HttpStatus.NOT_FOUND} due to sign-up sheet not found"))
-                ))
-        }
-    }
-
-    fun signOutGivenContributorFromSignUpSheet(eventId: String, sheetId: String, contributorId: String):
-            ResponseEntity<BaseResponse<EventSignUpSheetList>>?{
-        datastoreRepositoryContract.getEntityFromId(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventId,
-            EventSignUpSheetList::class.java)?.let { eventSignUpSheet ->
-            val updatedEventSignUpSheet = eventSignUpSheet.copy()
-            val filteredSignUpSheet = eventSignUpSheet.signUpSheetItemList.filter { it.sheetId == sheetId }
-
-            if (filteredSignUpSheet.isNotEmpty()) {
-                val selectedSignUpSheet = filteredSignUpSheet[0]
-
-                val contributorIndexList = selectedSignUpSheet
-                    .contributorList.withIndex()
-                    .filter { (_, value) -> value.contributorId == contributorId }
-                    .map { it.index }
-
-                var isRemoved = false
-                if (contributorIndexList.isNotEmpty()) {
-                    val elementToRemove = selectedSignUpSheet.contributorList[contributorIndexList[0]]
-                    isRemoved = selectedSignUpSheet.contributorList.remove(elementToRemove)
-                }
-
-                if (isRemoved) {
-                    val sheetIndexList = updatedEventSignUpSheet.signUpSheetItemList.withIndex()
+                    val sheetIndexList = updatedSighUpSheet.signUpSheetItemList.withIndex()
                         .filter { (_, value) -> value.sheetId == sheetId }
                         .map { it.index }
 
                     if (sheetIndexList.isNotEmpty()) {
                         val sheetIndex = sheetIndexList[0]
 
-                        updatedEventSignUpSheet.signUpSheetItemList.removeAt(sheetIndex)
-                        updatedEventSignUpSheet.signUpSheetItemList.add(sheetIndex, selectedSignUpSheet)
+                        updatedSighUpSheet.signUpSheetItemList.removeAt(sheetIndex)
+                        updatedSighUpSheet.signUpSheetItemList.add(sheetIndex, selectedSignUpSheet)
 
-                        datastoreRepositoryContract.updateEntity(DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, updatedEventSignUpSheet.id, updatedEventSignUpSheet)
+                        datastoreRepositoryContract.updateEntityTx(
+                            transaction,
+                            DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION,
+                            updatedSighUpSheet.id, updatedSighUpSheet
+                        )
 
-                        return ResponseEntity
-                            .status(HttpStatus.OK)
-                            .body(BaseResponse(Status.SUCCESS,
-                                updatedEventSignUpSheet,
-                                null))
+                        Pair(HttpStatus.OK, updatedSighUpSheet)
                     } else {
-                        return ResponseEntity
-                            .status(HttpStatus.NOT_FOUND)
-                            .body(BaseResponse(
-                                Status.ERROR, null, listOf(
-                                    Error("${HttpStatus.NOT_FOUND} due to sign-up sheet not found")
-                                ))
-                            )
+                        Pair(HttpStatus.NOT_FOUND, null)
                     }
                 } else {
-                    return ResponseEntity
-                        .status(HttpStatus.SERVICE_UNAVAILABLE)
-                        .body(BaseResponse(
-                            Status.ERROR, null, listOf(
-                                Error("${HttpStatus.SERVICE_UNAVAILABLE} Failed to remove the contributor")
-                            ))
-                        )
+                    Pair(HttpStatus.NOT_FOUND, null)
                 }
-            } else {
+            }?: run {
+                Pair(HttpStatus.NOT_FOUND, null)
+            }
+        }
+
+        when (updateSignUpSheetResult.first) {
+            HttpStatus.OK -> {
+                return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(BaseResponse(Status.SUCCESS,
+                        updateSignUpSheetResult.second as EventSignUpSheetList,
+                        null))
+            }
+            else -> {
                 return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .body(BaseResponse(
@@ -835,12 +872,94 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
                         ))
                     )
             }
-        }?: run {
-            return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(BaseResponse(Status.ERROR, null, listOf(
-                    Error("${HttpStatus.NOT_FOUND} due to sign-up sheet not found"))
-                ))
+        }
+    }
+
+    fun signOutGivenContributorFromSignUpSheet(eventId: String, sheetId: String, contributorId: String):
+            ResponseEntity<BaseResponse<EventSignUpSheetList>>?{
+
+        val updateSignUpSheetResult = datastoreRepositoryContract.runInTransaction { transaction ->
+            // Read the data
+            val eventSighUpSheet = datastoreRepositoryContract.getEntityFromIdTx(
+                transaction, DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, eventId, EventSignUpSheetList::class.java)
+
+            // Write/Modify data
+            eventSighUpSheet?.let { sighUpSheet ->
+                val updatedSignUpSheet = sighUpSheet.copy()
+                val filteredSignUpSheet = sighUpSheet.signUpSheetItemList.filter { it.sheetId == sheetId }
+
+                if (filteredSignUpSheet.isNotEmpty()) {
+                    val selectedSignUpSheet = filteredSignUpSheet[0]
+
+                    val contributorIndexList = selectedSignUpSheet
+                        .contributorList.withIndex()
+                        .filter { (_, value) -> value.contributorId == contributorId }
+                        .map { it.index }
+
+                    var isRemoved = false
+                    if (contributorIndexList.isNotEmpty()) {
+                        val elementToRemove = selectedSignUpSheet.contributorList[contributorIndexList[0]]
+                        isRemoved = selectedSignUpSheet.contributorList.remove(elementToRemove)
+                    }
+
+                    if (isRemoved) {
+                        val sheetIndexList = updatedSignUpSheet.signUpSheetItemList.withIndex()
+                            .filter { (_, value) -> value.sheetId == sheetId }
+                            .map { it.index }
+
+                        if (sheetIndexList.isNotEmpty()) {
+                            val sheetIndex = sheetIndexList[0]
+
+                            updatedSignUpSheet.signUpSheetItemList.removeAt(sheetIndex)
+                            updatedSignUpSheet.signUpSheetItemList.add(sheetIndex, selectedSignUpSheet)
+
+                            datastoreRepositoryContract.updateEntityTx(
+                                transaction,
+                                DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION,
+                                updatedSignUpSheet.id, updatedSignUpSheet
+                            )
+
+                            Pair(HttpStatus.OK, updatedSignUpSheet)
+                        } else {
+                            Pair(HttpStatus.NOT_FOUND, null)
+                        }
+                    } else {
+                        Pair(HttpStatus.SERVICE_UNAVAILABLE, null)
+                    }
+                } else {
+                    Pair(HttpStatus.NOT_FOUND, null)
+                }
+            }?: run {
+                Pair(HttpStatus.NOT_FOUND, null)
+            }
+        }
+
+        when (updateSignUpSheetResult.first) {
+            HttpStatus.OK -> {
+                return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(BaseResponse(Status.SUCCESS,
+                        updateSignUpSheetResult.second as EventSignUpSheetList,
+                        null))
+            }
+            HttpStatus.SERVICE_UNAVAILABLE -> {
+                return ResponseEntity
+                    .status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body(BaseResponse(
+                        Status.ERROR, null, listOf(
+                            Error("${HttpStatus.SERVICE_UNAVAILABLE} Failed to remove the contributor")
+                        ))
+                    )
+            }
+            else -> {
+                return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(BaseResponse(
+                        Status.ERROR, null, listOf(
+                            Error("${HttpStatus.NOT_FOUND} due to sign-up sheet not found")
+                        ))
+                    )
+            }
         }
     }
 
