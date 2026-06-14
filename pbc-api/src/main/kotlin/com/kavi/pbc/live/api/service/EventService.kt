@@ -419,7 +419,7 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
         )
 
         val eventUrl = when(appProperties.appEnv) {
-            "prod" -> "https://pbc-live-prod.web.app/#event/event-selected/${event.id}"
+            "prod" -> "https://app.pittsburghbuddhistcenter.org/#event/event-selected/${event.id}"
             else -> "https://pbclive-digital.github.io/pbc-web-app/#event/event-selected/${event.id}"
         }
 
