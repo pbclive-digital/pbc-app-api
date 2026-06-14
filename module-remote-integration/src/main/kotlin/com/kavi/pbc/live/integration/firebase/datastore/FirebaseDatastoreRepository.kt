@@ -4,8 +4,10 @@ import com.google.api.core.ApiFuture
 import com.google.cloud.firestore.CollectionReference
 import com.google.cloud.firestore.DocumentReference
 import com.google.cloud.firestore.DocumentSnapshot
+import com.google.cloud.firestore.Firestore
 import com.google.cloud.firestore.Query
 import com.google.cloud.firestore.QuerySnapshot
+import com.google.cloud.firestore.Transaction
 import com.google.cloud.firestore.WriteResult
 import com.google.firebase.cloud.FirestoreClient
 import com.kavi.pbc.live.com.kavi.pbc.live.integration.DatastoreRepositoryContract
@@ -188,5 +190,127 @@ class FirebaseDatastoreRepository: DatastoreRepositoryContract {
                 .document(entityId)
                 .delete()
         return collectionFuture.get().updateTime.toString()
+    }
+
+    override fun <T> runInTransaction(action: (transaction: Any) -> T): T {
+        val firestore = FirestoreClient.getFirestore()
+
+        // firestore.runTransaction returns an ApiFuture, we use .get() to block synchronously
+        val future = firestore.runTransaction { tx ->
+            action(tx)
+        }
+        return future.get()
+    }
+
+    override fun <T> getEntityFromIdTx(
+        transaction: Any,
+        entityCollection: String,
+        entityId: String,
+        className: Class<T>
+    ): T? {
+        val tx = transaction as Transaction
+        val documentReference = FirestoreClient.getFirestore().collection(entityCollection).document(entityId)
+        val snapshot = tx.get(documentReference).get() // Reads in a transaction
+        return if (snapshot.exists()) {
+            snapshot.toObject(className)
+        } else {
+            null
+        }
+    }
+
+    override fun <T> getEntityListFromPropertiesTx(
+        transaction: Any,
+        entityCollection: String,
+        propertiesMap: Map<String, Any>?,
+        notInPropertiesMap: Map<String, Any>?,
+        lessThanMap: Map<String, Any>?,
+        greaterThanMap: Map<String, Any>?,
+        orderByMap: Map<String, String>?,
+        limit: Int?,
+        className: Class<T>
+    ): MutableList<T> {
+        val tx = transaction as Transaction
+        val entityList: MutableList<T> = ArrayList()
+
+        val collectionEntity: CollectionReference = FirestoreClient.getFirestore()
+            .collection(entityCollection)
+
+        var collectionQuery: Query = collectionEntity
+
+        // 1. Build out the query constraints (same as your original method)
+        propertiesMap?.keys?.forEach {
+            val propertyItem = propertiesMap[it]
+            collectionQuery = if (propertyItem is List<*>) {
+                collectionQuery.whereIn(it, propertyItem)
+            } else {
+                collectionQuery.whereEqualTo(it, propertyItem)
+            }
+        }
+        notInPropertiesMap?.keys?.forEach {
+            val propertyItem = notInPropertiesMap[it]
+            collectionQuery = if (propertyItem is List<*>) {
+                collectionQuery.whereNotIn(it, propertyItem)
+            } else {
+                collectionQuery.whereNotEqualTo(it, propertyItem)
+            }
+        }
+        lessThanMap?.keys?.forEach {
+            lessThanMap[it]?.let { lessThanValue ->
+                collectionQuery = collectionQuery.whereLessThan(it, lessThanValue)
+            }
+        }
+        greaterThanMap?.keys?.forEach {
+            greaterThanMap[it]?.let { greaterThanValue ->
+                collectionQuery = collectionQuery.whereGreaterThan(it, greaterThanValue)
+            }
+        }
+        orderByMap?.let {
+            val orderByProperty = orderByMap["property"]
+            val orderByDirection = orderByMap["direction"]
+            if (orderByProperty != null && orderByDirection != null) {
+                when (orderByDirection) {
+                    "ASC" -> collectionQuery = collectionQuery.orderBy(orderByProperty, Query.Direction.ASCENDING)
+                    "DESC" -> collectionQuery = collectionQuery.orderBy(orderByProperty, Query.Direction.DESCENDING)
+                }
+            }
+        }
+        limit?.let {
+            collectionQuery = collectionQuery.limit(it)
+        }
+
+        // 2. Fetch the query result via the transaction object
+        // tx.get(query) returns an ApiFuture<QuerySnapshot>, we call .get() to resolve it
+        val querySnapshot = tx.get(collectionQuery).get()
+
+        // 3. Map documents to your classes
+        querySnapshot.documents.forEach { doc ->
+            doc.toObject(className)?.let { entityItem ->
+                entityList.add(entityItem)
+            }
+        }
+
+        return entityList
+    }
+
+    override fun updateEntityTx(
+        transaction: Any,
+        entityCollection: String,
+        entityId: String,
+        entity: BaseModel
+    ) {
+        val tx = transaction as Transaction
+        val docRef = FirestoreClient.getFirestore().collection(entityCollection).document(entityId)
+        tx.update(docRef, entity.toMap())
+    }
+
+    override fun createEntityTx(
+        transaction: Any,
+        entityCollection: String,
+        entityId: String,
+        entity: BaseModel
+    ) {
+        val tx = transaction as Transaction
+        val docRef = FirestoreClient.getFirestore().collection(entityCollection).document(entityId)
+        tx.set(docRef, entity.toMap())
     }
 }
