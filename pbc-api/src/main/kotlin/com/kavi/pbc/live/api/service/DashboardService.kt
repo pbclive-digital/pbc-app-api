@@ -22,6 +22,7 @@ import com.kavi.pbc.live.data.DataConstant
 import com.kavi.pbc.live.data.model.event.EventType
 import com.kavi.pbc.live.data.model.news.News
 import com.kavi.pbc.live.data.model.news.NewsStatus
+import com.kavi.pbc.live.data.model.privacy.PolicyItem
 
 
 @Service
@@ -78,6 +79,11 @@ class DashboardService (
         }
     }
 
+    fun getPrivacyPolicy(): ResponseEntity<BaseResponse<List<PolicyItem>>> {
+        val privacyPolicyList: List<PolicyItem> = loadPrivacyPolicy()
+        return ResponseEntity.ok(BaseResponse(Status.SUCCESS, privacyPolicyList, null))
+    }
+
     private fun upcomingEvents(): MutableList<Event> {
         val properties = mapOf(
             "eventStatus" to EventStatus.PUBLISHED
@@ -121,6 +127,13 @@ class DashboardService (
         val resource: Resource = resourceLoader!!.getResource("classpath:quotes/daily_quotes.json")
         resource.inputStream.use { inputStream ->
             return objectMapper.readValue(inputStream, object : TypeReference<List<DailyQuote>>() {})
+        }
+    }
+
+    private fun loadPrivacyPolicy(): List<PolicyItem> {
+        val resource: Resource = resourceLoader!!.getResource("classpath:privacy/privacy_policy.json")
+        resource.inputStream.use { inputStream ->
+            return objectMapper.readValue(inputStream, object : TypeReference<List<PolicyItem>>() {})
         }
     }
 
