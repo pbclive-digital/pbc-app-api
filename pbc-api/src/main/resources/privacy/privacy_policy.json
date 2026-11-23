@@ -1,87 +1,90 @@
-[
-  {
-    "id": "pp001",
-    "title": "Information We Collect",
-    "description": "We collect information that you provide directly to us when you register for an account, interact with events, or communicate with us.",
-    "pointList": [
-      "Google Account Authentication (\"Sign in with Google\"): When you choose to sign in using Google, we collect your Google account ID and email address to authenticate your identity and create your account.",
-      "Profile Information: If you choose to provide them, we may collect your first name, last name, phone number, and physical address to manage your profile and facilitate community engagement.",
-      "Communications & Interaction Data: We collect inquiries, questions, and feedback submitted through our web-app or mobile apps, as well as event registration details.",
-      "Automatically Collected Technical Data: When you access our Service, our servers automatically record information that your browser or mobile device sends, including your Internet Protocol (IP) address, browser type, device type, operating system, access times, and pages viewed."
-    ]
-  },
-  {
-    "id": "pp002",
-    "title": "How We Use Your Information",
-    "description": "We use the information we collect for various purposes to support the Pittsburgh Buddhist Center community, including:",
-    "pointList": [
-      "Account Management & Authentication: To verify your identity via Google sign-in, maintain your user profile, and secure your account.",
-      "Core Service Delivery: To manage community events, publish news and announcements, and respond to your questions or support requests.",
-      "Communication: To send you important administrative notices, updates regarding events, and responses to your inquiries.",
-      "Service Improvement: To analyze usage patterns, troubleshoot technical issues, and improve the functionality and security of our web and mobile applications."
-    ]
-  },
-  {
-    "id": "pp003",
-    "title": "Data Sharing and Disclosure",
-    "description": "We do not sell, trade, rent, or otherwise share your personal information with any third parties or third-party tools. Your data remains strictly confidential within the Pittsburgh Buddhist Center. We may disclose your information only under the following limited circumstances:",
-    "pointList": [
-      "Legal Compliance: If required to do so by law or in response to valid requests by public authorities (e.g., a court or government agency).",
-      "Protection of Rights: To protect and defend the rights, property, or safety of the Pittsburgh Buddhist Center, our users, or others.",
-      "Service Providers (Infrastructure Only): We utilize secure hosting and infrastructure services (such as cloud database and server providers) strictly to operate the application. These providers are bound by strict confidentiality obligations and are prohibited from accessing or using your personal data for any other purpose."
-    ]
-  },
-  {
-    "id": "pp004",
-    "title": "Mobile Applications (Android and iOS)",
-    "description": "In anticipation of our future Android and iOS mobile applications, this Privacy Policy applies equally to mobile access.",
-    "pointList": [
-      "Permissions: Our mobile apps may request standard device permissions (such as internet access or notifications) solely to deliver core features like event alerts and news updates.",
-      "Data Synchronization: Your account data remains synchronized securely between the web application and mobile applications using encrypted protocols. No additional tracking or advertising frameworks are integrated into our mobile apps."
-    ]
-  },
-  {
-    "id": "pp005",
-    "title": "Data Security",
-    "description": "We implement appropriate technical and organizational security measures designed to protect your personal information from unauthorized access, accidental loss, alteration, or disclosure. However, please note that no method of transmission over the internet or electronic storage is 100% secure, and we cannot guarantee absolute security.",
-    "pointList": []
-  },
-  {
-    "id": "pp006",
-    "title": "Data Retention",
-    "description": "We retain your personal information only for as long as is necessary to fulfill the purposes outlined in this Privacy Policy, maintain your account, or comply with our legal obligations. You may request the deletion of your account and associated personal data at any time by contacting us.",
-    "pointList": []
-  },
-  {
-    "id": "pp007",
-    "title": "Your Rights and Choices",
-    "description": "You have the right to:",
-    "pointList": [
-      "Access and Update: View and update your profile information directly through your account settings.",
-      "Account Deletion: Request the deactivation or permanent deletion of your account and associated personal data.",
-      "Opt-Out: Revoke Google sign-in access at any time through your Google Account security settings."
-    ]
-  },
-  {
-    "id": "pp008",
-    "title": "Children's Privacy",
-    "description": "Our Service is designed for a general audience and is not directed knowingly to children under the age of 13. We do not knowingly collect personal information from children under 13. If you believe we have inadvertently collected information from a minor, please contact us immediately so we can remove it.",
-    "pointList": []
-  },
-  {
-    "id": "pp009",
-    "title": "Changes to This Privacy Policy",
-    "description": "We may update this Privacy Policy from time to time to reflect changes in our practices, technology, or legal requirements. We will notify you of any material updates by revising the \"Last Updated\" date at the top of this policy. We encourage you to review this Privacy Policy periodically.",
-    "pointList": []
-  },
-  {
-    "id": "pp010",
-    "title": "Contact Us",
-    "description": "If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact the Pittsburgh Buddhist Center at:",
-    "pointList": [
-      "Organization: Pittsburgh Buddhist Center",
-      "Email: info@pittsburghbuddhistcenter.org",
-      "Address: 58 Qsi lane, Allison Park PA 15101"
-    ]
-  }
-]
+{
+  "lastUpdated": "November 22, 2026",
+  "policyItemList": [
+    {
+      "id": "pp001",
+      "title": "Information We Collect",
+      "description": "We collect information that you provide directly to us when you register for an account, interact with events, or communicate with us.",
+      "pointList": [
+        "Google Account Authentication (\"Sign in with Google\"): When you choose to sign in using Google, we collect your Google account ID and email address to authenticate your identity and create your account.",
+        "Profile Information: If you choose to provide them, we may collect your first name, last name, phone number, and physical address to manage your profile and facilitate community engagement.",
+        "Communications & Interaction Data: We collect inquiries, questions, and feedback submitted through our web-app or mobile apps, as well as event registration details.",
+        "Automatically Collected Technical Data: When you access our Service, our servers automatically record information that your browser or mobile device sends, including your Internet Protocol (IP) address, browser type, device type, operating system, access times, and pages viewed."
+      ]
+    },
+    {
+      "id": "pp002",
+      "title": "How We Use Your Information",
+      "description": "We use the information we collect for various purposes to support the Pittsburgh Buddhist Center community, including:",
+      "pointList": [
+        "Account Management & Authentication: To verify your identity via Google sign-in, maintain your user profile, and secure your account.",
+        "Core Service Delivery: To manage community events, publish news and announcements, and respond to your questions or support requests.",
+        "Communication: To send you important administrative notices, updates regarding events, and responses to your inquiries.",
+        "Service Improvement: To analyze usage patterns, troubleshoot technical issues, and improve the functionality and security of our web and mobile applications."
+      ]
+    },
+    {
+      "id": "pp003",
+      "title": "Data Sharing and Disclosure",
+      "description": "We do not sell, trade, rent, or otherwise share your personal information with any third parties or third-party tools. Your data remains strictly confidential within the Pittsburgh Buddhist Center. We may disclose your information only under the following limited circumstances:",
+      "pointList": [
+        "Legal Compliance: If required to do so by law or in response to valid requests by public authorities (e.g., a court or government agency).",
+        "Protection of Rights: To protect and defend the rights, property, or safety of the Pittsburgh Buddhist Center, our users, or others.",
+        "Service Providers (Infrastructure Only): We utilize secure hosting and infrastructure services (such as cloud database and server providers) strictly to operate the application. These providers are bound by strict confidentiality obligations and are prohibited from accessing or using your personal data for any other purpose."
+      ]
+    },
+    {
+      "id": "pp004",
+      "title": "Mobile Applications (Android and iOS)",
+      "description": "In anticipation of our future Android and iOS mobile applications, this Privacy Policy applies equally to mobile access.",
+      "pointList": [
+        "Permissions: Our mobile apps may request standard device permissions (such as internet access or notifications) solely to deliver core features like event alerts and news updates.",
+        "Data Synchronization: Your account data remains synchronized securely between the web application and mobile applications using encrypted protocols. No additional tracking or advertising frameworks are integrated into our mobile apps."
+      ]
+    },
+    {
+      "id": "pp005",
+      "title": "Data Security",
+      "description": "We implement appropriate technical and organizational security measures designed to protect your personal information from unauthorized access, accidental loss, alteration, or disclosure. However, please note that no method of transmission over the internet or electronic storage is 100% secure, and we cannot guarantee absolute security.",
+      "pointList": []
+    },
+    {
+      "id": "pp006",
+      "title": "Data Retention",
+      "description": "We retain your personal information only for as long as is necessary to fulfill the purposes outlined in this Privacy Policy, maintain your account, or comply with our legal obligations. You may request the deletion of your account and associated personal data at any time by contacting us.",
+      "pointList": []
+    },
+    {
+      "id": "pp007",
+      "title": "Your Rights and Choices",
+      "description": "You have the right to:",
+      "pointList": [
+        "Access and Update: View and update your profile information directly through your account settings.",
+        "Account Deletion: Request the deactivation or permanent deletion of your account and associated personal data.",
+        "Opt-Out: Revoke Google sign-in access at any time through your Google Account security settings."
+      ]
+    },
+    {
+      "id": "pp008",
+      "title": "Children's Privacy",
+      "description": "Our Service is designed for a general audience and is not directed knowingly to children under the age of 13. We do not knowingly collect personal information from children under 13. If you believe we have inadvertently collected information from a minor, please contact us immediately so we can remove it.",
+      "pointList": []
+    },
+    {
+      "id": "pp009",
+      "title": "Changes to This Privacy Policy",
+      "description": "We may update this Privacy Policy from time to time to reflect changes in our practices, technology, or legal requirements. We will notify you of any material updates by revising the \"Last Updated\" date at the top of this policy. We encourage you to review this Privacy Policy periodically.",
+      "pointList": []
+    },
+    {
+      "id": "pp010",
+      "title": "Contact Us",
+      "description": "If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact the Pittsburgh Buddhist Center at:",
+      "pointList": [
+        "Organization: Pittsburgh Buddhist Center",
+        "Email: info@pittsburghbuddhistcenter.org",
+        "Address: 58 Qsi lane, Allison Park PA 15101"
+      ]
+    }
+  ]
+}

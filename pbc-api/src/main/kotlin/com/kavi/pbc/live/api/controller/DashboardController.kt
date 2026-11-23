@@ -7,6 +7,7 @@ import com.kavi.pbc.live.data.model.DailyQuote
 import com.kavi.pbc.live.data.model.event.Event
 import com.kavi.pbc.live.data.model.news.News
 import com.kavi.pbc.live.data.model.privacy.PolicyItem
+import com.kavi.pbc.live.data.model.privacy.PrivacyPolicy
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -54,7 +55,7 @@ class DashboardController(private val dashboardService: DashboardService) {
     }
 
     @GetMapping("/get/privacy/policy")
-    fun getDashboardPrivacyPolicy(): ResponseEntity<BaseResponse<List<PolicyItem>>>? {
+    fun getDashboardPrivacyPolicy(): ResponseEntity<BaseResponse<PrivacyPolicy>>? {
         logger.printSeparator()
         logger.printInfo("REQUEST MAPPING: GET: [/dashboard/get/privacy/policy]", DashboardController::class.java)
 
