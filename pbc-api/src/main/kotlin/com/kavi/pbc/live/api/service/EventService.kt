@@ -349,25 +349,28 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
             // --- 2. POTLUCK WRITE ---
             if (event.potluckAvailable) {
                 if (existingPotluck != null) {
-                    val updatedEventPotluck = existingPotluck.copy()
+                    val givenList = event.potluckItemList
+                    // Compare and Dropping
+                    val existingById = existingPotluck.potluckItemList.associateBy { it.itemId }
 
-                    event.potluckItemList?.let { givenPotluckItemList ->
-                        if (givenPotluckItemList.size > existingPotluck.potluckItemList.size) {
-                            givenPotluckItemList.forEach { potluckItem ->
-                                if (existingPotluck.potluckItemList.none { it.itemId == potluckItem.itemId }) {
-                                    updatedEventPotluck.potluckItemList.add(
-                                        EventPotluckItem(potluckItem.itemId, potluckItem.itemName, potluckItem.itemCount)
-                                    )
-                                }
-                            }
-                        } else if (givenPotluckItemList.size < existingPotluck.potluckItemList.size) {
-                            existingPotluck.potluckItemList.forEach { selectedEventPotluckItem ->
-                                if (givenPotluckItemList.none { it.itemId == selectedEventPotluckItem.itemId }) {
-                                    updatedEventPotluck.potluckItemList.remove(selectedEventPotluckItem)
-                                }
-                            }
+                    val mergedItems = givenList?.map { given ->
+                        val existing = existingById[given.itemId]
+                        if (existing != null) {
+                            // Modified item: take new name/count, keep contributors
+                            EventPotluckItem(
+                                itemId = existing.itemId,
+                                itemName = given.itemName,
+                                availableCount = given.itemCount,
+                                contributorList = existing.contributorList
+                            )
+                        } else {
+                            // New item
+                            EventPotluckItem(given.itemId, given.itemName, given.itemCount)
                         }
-                    }
+                    }?.toMutableList() ?: existingPotluck.potluckItemList.toMutableList()
+
+                    val updatedEventPotluck = existingPotluck.copy(potluckItemList = mergedItems)
+
                     datastoreRepositoryContract.updateEntityTx(
                         transaction, DatastoreConstant.EVENT_POTLUCK_COLLECTION, updatedEventPotluck.id, updatedEventPotluck
                     )
@@ -388,25 +391,31 @@ class EventService @Autowired constructor(appProperties: AppProperties) {
             // --- 3. SIGN UP SHEET WRITE ---
             if (event.signUpSheetAvailable) {
                 if (existingSignUpSheets != null) {
-                    val updatedEventSignUpSheets = existingSignUpSheets.copy()
+                    val givenList = event.signUpSheetList
+                    // Compare and Dropping
+                    val existingById = existingSignUpSheets.signUpSheetItemList.associateBy { it.sheetId }
 
-                    event.signUpSheetList?.let { givenSignUpSheets ->
-                        if (givenSignUpSheets.size > existingSignUpSheets.signUpSheetItemList.size) {
-                            givenSignUpSheets.forEach { signUpSheetItem ->
-                                if (existingSignUpSheets.signUpSheetItemList.none { it.sheetId == signUpSheetItem.sheetId }) {
-                                    updatedEventSignUpSheets.signUpSheetItemList.add(
-                                        EventSignUpSheet(signUpSheetItem.sheetId, signUpSheetItem.sheetName, signUpSheetItem.sheetDescription, signUpSheetItem.availableCount, signUpSheetItem.allowMultiSignUps)
-                                    )
-                                }
-                            }
-                        } else if (givenSignUpSheets.size < existingSignUpSheets.signUpSheetItemList.size) {
-                            existingSignUpSheets.signUpSheetItemList.forEach { selectedSignUpSheetItem ->
-                                if (givenSignUpSheets.none { it.sheetId == selectedSignUpSheetItem.sheetId }) {
-                                    updatedEventSignUpSheets.signUpSheetItemList.remove(selectedSignUpSheetItem)
-                                }
-                            }
+                    val mergedSheets = givenList?.map { given ->
+                        val existing = existingById[given.sheetId]
+                        if (existing != null) {
+                            EventSignUpSheet(
+                                sheetId = existing.sheetId,
+                                sheetName = given.sheetName,
+                                sheetDescription = given.sheetDescription,
+                                availableCount = given.availableCount,
+                                allowMultiSignUps = given.allowMultiSignUps,
+                                contributorList = existing.contributorList
+                            )
+                        } else {
+                            EventSignUpSheet(
+                                given.sheetId, given.sheetName, given.sheetDescription,
+                                given.availableCount, given.allowMultiSignUps
+                            )
                         }
-                    }
+                    }?.toMutableList() ?: existingSignUpSheets.signUpSheetItemList.toMutableList()
+
+                    val updatedEventSignUpSheets = existingSignUpSheets.copy(signUpSheetItemList = mergedSheets)
+
                     datastoreRepositoryContract.updateEntityTx(
                         transaction, DatastoreConstant.EVENT_SIGN_UP_SHEET_COLLECTION, updatedEventSignUpSheets.id, updatedEventSignUpSheets
                     )
